@@ -105,7 +105,7 @@ class VlrMatch:
 
 def _session() -> requests.Session:
     s = requests.Session()
-    s.headers.update({"User-Agent": "Velo/1.0 (dataset sync)"})
+    s.headers.update({"User-Agent": "Velo.gg/1.0 (dataset sync)"})
     return s
 
 

@@ -14,13 +14,13 @@ function About() {
     return (
         <div className="home about-page">
             <header className="text-content">
-                <p className="section-eyebrow">About Velo</p>
+                <p className="section-eyebrow">About Velo.gg</p>
                 <h1>About</h1>
             </header>
 
             <div className="about">
                 <p>
-                    Velo predicts VCT match and map winners using a margin-aware Elo model plus a
+                    Velo.gg predicts VCT match and map winners using a margin-aware Elo model plus a
                     small residual (international Elo, map pool, trusted H2H) trained on
                     pro match outcomes — rolling Elo, recent win rates, and map history.
                     Map predictions cover the current competitive pool plus standard maps (including Summit).

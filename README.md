@@ -1,6 +1,6 @@
-# Velo
+# Velo.gg
 
-**Velo** is Elo-backed Valorant Champions Tour match forecasting — pick any two pro teams, get a winner call, per-map breakdowns, stat comparisons, roster intel, and a live upcoming VCT schedule.
+**Velo.gg** is Elo-backed Valorant Champions Tour match forecasting — pick any two pro teams, get a winner call, per-map breakdowns, stat comparisons, roster intel, and a live upcoming VCT schedule.
 
 [![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=white)](https://react.dev/)
 [![Flask](https://img.shields.io/badge/Flask-3-000000?logo=flask&logoColor=white)](https://flask.palletsprojects.com/)
@@ -8,7 +8,7 @@
 [![Accuracy](https://img.shields.io/badge/Holdout~63.2%25-time--ordered-2ea44f)](./README.md#model-accuracy)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 
-Velo is based on [terrdv/VCT-Match-Predictor](https://github.com/terrdv/VCT-Match-Predictor), extended with a Kaggle data pipeline, VLR live sync, 2021–2026 seasons, point-in-time features, Elo-anchored match modeling, map-level models, and a full UI redesign.
+Velo.gg is based on [terrdv/VCT-Match-Predictor](https://github.com/terrdv/VCT-Match-Predictor), extended with a Kaggle data pipeline, VLR live sync, 2021–2026 seasons, point-in-time features, Elo-anchored match modeling, map-level models, and a full UI redesign.
 
 | Snapshot | |
 |---|---|
@@ -268,7 +268,7 @@ Default: **`--min-year 2021`** with pro-tournament filtering (Champions, Masters
 
 ## License & credits
 
-- **Product:** Velo
+- **Product:** Velo.gg
 - **License:** [MIT](./LICENSE)
 - **Dataset:** MIT (Kaggle)
 - **Author:** [maharshinath](https://github.com/maharshinath)

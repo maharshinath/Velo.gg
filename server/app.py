@@ -195,7 +195,7 @@ def spa_or_api_root(path: str):
     if path in ("", "/"):
         return {
             "status": "ok",
-            "message": "Velo API",
+            "message": "Velo.gg API",
             "endpoints": [
                 "/api/health",
                 "/api/teams",

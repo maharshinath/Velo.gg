@@ -61,7 +61,7 @@ function MakePrediction() {
         <div className="home make-prediction">
             <header className="text-content">
                 <p className="section-eyebrow">Valorant Champions Tour</p>
-                <h1>Velo</h1>
+                <h1>Velo.gg</h1>
                 <p className="hero-tagline">Call the match. Elo-backed VCT winner and map breakdowns.</p>
             </header>
 

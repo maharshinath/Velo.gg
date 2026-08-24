@@ -1,6 +1,6 @@
 # Client (React + Vite)
 
-Frontend for **Velo**. Full pipeline, model, and API docs live in the root [README](../README.md).
+Frontend for **Velo.gg**. Full pipeline, model, and API docs live in the root [README](../README.md).
 
 | Snapshot (Aug 2026) | |
 |---|---|

@@ -8,7 +8,7 @@ function NavBar() {
   return (
     <nav className="navbar glass">
       <div className="app-name">
-        <NavLink to="/" end>Velo</NavLink>
+        <NavLink to="/" end>Velo.gg</NavLink>
       </div>
       <div className="right">
         <NavLink to="/" end className={linkClass}>Home</NavLink>

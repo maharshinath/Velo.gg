@@ -97,7 +97,7 @@ function Home() {
         ) : (
             <div className="home">
                 <div className="text-content">
-                    <h1>Velo</h1>
+                    <h1>Velo.gg</h1>
                     <p>Call VCT matches with a margin-aware Elo model.</p>
                     <Matchup team1={match[0]} team2={match[1]} />
                     <div className="buttons">

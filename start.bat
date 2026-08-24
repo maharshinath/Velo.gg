@@ -1,5 +1,5 @@
 @echo off
-title Velo
+title Velo.gg
 cd /d "%~dp0"
 echo Launching backend and frontend in separate windows...
 start "VCT API" cmd /k "%~dp0start-backend.bat"

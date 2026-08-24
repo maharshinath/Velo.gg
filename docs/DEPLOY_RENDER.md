@@ -1,6 +1,6 @@
-# Deploy Velo on Render
+# Deploy Velo.gg on Render
 
-Product name: **Velo**. Repo slug: [maharshinath/VCT-Match-Predictor](https://github.com/maharshinath/VCT-Match-Predictor).  
+Product name: **Velo.gg**. Repo slug: [maharshinath/VCT-Match-Predictor](https://github.com/maharshinath/VCT-Match-Predictor).  
 Connect Render to the **maharshinath** GitHub account.
 
 Current shipped snapshot (also in the root README):

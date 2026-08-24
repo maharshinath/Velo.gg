@@ -1,5 +1,5 @@
 @echo off
-title Velo - App
+title Velo.gg - App
 cd /d "%~dp0client"
 echo Starting app on http://localhost:5173
 echo.
