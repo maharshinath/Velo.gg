@@ -112,8 +112,8 @@ Raw Kaggle files (~79 MB) are not committed. Download into `server/data/kaggle/`
 ### Install
 
 ```bash
-git clone https://github.com/maharshinath/VCT-Match-Predictor.git
-cd VCT-Match-Predictor
+git clone https://github.com/maharshinath/Velo.gg.git
+cd Velo.gg
 
 cd server && pip install -r requirements.txt
 cd ../client && npm install
@@ -186,7 +186,7 @@ Base URL: `http://127.0.0.1:5001/api`
 ## Project structure
 
 ```
-VCT-Match-Predictor/
+Velo.gg/
 ├── client/
 │   ├── src/
 │   │   ├── pages/              # MakePrediction, PredictionPage, About, Compare

@@ -1,6 +1,6 @@
 # Deploy Velo.gg on Render
 
-Product name: **Velo.gg**. Repo slug: [maharshinath/VCT-Match-Predictor](https://github.com/maharshinath/VCT-Match-Predictor).  
+Product: **Velo.gg**. Repo: [maharshinath/Velo.gg](https://github.com/maharshinath/Velo.gg).  
 Connect Render to the **maharshinath** GitHub account.
 
 Current shipped snapshot (also in the root README):
@@ -22,7 +22,7 @@ After you sync/retrain locally, **commit `models/rf.pkl`, CSVs, and `model_metri
 ## Steps (Dashboard)
 
 1. Create / log into [Render](https://render.com) and connect the **maharshinath** GitHub account.
-2. **New → Blueprint** → pick `maharshinath/VCT-Match-Predictor` (reads `render.yaml`).
+2. **New → Blueprint** → pick `maharshinath/Velo.gg` (reads `render.yaml`).
 3. When prompted for `VITE_API_ORIGIN` on the static site, set it to your API URL **without a trailing slash**, e.g.  
    `https://vct-match-predictor-api.onrender.com`  
    (use the exact hostname Render assigns after the API service is created — you can create the API first, then set this and redeploy the static site).
