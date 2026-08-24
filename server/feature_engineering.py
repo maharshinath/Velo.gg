@@ -47,6 +47,15 @@ PLAYER_STAT_COLUMN_FALLBACKS: dict[str, tuple[str, ...]] = {
     "Average First Kills": ("First Kills", "First Kills Per Round"),
 }
 
+PLAYER_STAT_LOAD_COLUMNS = [
+    "Tournament",
+    "Stage",
+    "Match Type",
+    "Teams",
+    *PLAYER_STAT_SOURCE_COLUMNS.values(),
+    "First Kills Per Round",
+]
+
 DEFAULT_PLAYER_STATS = {
     "K/D Ratio": 1.0,
     "Average Damage": 130.0,
@@ -136,7 +145,7 @@ class MatchFeatureTracker:
         self._player_history: dict[str, list[dict[str, float]]] = defaultdict(list)
         self._elo: dict[str, float] = defaultdict(lambda: ELO_INITIAL)
         self._international_elo: dict[str, float] = defaultdict(lambda: ELO_INITIAL)
-        self._player_stats_index: dict[tuple, pd.DataFrame] = {}
+        self._player_stats_index: dict[tuple, dict[str, float] | pd.DataFrame] = {}
         self._player_bucket_consumed: set[tuple] = set()
         self._map_stats: dict[tuple[str, str], dict[str, int]] = defaultdict(
             lambda: {"wins": 0, "played": 0}
@@ -144,12 +153,24 @@ class MatchFeatureTracker:
         self._map_scores_index: dict[tuple, pd.DataFrame] = {}
 
     def index_player_stats(self, player_stats: pd.DataFrame) -> None:
-        stats = player_stats.copy()
-        stats["Teams"] = stats["Teams"].astype(str).str.strip()
-        grouped: dict[tuple, pd.DataFrame] = {}
+        if player_stats is None or player_stats.empty:
+            self._player_stats_index = {}
+            return
+        stats = player_stats
+        if "Teams" in stats.columns:
+            stats["Teams"] = stats["Teams"].astype(str).str.strip()
+        grouped: dict[tuple, dict[str, float]] = {}
         for keys, group in stats.groupby(["Tournament", "Stage", "Match Type", "Teams"], sort=False):
-            grouped[keys] = group
+            snap = aggregate_player_rows(group)
+            if snap:
+                grouped[keys] = snap
         self._player_stats_index = grouped
+
+    def release_replay_indexes(self) -> None:
+        """Drop per-match lookup tables after history replay (live API only needs rolling state)."""
+        self._player_stats_index = {}
+        self._map_scores_index = {}
+        self._player_bucket_consumed = set()
 
     def index_map_scores(self, map_scores: pd.DataFrame | None) -> None:
         self._map_scores_index = {}
@@ -237,10 +258,12 @@ class MatchFeatureTracker:
         team: str,
     ) -> dict[str, float] | None:
         key = (tournament, stage, match_type, team)
-        rows = self._player_stats_index.get(key)
-        if rows is None:
+        snap = self._player_stats_index.get(key)
+        if snap is None:
             return None
-        return aggregate_player_rows(rows)
+        if isinstance(snap, pd.DataFrame):
+            return aggregate_player_rows(snap)
+        return snap
 
     def _roster_stability(self, team: str) -> float:
         ratings = [
@@ -463,6 +486,7 @@ def build_live_feature_tracker(
             score_b=score_b,
         )
     tracker.flush_pending_player_stats()
+    tracker.release_replay_indexes()
     return tracker
 
 

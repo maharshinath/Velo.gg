@@ -8,10 +8,9 @@ SERVER_DIR = os.path.join(BASE_DIR, "..")
 if SERVER_DIR not in sys.path:
     sys.path.insert(0, SERVER_DIR)
 
-from feature_engineering import build_live_feature_tracker
+from feature_engineering import PLAYER_STAT_LOAD_COLUMNS, build_live_feature_tracker
 from model_training import add_engineered_features, load_model_bundle
 from map_predictions import MapPredictor
-from odds_vlr import fetch_match_odds
 from prediction_extras import (
     build_betting_insight,
     build_key_factors,
@@ -25,28 +24,40 @@ from prediction_extras import (
 
 class RandomForestPredictor:
     def __init__(self):
+        import gc
+
         model_path = os.path.join(BASE_DIR, "rf.pkl")
-        self.rf_model, self.feature_cols = load_model_bundle(model_path)
         self.team_data = pd.read_csv(os.path.join(BASE_DIR, "../csv/team_data.csv"))
         self.match_data = pd.read_csv(os.path.join(BASE_DIR, "../csv/scores.csv"))
-        player_stats_path = os.path.join(BASE_DIR, "../csv/player_stats_merged.csv")
-        if os.path.exists(player_stats_path):
-            self.player_stats = pd.read_csv(player_stats_path)
-        else:
-            vlr_path = os.path.join(BASE_DIR, "../data/vlr_player_stats.csv")
-            self.player_stats = pd.read_csv(vlr_path) if os.path.exists(vlr_path) else pd.DataFrame()
+        player_stats = self._load_player_stats()
         self.feature_tracker = build_live_feature_tracker(
             self.match_data,
-            self.player_stats,
+            player_stats,
             regions={
                 str(team): str(region)
                 for team, region in zip(self.team_data["Team"], self.team_data.get("Region", []))
                 if pd.notna(region) and str(region).strip()
             },
+            map_scores=pd.DataFrame(),
         )
+        del player_stats
+        gc.collect()
+        self.rf_model, self.feature_cols = load_model_bundle(model_path)
         self.map_predictor = MapPredictor()
         self.recent_form = compute_recent_form(self.match_data)
         self.agent_diversity = compute_agent_diversity()
+        gc.collect()
+
+    @staticmethod
+    def _load_player_stats() -> pd.DataFrame:
+        merged = os.path.join(BASE_DIR, "../csv/player_stats_merged.csv")
+        vlr = os.path.join(BASE_DIR, "../data/vlr_player_stats.csv")
+        path = merged if os.path.exists(merged) else vlr
+        if not os.path.exists(path):
+            return pd.DataFrame()
+        header = pd.read_csv(path, nrows=0)
+        usecols = [c for c in PLAYER_STAT_LOAD_COLUMNS if c in header.columns]
+        return pd.read_csv(path, usecols=usecols)
 
     def get_winrate_team1(self, team1, team2):
         """Rolling head-to-head win rate for team1 vs team2 (last N meetings)."""
@@ -101,6 +112,8 @@ class RandomForestPredictor:
         odds = None
         if include_odds:
             try:
+                from odds_vlr import fetch_match_odds
+
                 odds = fetch_match_odds(team1, team2)
             except Exception:
                 odds = None

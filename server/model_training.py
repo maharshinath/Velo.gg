@@ -6,9 +6,6 @@ from typing import Any
 
 import numpy as np
 import pandas as pd
-from sklearn.calibration import CalibratedClassifierCV
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import RandomizedSearchCV, train_test_split
 
 from feature_engineering import PLAYER_STAT_KEYS
 from vct_config import H2H_MIN_TRUST_MATCHES
@@ -202,7 +199,10 @@ def create_order_invariant_data(df: pd.DataFrame) -> pd.DataFrame:
 def load_model_bundle(path) -> tuple[Any, list[str]]:
     import joblib
 
-    loaded = joblib.load(path)
+    try:
+        loaded = joblib.load(path, mmap_mode="r")
+    except Exception:
+        loaded = joblib.load(path)
     if isinstance(loaded, dict) and "model" in loaded:
         return loaded["model"], list(loaded.get("feature_cols", FEATURE_COLS))
     return loaded, FEATURE_COLS
@@ -236,6 +236,7 @@ def _split_time_ordered(matches: pd.DataFrame, test_size: float) -> tuple[pd.Dat
 
 
 def _prepare_xy(matches: pd.DataFrame, time_ordered: bool, test_size: float, random_state: int):
+    from sklearn.model_selection import train_test_split
     if time_ordered:
         train_base, test_base = _split_time_ordered(matches, test_size)
         train_aug = create_order_invariant_data(train_base)
@@ -293,6 +294,9 @@ def _fit_lgbm(
     x_val: pd.DataFrame | None = None,
     y_val: pd.Series | None = None,
 ) -> tuple[Any, dict]:
+    from sklearn.calibration import CalibratedClassifierCV
+    from sklearn.model_selection import RandomizedSearchCV
+
     try:
         from lightgbm import LGBMClassifier  # noqa: F401
     except ImportError:
@@ -364,6 +368,7 @@ def _early_stopped_estimators(
 ) -> int:
     """Choose tree count via early stopping on late chrono slice or stratified holdout."""
     from lightgbm import early_stopping, log_evaluation
+    from sklearn.model_selection import train_test_split
 
     if x_val is not None and y_val is not None and len(x_val) >= 20:
         x_fit, y_fit, x_es, y_es = x_train, y_train, x_val, y_val
@@ -407,6 +412,9 @@ def _fit_rf(
     tune: bool,
     random_state: int,
 ) -> tuple[Any, dict]:
+    from sklearn.ensemble import RandomForestClassifier
+    from sklearn.model_selection import RandomizedSearchCV
+
     if tune:
         search = RandomizedSearchCV(
             RandomForestClassifier(random_state=random_state, n_jobs=-1),
@@ -657,6 +665,8 @@ def train_match_model(
     refit_full: bool = True,
 ) -> tuple[Any, dict]:
     """Train Elo (+ sparse residual only if it strictly beats pure Elo)."""
+    from sklearn.model_selection import train_test_split
+
     del tune, random_state  # unused; kept for call-site compatibility
     if time_ordered:
         train_base, test_base = _split_time_ordered(matches, test_size)
