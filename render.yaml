@@ -18,7 +18,6 @@ services:
   - type: web
     name: vct-match-predictor-web
     runtime: static
-    plan: free
     rootDir: client
     buildCommand: npm install && npm run build
     staticPublishPath: dist
