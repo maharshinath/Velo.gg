@@ -26,6 +26,12 @@ function About() {
                     Map predictions cover the current competitive pool plus standard maps (including Summit).
                 </p>
                 <p>
+                    Live app:{' '}
+                    <a href="https://velo-gg.onrender.com" target="_blank" rel="noopener noreferrer">
+                        https://velo-gg.onrender.com
+                    </a>
+                </p>
+                <p>
                     Dataset:{' '}
                     <a
                         href="https://www.kaggle.com/datasets/ryanluong1/valorant-champion-tour-2021-2023-data"

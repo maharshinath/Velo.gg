@@ -68,6 +68,7 @@ Match results and player stats refresh via VLR sync; map stats come from rebuilt
 | **Roaster** | Player rosters lazy-loaded from the VLR API when you open the tab |
 
 ### About
+- **Live app:** [https://velo-gg.onrender.com](https://velo-gg.onrender.com)
 - Dataset attribution and live model accuracy from `model_metrics.json`
 
 ---
