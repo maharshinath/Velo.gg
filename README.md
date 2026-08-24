@@ -9,8 +9,6 @@
 [![Accuracy](https://img.shields.io/badge/Holdout~63.2%25-time--ordered-2ea44f)](./README.md#model-accuracy)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 
-**Live app:** [https://velo-gg.onrender.com](https://velo-gg.onrender.com)
-
 Velo.gg is based on [terrdv/VCT-Match-Predictor](https://github.com/terrdv/VCT-Match-Predictor), extended with a Kaggle data pipeline, VLR live sync, 2021–2026 seasons, point-in-time features, Elo-anchored match modeling, map-level models, and a full UI redesign.
 
 | Snapshot | |
@@ -19,6 +17,17 @@ Velo.gg is based on [terrdv/VCT-Match-Predictor](https://github.com/terrdv/VCT-M
 | **Teams** | 90 |
 | **Model** | Elo + series-margin updates |
 | **Honest holdout** | ~63.2% (time-ordered) |
+
+---
+
+## Live
+
+| | URL |
+|---|---|
+| **App** | [https://velo-gg.onrender.com](https://velo-gg.onrender.com) |
+| **API** | [https://velo-gg-api.onrender.com/api](https://velo-gg-api.onrender.com/api) |
+
+The first request after idle time can be slow — Render’s free API sleeps when unused.
 
 ---
 
