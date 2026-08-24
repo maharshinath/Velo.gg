@@ -1,6 +1,6 @@
 # Client (React + Vite)
 
-Frontend for **VCT Match Predictor**. Full pipeline, model, and API docs live in the root [README](../README.md).
+Frontend for **Velo**. Full pipeline, model, and API docs live in the root [README](../README.md).
 
 | Snapshot (Aug 2026) | |
 |---|---|

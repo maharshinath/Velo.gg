@@ -97,8 +97,8 @@ function Home() {
         ) : (
             <div className="home">
                 <div className="text-content">
-                    <h1>VCT Match Predictor</h1>
-                    <p>Predict the outcome of VCT matches using machine learning</p>
+                    <h1>Velo</h1>
+                    <p>Call VCT matches with a margin-aware Elo model.</p>
                     <Matchup team1={match[0]} team2={match[1]} />
                     <div className="buttons">
                         <button onClick={clearMatch}>Clear Match</button>

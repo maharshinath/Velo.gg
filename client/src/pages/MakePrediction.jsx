@@ -61,8 +61,8 @@ function MakePrediction() {
         <div className="home make-prediction">
             <header className="text-content">
                 <p className="section-eyebrow">Valorant Champions Tour</p>
-                <h1>VCT Match Predictor</h1>
-                <p className="hero-tagline">Select two teams to generate a match winner and map breakdown.</p>
+                <h1>Velo</h1>
+                <p className="hero-tagline">Call the match. Elo-backed VCT winner and map breakdowns.</p>
             </header>
 
             {team1 !== '' && team2 !== '' && (

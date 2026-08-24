@@ -195,7 +195,7 @@ def spa_or_api_root(path: str):
     if path in ("", "/"):
         return {
             "status": "ok",
-            "message": "VCT Match Predictor API",
+            "message": "Velo API",
             "endpoints": [
                 "/api/health",
                 "/api/teams",
