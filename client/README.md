@@ -7,8 +7,9 @@ Frontend for **Velo.gg**. Full pipeline, model, and API docs live in the root [R
 | Dataset | **1,269** pro series · **90** teams · 2021–2026 |
 | Match model | Elo + series-margin K, gated sparse residual (**11** features when it ships) |
 | Honest holdout | **63.2%** time-ordered · **71.4%** when confidence ≥ 65% (~20% of games) |
-| App | http://localhost:5173 |
-| API | http://127.0.0.1:5001/api |
+| App (local) | http://localhost:5173 |
+| API (local) | http://127.0.0.1:5001/api |
+| **Live** | https://velo-gg.onrender.com |
 
 The About page loads accuracy live from `GET /api/meta` (`server/data/model_metrics.json`). Restart Flask after a retrain so `rf.pkl` and metrics stay in sync.
 

@@ -2,11 +2,14 @@
 
 **Velo.gg** is Elo-backed Valorant Champions Tour match forecasting — pick any two pro teams, get a winner call, per-map breakdowns, stat comparisons, roster intel, and a live upcoming VCT schedule.
 
+[![Live](https://img.shields.io/badge/Live-velo--gg.onrender.com-2ea44f)](https://velo-gg.onrender.com)
 [![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=white)](https://react.dev/)
 [![Flask](https://img.shields.io/badge/Flask-3-000000?logo=flask&logoColor=white)](https://flask.palletsprojects.com/)
 [![Model](https://img.shields.io/badge/Model-Elo%20%2B%20margin-F7931E?logo=scikit-learn&logoColor=white)](https://scikit-learn.org/)
 [![Accuracy](https://img.shields.io/badge/Holdout~63.2%25-time--ordered-2ea44f)](./README.md#model-accuracy)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
+
+**Live app:** [https://velo-gg.onrender.com](https://velo-gg.onrender.com)
 
 Velo.gg is based on [terrdv/VCT-Match-Predictor](https://github.com/terrdv/VCT-Match-Predictor), extended with a Kaggle data pipeline, VLR live sync, 2021–2026 seasons, point-in-time features, Elo-anchored match modeling, map-level models, and a full UI redesign.
 
@@ -148,14 +151,17 @@ npm run dev
 
 | Service | URL |
 |---------|-----|
-| App | http://localhost:5173 |
-| API | http://127.0.0.1:5001/api |
+| **Live app** | https://velo-gg.onrender.com |
+| App (local) | http://localhost:5173 |
+| API (local) | http://127.0.0.1:5001/api |
 
 Restart Flask after retraining so it loads the new `rf.pkl`.
 
 ### Deploy (Render)
 
 See [docs/DEPLOY_RENDER.md](docs/DEPLOY_RENDER.md) — Blueprint in `render.yaml` (API + static site).
+
+**Production:** [https://velo-gg.onrender.com](https://velo-gg.onrender.com)
 
 ### Tests
 
