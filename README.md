@@ -1,27 +1,27 @@
 # VCT Match Predictor
 
-**Data-driven Valorant Champions Tour match forecasting** — pick any two pro teams, get an Elo + form winner prediction, per-map breakdowns, stat comparisons, roster intel, and a live upcoming VCT schedule.
+**Data-driven Valorant Champions Tour match forecasting** — pick any two pro teams, get an Elo-based winner prediction, per-map breakdowns, stat comparisons, roster intel, and a live upcoming VCT schedule.
 
 [![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=white)](https://react.dev/)
 [![Flask](https://img.shields.io/badge/Flask-3-000000?logo=flask&logoColor=white)](https://flask.palletsprojects.com/)
-[![Model](https://img.shields.io/badge/Model-Elo%20%2B%20form-F7931E?logo=scikit-learn&logoColor=white)](https://scikit-learn.org/)
-[![Accuracy](https://img.shields.io/badge/Holdout~60.8%25-time--ordered-2ea44f)](./README.md#model-accuracy)
+[![Model](https://img.shields.io/badge/Model-Elo%20%2B%20margin-F7931E?logo=scikit-learn&logoColor=white)](https://scikit-learn.org/)
+[![Accuracy](https://img.shields.io/badge/Holdout~63.2%25-time--ordered-2ea44f)](./README.md#model-accuracy)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 
 Based on [terrdv/VCT-Match-Predictor](https://github.com/terrdv/VCT-Match-Predictor), extended with a Kaggle data pipeline, VLR live sync, 2021–2026 seasons, point-in-time features, Elo-anchored match modeling, map-level models, and a full UI redesign.
 
 | Snapshot | |
 |---|---|
-| **Matches** | 1,189 pro series |
-| **Teams** | 82 |
-| **Model** | Elo + recent form |
-| **Honest holdout** | ~60.8% (time-ordered) |
+| **Matches** | 1,269 pro series |
+| **Teams** | 90 |
+| **Model** | Elo + series-margin updates |
+| **Honest holdout** | ~63.2% (time-ordered) |
 
 ---
 
 ## What it does
 
-1. **Select two VCT teams** from **82** pro rosters with logos and region tags.
+1. **Select two VCT teams** from **90** pro rosters with logos and region tags.
 2. **Get a match winner prediction** with confidence tier (Likely · Slight edge · Toss-up), animated reveal, and a highlighted predicted winner strip.
 3. **Browse upcoming VCT 2026 games** on the home page (live + upcoming from VLR), then jump straight into a prediction.
 4. **Drill into detail tabs** — map-by-map win chances, head-to-head stats, full breakdown with key factors, and live rosters.
@@ -34,8 +34,8 @@ Shareable URLs: `/predict/Sentinels/Fnatic` (team names are URL-encoded automati
 
 | | |
 |---|---|
-| **Pro matches** | **1,189** |
-| **Teams** | **82** |
+| **Pro matches** | **1,269** |
+| **Teams** | **90** |
 | **Season span** | 2021 – **2026** |
 | **Latest events** | VCT 2026 Stage 2 (Americas / Pacific / China / EMEA), earlier Stage 1 + Masters |
 
@@ -80,19 +80,19 @@ python scripts/evaluate_model.py
 
 | Metric | Value | Meaning |
 |--------|------:|---------|
-| Time-ordered split | **60.8%** | Train on earlier matches, test on later ones (honest baseline) |
-| Deployed holdout | **60.8%** | Saved model evaluated on the same time-ordered holdout |
-| International events | **67.6%** | Time-ordered holdout on internationals only |
-| Regional VCT | **58.3%** | Time-ordered holdout on regional VCT events |
-| Walk-forward | **58.3%** | Rolling retrain accuracy across the timeline |
-| Random split | **59.1%** | Stratified shuffle (less realistic than time-ordered) |
+| Time-ordered split | **63.2%** | Train on earlier matches, test on later ones (honest baseline) |
+| Deployed holdout | **63.2%** | Saved model evaluated on the same time-ordered holdout |
+| International events | **64.9%** | Time-ordered holdout on internationals only |
+| Regional VCT | **61.3%** | Time-ordered holdout on regional VCT events |
+| Walk-forward | **59.2%** | Rolling retrain accuracy across the timeline |
+| Random split | **60.7%** | Stratified shuffle (less realistic than time-ordered) |
 
-> **Honest reading:** Prefer the **time-ordered** figure (**~61%**) over random-split numbers. Complex tree models on noisy features underperformed a simple Elo + recent-form blend on this dataset, so the deployed match model is Elo-anchored.
+> **Honest reading:** Prefer the **time-ordered** figure (**~63%**) over random-split numbers. Complex tree models on noisy features underperformed Elo on this dataset. The deployed match model stays Elo-anchored (a sparse residual is trained but only shipped when it beats pure Elo on holdout).
 
 | | |
 |---|---|
-| **Match model** | Elo-anchored classifier (team Elo + recent win rates), calibrated blend |
-| **Features (match)** | Team A/B Elo, Team A/B win rate (**4** columns at predict time) |
+| **Match model** | Elo-anchored classifier (team Elo with series-margin K scaling) |
+| **Features (match)** | Elo plus a gated sparse residual (**11** columns when residual ships) |
 | **Training data** | Point-in-time rolling features (no full-career leakage on H2H / form) |
 | **Map model** | Separate map win % from `map_team_stats.csv` / `map_h2h_stats.csv` |
 | **Extras** | Confidence labels, key factors, series simulation helpers |

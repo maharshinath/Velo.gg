@@ -1,12 +1,14 @@
-"""Upcoming (and live) VCT 2026 matches from VLR.gg for the homepage."""
+"""Upcoming (and live) VCT 2026 matches from VLR for the homepage."""
 
 from __future__ import annotations
 
+import re
 import time
 from datetime import datetime, timezone
 from typing import Any
 
 import requests
+from bs4 import BeautifulSoup
 
 from vlr_ingest import VLR_API, _get_with_retry, clean_team_display_name
 
@@ -24,7 +26,7 @@ def _session() -> requests.Session:
                 "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
                 "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
             ),
-            "Accept": "application/json",
+            "Accept": "application/json, text/html;q=0.9,*/*;q=0.8",
         }
     )
     return s
@@ -65,7 +67,7 @@ def _team_blob(raw: dict) -> dict[str, Any]:
     score_s = "" if score is None else str(score).strip()
     return {
         "name": name,
-        "score": score_s if score_s not in ("", "None") else None,
+        "score": score_s if score_s not in ("", "None", "–", "-") else None,
         "won": bool(raw["won"]) if raw.get("won") is not None else None,
         "logo": raw.get("logo"),
         "id": str(raw.get("id") or "") or None,
@@ -94,7 +96,6 @@ def _normalize(match: dict) -> dict[str, Any] | None:
         bucket = "upcoming"
     mid = str(match.get("id") or "")
     utc = _parse_utc(match)
-    # Drop completed spill / past scheduled if clearly completed status
     if utc and utc.year != _TARGET_YEAR and "2026" not in tournament:
         return None
     return {
@@ -105,9 +106,9 @@ def _normalize(match: dict) -> dict[str, Any] | None:
         "bucket": bucket,
         "event": match.get("event"),
         "tournament": tournament,
-        "utc": utc.isoformat() if utc else None,
+        "utc": utc.isoformat() if utc else match.get("utc_local"),
         "url": f"https://www.vlr.gg/{mid}" if mid else None,
-        "source": "matches",
+        "source": match.get("source") or "matches",
     }
 
 
@@ -129,6 +130,117 @@ def _fetch_api_list(session: requests.Session, path: str, params: dict | None = 
         return []
 
 
+def _parse_vlr_date_label(text: str) -> datetime | None:
+    # e.g. "Sat, August 22, 2026 Today"
+    cleaned = re.sub(r"\b(Today|Tomorrow)\b", "", text, flags=re.I).strip(" ,")
+    for fmt in ("%a, %B %d, %Y", "%B %d, %Y"):
+        try:
+            return datetime.strptime(cleaned, fmt)
+        except ValueError:
+            continue
+    return None
+
+
+def _parse_vlr_clock(text: str) -> tuple[int, int] | None:
+    m = re.match(r"^(\d{1,2}):(\d{2})\s*(AM|PM)$", (text or "").strip(), re.I)
+    if not m:
+        return None
+    hour = int(m.group(1))
+    minute = int(m.group(2))
+    ampm = m.group(3).upper()
+    if ampm == "AM":
+        if hour == 12:
+            hour = 0
+    elif hour != 12:
+        hour += 12
+    return hour, minute
+
+
+def _extract_tournament(event_el) -> tuple[str | None, str | None]:
+    if event_el is None:
+        return None, None
+    series_el = event_el.select_one(".match-item-event-series")
+    series = " ".join(series_el.get_text(" ", strip=True).split()) if series_el else None
+    full = " ".join(event_el.get_text(" ", strip=True).split())
+    tournament = full
+    if series and full.startswith(series):
+        tournament = full[len(series) :].strip(" ·|-")
+    return tournament or None, series
+
+
+def _fetch_vlrgg_upcoming(session: requests.Session) -> list[dict[str, Any]]:
+    """Scrape live/upcoming cards from vlr.gg/matches when the JSON API is down."""
+    resp = _get_with_retry(session, "https://www.vlr.gg/matches", timeout=_TIMEOUT, retries=2)
+    if resp is None or resp.status_code != 200:
+        return []
+
+    soup = BeautifulSoup(resp.text, "html.parser")
+    rows: list[dict[str, Any]] = []
+    current_date: datetime | None = None
+
+    for node in soup.select(".wf-label.mod-large, a.match-item"):
+        classes = node.get("class") or []
+        if "wf-label" in classes:
+            current_date = _parse_vlr_date_label(node.get_text(" ", strip=True))
+            continue
+
+        status_el = node.select_one(".ml-status")
+        status = status_el.get_text(strip=True) if status_el else "Upcoming"
+        status_u = status.upper()
+        if status_u in ("COMPLETED", "COMPLETE", "FINISHED"):
+            continue
+
+        href = node.get("href") or ""
+        mid_m = re.match(r"^/(\d+)/", href)
+        mid = mid_m.group(1) if mid_m else ""
+
+        team_blocks = node.select(".match-item-vs-team")
+        if len(team_blocks) < 2:
+            continue
+        teams: list[dict[str, Any]] = []
+        for block in team_blocks[:2]:
+            name_el = block.select_one(".text-of")
+            score_el = block.select_one(".match-item-vs-team-score")
+            name = clean_team_display_name(name_el.get_text(" ", strip=True) if name_el else "")
+            score_txt = score_el.get_text(strip=True) if score_el else ""
+            score = score_txt if score_txt.isdigit() else None
+            teams.append(
+                {
+                    "name": name,
+                    "score": score,
+                    "won": "mod-winner" in (block.get("class") or []),
+                }
+            )
+        if len(teams) != 2:
+            continue
+
+        tournament, series = _extract_tournament(node.select_one(".match-item-event"))
+        if not _is_vct_2026(tournament or ""):
+            continue
+
+        time_el = node.select_one(".match-item-time")
+        clock = _parse_vlr_clock(time_el.get_text(strip=True) if time_el else "")
+        utc_local = None
+        if current_date and clock:
+            utc_local = (
+                f"{current_date.year:04d}-{current_date.month:02d}-{current_date.day:02d}"
+                f"T{clock[0]:02d}:{clock[1]:02d}:00"
+            )
+
+        rows.append(
+            {
+                "id": mid,
+                "teams": teams,
+                "status": status,
+                "tournament": tournament,
+                "event": series,
+                "utc_local": utc_local,
+                "source": "vlrgg",
+            }
+        )
+    return rows
+
+
 def fetch_upcoming_matches() -> dict[str, Any]:
     """Live + upcoming VCT 2026 matches (no date='today' filter, no results)."""
     cache_key = "upcoming_vct_2026"
@@ -140,16 +252,32 @@ def fetch_upcoming_matches() -> dict[str, Any]:
     raw = _fetch_api_list(session, "matches")
     if not raw:
         raw = _fetch_api_list(session, "matches", {"status": "upcoming"})
+    source = "api"
 
     by_id: dict[str, dict[str, Any]] = {}
     for item in raw:
         if not isinstance(item, dict):
             continue
+        if "source" not in item:
+            item = {**item, "source": source}
         row = _normalize(item)
         if not row:
             continue
         key = row["id"] or f"{row['team1']['name']}::{row['team2']['name']}::{row.get('utc')}"
         by_id[key] = row
+
+    # orlandomm often 503s or returns non-VCT noise; scrape vlr.gg when empty.
+    if not by_id:
+        raw = _fetch_vlrgg_upcoming(session)
+        source = "vlrgg"
+        for item in raw:
+            if not isinstance(item, dict):
+                continue
+            row = _normalize(item)
+            if not row:
+                continue
+            key = row["id"] or f"{row['team1']['name']}::{row['team2']['name']}::{row.get('utc')}"
+            by_id[key] = row
 
     matches = list(by_id.values())
 
@@ -164,6 +292,7 @@ def fetch_upcoming_matches() -> dict[str, Any]:
         "fetched_at": datetime.now(timezone.utc).isoformat(),
         "count": len(matches),
         "matches": matches,
+        "source": source,
     }
     _CACHE[cache_key] = (time.time(), payload)
     return payload

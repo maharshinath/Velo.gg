@@ -64,6 +64,9 @@ class RandomForestPredictor:
         for col in df.columns:
             df[col] = pd.to_numeric(df[col], errors="coerce")
         df = add_engineered_features(df.fillna(0))
+        for col in self.feature_cols:
+            if col not in df.columns:
+                df[col] = 0.0
         return df[self.feature_cols].fillna(0)
 
     def _win_probability_team1(self, team1: str, team2: str) -> float:

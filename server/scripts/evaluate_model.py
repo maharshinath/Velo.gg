@@ -10,15 +10,15 @@ from pathlib import Path
 import pandas as pd
 from sklearn.metrics import accuracy_score
 
-from sklearn.model_selection import train_test_split
-
 SERVER_DIR = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(SERVER_DIR))
 
 from model_training import (  # noqa: E402
-    _fit_elo_anchored,
+    ELO_BASE_COLS,
+    MATCH_MODEL_SOURCE_COLS,
     load_model_bundle,
     probability_scores,
+    train_match_model,
     walk_forward_accuracy,
 )
 from tournament_utils import is_international_tournament  # noqa: E402
@@ -27,12 +27,11 @@ from vct_config import BETTING_CONFIDENCE_GATE  # noqa: E402
 METRICS_PATH = SERVER_DIR / "data" / "model_metrics.json"
 
 
-ELO_FEATURE_COLS = [
-    "Team A Elo",
-    "Team B Elo",
-    "Team A Winrate",
-    "Team B Winrate",
-]
+def _feature_cols_for(df: pd.DataFrame) -> list[str]:
+    cols = [c for c in MATCH_MODEL_SOURCE_COLS if c in df.columns]
+    if all(c in cols for c in ELO_BASE_COLS):
+        return cols
+    return [c for c in ELO_BASE_COLS if c in df.columns]
 
 
 def is_regional_vct(tournament: str) -> bool:
@@ -42,33 +41,46 @@ def is_regional_vct(tournament: str) -> bool:
 def _evaluate_random_split(df: pd.DataFrame, test_frac: float = 0.2) -> dict[str, float] | None:
     if len(df) < 20:
         return None
-    x = df[ELO_FEATURE_COLS]
+    model, report = train_match_model(
+        df, tune=False, test_size=test_frac, time_ordered=False, refit_full=False
+    )
+    # Approximate probability metrics on a fresh stratified holdout; accuracy from report.
+    from sklearn.model_selection import train_test_split
+
+    cols = list(report.get("feature_cols") or _feature_cols_for(df))
+    use_cols = [c for c in cols if c in df.columns]
+    x = df[use_cols]
     y = df["Team A Win"].astype(int)
-    x_train, x_test, y_train, y_test = train_test_split(
+    _, x_test, _, y_test = train_test_split(
         x, y, test_size=test_frac, random_state=42, stratify=y
     )
-    model, _ = _fit_elo_anchored(x_train, y_train, x_val=x_test, y_val=y_test)
-    return probability_scores(model, x_test, y_test)
+    try:
+        scores = probability_scores(model, x_test, y_test)
+    except Exception:
+        scores = {"accuracy": 0.0, "brier_score": float("nan"), "log_loss": float("nan")}
+    scores["accuracy"] = float(report["test_accuracy"]) / 100.0
+    return scores
 
 
 def _evaluate_segment(df: pd.DataFrame, test_frac: float = 0.2) -> dict[str, float] | None:
     if len(df) < 20:
         return None
+    model, report = train_match_model(
+        df, tune=False, test_size=test_frac, time_ordered=True, refit_full=False
+    )
     split = max(1, int(len(df) * (1 - test_frac)))
-    train_base = df.iloc[:split]
     test_base = df.iloc[split:]
-    if train_base.empty or test_base.empty:
+    if test_base.empty:
         return None
-    model, _ = _fit_elo_anchored(
-        train_base[ELO_FEATURE_COLS],
-        train_base["Team A Win"].astype(int),
-        x_val=test_base[ELO_FEATURE_COLS],
-        y_val=test_base["Team A Win"].astype(int),
-    )
+    cols = list(report.get("feature_cols") or getattr(model, "feature_cols", None) or _feature_cols_for(df))
+    use_cols = [c for c in cols if c in test_base.columns]
+    if not use_cols:
+        use_cols = _feature_cols_for(test_base)
     scores = probability_scores(
-        model, test_base[ELO_FEATURE_COLS], test_base["Team A Win"].astype(int)
+        model, test_base[use_cols], test_base["Team A Win"].astype(int)
     )
-    probs = model.predict_proba(test_base[ELO_FEATURE_COLS])[:, 1]
+    scores["accuracy"] = float(report["test_accuracy"]) / 100.0
+    probs = model.predict_proba(test_base[use_cols])[:, 1]
     y = test_base["Team A Win"].astype(int).to_numpy()
     scores["selective"] = _selective_accuracy(probs, y, BETTING_CONFIDENCE_GATE)
     return scores

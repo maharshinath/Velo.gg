@@ -302,6 +302,59 @@ def _match_pairs(match: dict) -> tuple[str, str] | None:
     return str(t0), str(t1)
 
 
+def _find_match_candidate_from_vlrgg(
+    session: requests.Session,
+    team1: str,
+    team2: str,
+) -> dict | None:
+    """Find a match URL by scraping vlr.gg match lists (API-independent)."""
+    for url in (
+        "https://www.vlr.gg/matches",
+        "https://www.vlr.gg/matches/?group=upcoming",
+        "https://www.vlr.gg/matches/results",
+    ):
+        try:
+            resp = _get_with_retry(
+                session,
+                url,
+                timeout=_ODDS_TIMEOUT,
+                retries=_ODDS_RETRIES,
+            )
+            if resp is None or resp.status_code != 200:
+                continue
+            soup = BeautifulSoup(resp.text, "html.parser")
+            for anchor in soup.select("a.match-item"):
+                team_blocks = anchor.select(".match-item-vs-team .text-of")
+                if len(team_blocks) < 2:
+                    continue
+                a = clean_team_display_name(team_blocks[0].get_text(" ", strip=True))
+                b = clean_team_display_name(team_blocks[1].get_text(" ", strip=True))
+                if not (
+                    (_names_match(a, team1) and _names_match(b, team2))
+                    or (_names_match(a, team2) and _names_match(b, team1))
+                ):
+                    continue
+                href = anchor.get("href") or ""
+                m = re.match(r"^/(\d+)/", href)
+                if not m:
+                    continue
+                mid = m.group(1)
+                status_el = anchor.select_one(".ml-status")
+                status = status_el.get_text(strip=True) if status_el else None
+                match_url = href if href.startswith("http") else f"https://www.vlr.gg{href}"
+                return {
+                    "match_id": mid,
+                    "url": match_url,
+                    "vlr_team_a": a,
+                    "vlr_team_b": b,
+                    "status": status,
+                }
+        except Exception:
+            continue
+        time.sleep(REQUEST_DELAY)
+    return None
+
+
 def _find_match_candidate(
     session: requests.Session,
     team1: str,
@@ -354,8 +407,8 @@ def _find_match_candidate(
                         "status": match.get("status"),
                     }
         time.sleep(REQUEST_DELAY)
-    return None
 
+    return _find_match_candidate_from_vlrgg(session, team1, team2)
 
 def fetch_match_odds(team1: str, team2: str) -> dict[str, Any] | None:
     """Return averaged decimal odds + per-bookie lines from VLR Betting module."""

@@ -32,9 +32,11 @@ from feature_engineering import (  # noqa: E402
 from model_training import (  # noqa: E402
     FEATURE_COLS,
     create_order_invariant_data,
+    evaluate_time_ordered_accuracy,
     save_model_bundle,
     train_match_model,
 )
+import vct_config  # noqa: E402
 
 CSV_DIR = SERVER_DIR / "csv"
 MODEL_DIR = SERVER_DIR / "models"
@@ -344,6 +346,22 @@ def build_match_features(
     return build_match_feature_rows(scores, player_stats, map_scores=map_scores)
 
 
+def _persist_elo_tuning(k: float, sweep: float, close: float) -> None:
+    """Write selected Elo K/margins into vct_config so live PIT Elo matches training."""
+    path = SERVER_DIR / "vct_config.py"
+    text = path.read_text(encoding="utf-8")
+    replacements = {
+        r"^ELO_K_FACTOR = .*$": f"ELO_K_FACTOR = {float(k)}",
+        r"^ELO_MARGIN_SWEEP = .*$": f"ELO_MARGIN_SWEEP = {float(sweep)}  # margin >= 2 maps",
+        r"^ELO_MARGIN_CLOSE = .*$": f"ELO_MARGIN_CLOSE = {float(close)}  # margin == 1",
+    }
+    for pattern, repl in replacements.items():
+        text, n = re.subn(pattern, repl, text, count=1, flags=re.M)
+        if n != 1:
+            print(f"Warning: could not persist Elo setting via pattern {pattern!r}", flush=True)
+    path.write_text(text, encoding="utf-8")
+
+
 def rebuild_pipeline(
     scores: pd.DataFrame,
     player_stats: pd.DataFrame,
@@ -364,8 +382,60 @@ def rebuild_pipeline(
 
     print("Building team_data.csv...", flush=True)
     team_data = build_team_data(scores, player_stats)
-    print("Building filtered_matches.csv (point-in-time features)...", flush=True)
-    filtered_matches = build_match_features(scores, player_stats, map_scores=map_scores)
+
+    elo_tune: dict | None = None
+    if tune:
+        print("Grid-searching Elo K / margin on time-ordered holdout...", flush=True)
+        k_grid = [24.0, 32.0, 40.0]
+        margin_grid = [
+            (1.25, 0.85),
+            (1.10, 0.95),
+            (1.15, 0.90),
+        ]
+        best_acc = -1.0
+        best_k = float(vct_config.ELO_K_FACTOR)
+        best_sweep = float(vct_config.ELO_MARGIN_SWEEP)
+        best_close = float(vct_config.ELO_MARGIN_CLOSE)
+        best_matches: pd.DataFrame | None = None
+        for k in k_grid:
+            for sweep, close in margin_grid:
+                vct_config.ELO_K_FACTOR = float(k)
+                vct_config.ELO_MARGIN_SWEEP = float(sweep)
+                vct_config.ELO_MARGIN_CLOSE = float(close)
+                candidate = build_match_features(scores, player_stats, map_scores=map_scores)
+                acc = evaluate_time_ordered_accuracy(candidate)
+                print(
+                    f"  K={k:g} sweep={sweep} close={close} -> Elo holdout {acc * 100:.1f}%",
+                    flush=True,
+                )
+                if acc > best_acc:
+                    best_acc = acc
+                    best_k = float(k)
+                    best_sweep = float(sweep)
+                    best_close = float(close)
+                    best_matches = candidate
+        vct_config.ELO_K_FACTOR = best_k
+        vct_config.ELO_MARGIN_SWEEP = best_sweep
+        vct_config.ELO_MARGIN_CLOSE = best_close
+        filtered_matches = best_matches if best_matches is not None else build_match_features(
+            scores, player_stats, map_scores=map_scores
+        )
+        elo_tune = {
+            "elo_k": best_k,
+            "elo_margin_sweep": best_sweep,
+            "elo_margin_close": best_close,
+            "elo_grid_holdout_accuracy": round(best_acc * 100, 1),
+        }
+        print(
+            f"Selected Elo config: K={best_k:g} sweep={best_sweep} close={best_close} "
+            f"({best_acc * 100:.1f}% Elo holdout)",
+            flush=True,
+        )
+        _persist_elo_tuning(best_k, best_sweep, best_close)
+    else:
+        print("Building filtered_matches.csv (point-in-time features)...", flush=True)
+        filtered_matches = build_match_features(scores, player_stats, map_scores=map_scores)
+
     print("Training model (time-ordered split)...", flush=True)
 
     CSV_DIR.mkdir(parents=True, exist_ok=True)
@@ -375,20 +445,28 @@ def rebuild_pipeline(
     filtered_matches.to_csv(CSV_DIR / "filtered_matches.csv", index=False)
 
     model, report = train_match_model(filtered_matches, tune=tune, time_ordered=True)
+    if elo_tune:
+        report.setdefault("best_params", {})
+        if isinstance(report["best_params"], dict):
+            report["best_params"] = {**report["best_params"], **elo_tune}
     MODEL_DIR.mkdir(parents=True, exist_ok=True)
     save_model_bundle(
         MODEL_DIR / "rf.pkl",
         model,
         feature_cols=report.get("feature_cols"),
+        algorithm=str(report.get("algorithm") or "elo_anchored"),
         metrics={
             "holdout_test_accuracy": report["test_accuracy"],
             "train_accuracy": report["train_accuracy"],
+            "elo_test_accuracy": report.get("elo_test_accuracy"),
             "refit_full": report.get("refit_full", False),
             "algorithm": report.get("algorithm"),
+            "best_params": report.get("best_params"),
         },
     )
     print(f"Train accuracy: {report['train_accuracy']}%")
     print(f"Holdout test accuracy: {report['test_accuracy']}%")
+    print(f"Elo-only holdout: {report.get('elo_test_accuracy')}%")
     print(f"Best params: {report['best_params']}")
     print(f"Algorithm: {report.get('algorithm', 'unknown')}")
 

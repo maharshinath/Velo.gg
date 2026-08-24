@@ -11,9 +11,9 @@ import pandas as pd
 from context_features import enrich_context_features, roster_stability_from_ratings
 from map_features import enrich_map_features
 from tournament_utils import is_international_tournament, shrink_rate
+import vct_config
 from vct_config import (
     ELO_INITIAL,
-    ELO_K_FACTOR,
     H2H_MIN_TRUST_MATCHES,
     RECENT_H2H_MATCHES,
     RECENT_LAN_MATCHES,
@@ -111,9 +111,8 @@ def series_margin_factor(score_a: float | int | None, score_b: float | int | Non
     if margin <= 0:
         return 1.0
     if margin >= 2:
-        return 1.10
-    return 0.95
-
+        return float(vct_config.ELO_MARGIN_SWEEP)
+    return float(vct_config.ELO_MARGIN_CLOSE)
 
 @dataclass
 class MatchFeatureTracker:
@@ -309,7 +308,7 @@ class MatchFeatureTracker:
         elo_a = elo[team_a]
         elo_b = elo[team_b]
         expected_a = 1.0 / (1.0 + 10 ** ((elo_b - elo_a) / 400.0))
-        k = ELO_K_FACTOR * margin_factor
+        k = float(vct_config.ELO_K_FACTOR) * margin_factor
         elo[team_a] = elo_a + k * (score_a - expected_a)
         elo[team_b] = elo_b + k * ((1.0 - score_a) - (1.0 - expected_a))
 

@@ -20,7 +20,8 @@ function About() {
 
             <div className="about">
                 <p>
-                    This app predicts VCT match and map winners using a calibrated Elo + form model trained on
+                    This app predicts VCT match and map winners using a margin-aware Elo model plus a
+                    small residual (international Elo, map pool, trusted H2H) trained on
                     pro match outcomes — rolling Elo, recent win rates, and map history.
                     Map predictions cover the current competitive pool plus standard maps (including Summit).
                 </p>

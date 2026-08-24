@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import re
+import sys
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -20,6 +21,15 @@ INGESTED_IDS_PATH = SERVER_DIR / "data" / "vlr_ingested_match_ids.json"
 REQUEST_DELAY = 0.4
 API_TIMEOUT = 90
 API_RETRIES = 5
+
+
+def _safe_print(msg: str) -> None:
+    """Print without crashing on Windows consoles that cannot encode team names."""
+    try:
+        print(msg, flush=True)
+    except UnicodeEncodeError:
+        encoding = getattr(sys.stdout, "encoding", None) or "utf-8"
+        print(msg.encode(encoding, errors="replace").decode(encoding, errors="replace"), flush=True)
 
 TEAM_ALIASES = {
     "Mega Minors": "NRG",
@@ -107,15 +117,21 @@ def _get_with_retry(
     timeout: int = API_TIMEOUT,
     retries: int = API_RETRIES,
 ) -> requests.Response | None:
+    last_resp: requests.Response | None = None
     for attempt in range(retries):
         try:
             resp = session.get(url, params=params, timeout=timeout)
+            last_resp = resp
+            # Retry transient upstream failures (VLR mirror flaps with 503 often).
+            if resp.status_code in (429, 502, 503, 504) and attempt + 1 < retries:
+                time.sleep(REQUEST_DELAY * (attempt + 3))
+                continue
             return resp
         except (requests.exceptions.Timeout, requests.exceptions.ConnectionError):
             if attempt + 1 >= retries:
                 raise
             time.sleep(REQUEST_DELAY * (attempt + 2))
-    return None
+    return last_resp
 
 
 def normalize_team(name: str, canonical: set[str] | None = None) -> str:
@@ -162,6 +178,56 @@ def save_ingested_ids(ids: set[str]) -> None:
     )
 
 
+def fetch_pro_events_from_vlrgg(
+    session: requests.Session,
+    *,
+    statuses: tuple[str, ...] = ("completed", "ongoing"),
+) -> list[dict]:
+    """Fallback event discovery when the orlandomm events API is unavailable."""
+    resp = _get_with_retry(session, "https://www.vlr.gg/events")
+    if resp is None or resp.status_code != 200:
+        return []
+
+    soup = BeautifulSoup(resp.text, "html.parser")
+    events: list[dict] = []
+    seen: set[str] = set()
+    for anchor in soup.select('a[href*="/event/"]'):
+        href = anchor.get("href") or ""
+        m = re.search(r"/event/(\d+)", href)
+        if not m:
+            continue
+        eid = m.group(1)
+        if eid in seen:
+            continue
+        seen.add(eid)
+        text = " ".join(anchor.get_text(" ", strip=True).split())
+        status = "upcoming"
+        lowered = text.lower()
+        if "completed" in lowered:
+            status = "completed"
+        elif "ongoing" in lowered:
+            status = "ongoing"
+        elif "upcoming" in lowered or "paused" in lowered:
+            status = "upcoming"
+        if status not in statuses:
+            continue
+        # Prefer the event title from the slug when the card text is noisy.
+        slug_m = re.search(r"/event/\d+/([^/?#]+)", href)
+        raw_name = slug_m.group(1).replace("-", " ") if slug_m else text
+        # Prefer the leading title before status markers when available.
+        title = re.split(
+            r"\b(?:ongoing|completed|upcoming|paused)\b",
+            text,
+            maxsplit=1,
+            flags=re.I,
+        )[0].strip()
+        name = normalize_tournament(title or raw_name)
+        if not is_pro_event(name):
+            continue
+        events.append({"id": eid, "name": name, "status": status})
+    return events
+
+
 def fetch_pro_events(
     session: requests.Session,
     *,
@@ -172,15 +238,21 @@ def fetch_pro_events(
     allowed_ids = {str(eid) for eid in event_ids} if event_ids else None
     events: list[dict] = []
     seen: set[str] = set()
+    api_ok = True
     for page in range(1, max_pages + 1):
         resp = _get_with_retry(
             session,
             f"{VLR_API}/events",
             params={"page": page, "limit": 50},
         )
-        if resp is None:
+        if resp is None or resp.status_code >= 500:
+            api_ok = False
             break
-        resp.raise_for_status()
+        try:
+            resp.raise_for_status()
+        except requests.exceptions.HTTPError:
+            api_ok = False
+            break
         batch = resp.json().get("data") or []
         if not batch:
             break
@@ -207,6 +279,24 @@ def fetch_pro_events(
                 }
             )
         time.sleep(REQUEST_DELAY)
+
+    if not api_ok and not events:
+        print("VLR API events unavailable; falling back to vlr.gg events page...", flush=True)
+        scraped = fetch_pro_events_from_vlrgg(session, statuses=statuses)
+        if allowed_ids:
+            scraped = [e for e in scraped if e["id"] in allowed_ids]
+            # Preserve explicit event ids even if scrape missed them.
+            scraped_ids = {e["id"] for e in scraped}
+            for eid in allowed_ids:
+                if eid not in scraped_ids:
+                    scraped.append(
+                        {
+                            "id": eid,
+                            "name": f"VLR Event {eid}",
+                            "status": "ongoing",
+                        }
+                    )
+        return scraped
     return events
 
 
@@ -1105,9 +1195,8 @@ def fetch_new_vlr_data(
         ingested.add(mid)
         canonical.update({row["Team A"], row["Team B"]})
         if verbose:
-            print(
-                f"    Added {row['Team A']} {row['Team A Score']}-{row['Team B Score']} {row['Team B']}",
-                flush=True,
+            _safe_print(
+                f"    Added {row['Team A']} {row['Team A Score']}-{row['Team B Score']} {row['Team B']}"
             )
 
     save_ingested_ids(ingested)
