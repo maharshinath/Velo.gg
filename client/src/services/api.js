@@ -29,9 +29,22 @@ const parseTeamsPayload = (data) => {
 }
 
 export const getTeams = async () => {
-    const response = await fetch(`${BASE_URL}/teams`)
-    if (!response.ok) throw new Error(`Failed to load teams (${response.status})`)
-    return parseTeamsPayload(await response.json())
+    let lastError = null
+    for (let attempt = 0; attempt < 4; attempt++) {
+        const controller = new AbortController()
+        const timer = setTimeout(() => controller.abort(), 45000)
+        try {
+            const response = await fetch(`${BASE_URL}/teams`, { signal: controller.signal })
+            if (!response.ok) throw new Error(`Failed to load teams (${response.status})`)
+            return parseTeamsPayload(await response.json())
+        } catch (err) {
+            lastError = err
+            await new Promise((resolve) => setTimeout(resolve, 2500 * (attempt + 1)))
+        } finally {
+            clearTimeout(timer)
+        }
+    }
+    throw lastError
 }
 
 

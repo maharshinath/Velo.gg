@@ -25,7 +25,9 @@ function MakePrediction() {
                 setError(null)
             } catch (err) {
                 console.error(err)
-                setError('Could not load teams. Make sure the API is running.')
+                setError(
+                    'Could not load teams. The API may be waking up (Render free) or out of memory. Wait a minute and refresh.'
+                )
             } finally {
                 setLoading(false)
             }

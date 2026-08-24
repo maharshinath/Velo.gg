@@ -4,6 +4,7 @@ from pathlib import Path
 from flask import Flask, request, send_from_directory
 from flask_restful import Api, Resource
 from flask_cors import CORS
+import pandas as pd
 
 from roster import get_team_roster
 from vct_config import ALL_STANDARD_MAPS, COMP_POOL_MAPS
@@ -16,7 +17,17 @@ CORS(app)
 api = Api(app)
 
 _predictor = None
+_team_table = None
 METRICS_PATH = SERVER_DIR / "data" / "model_metrics.json"
+TEAM_DATA_PATH = SERVER_DIR / "csv" / "team_data.csv"
+
+
+def load_team_table():
+    """Team list for the UI — do not load sklearn/the model for this."""
+    global _team_table
+    if _team_table is None:
+        _team_table = pd.read_csv(TEAM_DATA_PATH)
+    return _team_table
 
 
 def get_predictor():
@@ -48,14 +59,14 @@ class TeamData(Resource):
     def get(self, team):
         if not team:
             return {"error": "Query Parameter Required"}
-        predictor = get_predictor()
-        rows = predictor.team_data[predictor.team_data["Team"] == team]
+        table = load_team_table()
+        rows = table[table["Team"] == team]
         return rows.to_dict(orient="records")
 
 
 class TeamsData(Resource):
     def get(self):
-        return get_predictor().team_data.to_dict(orient="records")
+        return load_team_table().to_dict(orient="records")
 
 
 class PredictorMatchup(Resource):
@@ -111,8 +122,8 @@ class TeamRoster(Resource):
     def get(self, team):
         if not team:
             return {"error": "Team name is required"}, 400
-        predictor = get_predictor()
-        rows = predictor.team_data[predictor.team_data["Team"] == team]
+        rows = load_team_table()
+        rows = rows[rows["Team"] == team]
         if rows.empty:
             return {"error": f"Team '{team}' not found"}, 404
         return get_team_roster(team), 200
@@ -136,7 +147,7 @@ class TodayMatches(Resource):
             try:
                 known = {
                     str(t).strip().lower()
-                    for t in get_predictor().team_data["Team"].astype(str)
+                    for t in load_team_table()["Team"].astype(str)
                 }
             except Exception:
                 known = set()
