@@ -1,4 +1,5 @@
 import json
+import threading
 from pathlib import Path
 
 from flask import Flask, request, send_from_directory
@@ -17,6 +18,7 @@ CORS(app)
 api = Api(app)
 
 _predictor = None
+_predictor_lock = threading.Lock()
 _team_table = None
 METRICS_PATH = SERVER_DIR / "data" / "model_metrics.json"
 TEAM_DATA_PATH = SERVER_DIR / "csv" / "team_data.csv"
@@ -31,15 +33,25 @@ def load_team_table():
 
 
 def get_predictor():
-    """Load sklearn/pandas only on first real request so boot stays under free-tier RAM."""
+    """Load sklearn/pandas once. Concurrent first requests used to each reload (~90s) and hang the UI."""
     global _predictor
-    if _predictor is None:
-        print("Loading model and dataset...", flush=True)
-        from models.RandomForestPredictor import RandomForestPredictor as Predictor
+    if _predictor is not None:
+        return _predictor
+    with _predictor_lock:
+        if _predictor is None:
+            print("Loading model and dataset...", flush=True)
+            from models.RandomForestPredictor import RandomForestPredictor as Predictor
 
-        _predictor = Predictor()
-        print("Model ready.", flush=True)
-    return _predictor
+            _predictor = Predictor()
+            print("Model ready.", flush=True)
+        return _predictor
+
+
+def _warm_predictor() -> None:
+    try:
+        get_predictor()
+    except Exception as exc:
+        print(f"Model warmup failed: {exc}", flush=True)
 
 
 def load_model_metrics() -> dict:
@@ -222,4 +234,5 @@ def spa_or_api_root(path: str):
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    threading.Thread(target=_warm_predictor, daemon=True, name="model-warmup").start()
+    app.run(debug=True, port=5001, use_reloader=False)

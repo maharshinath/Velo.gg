@@ -5,7 +5,7 @@ const BASE_URL = API_BASE
 
 export const getPrediction = async (team1, team2) => {
     const result = await fetch(
-        `${BASE_URL}/predict/${encodeURIComponent(team1)}/${encodeURIComponent(team2)}`
+        `${BASE_URL}/predict/${encodeURIComponent(team1)}/${encodeURIComponent(team2)}?odds=0`
     )
     if (!result.ok) throw new Error('Prediction failed')
     return await result.json()

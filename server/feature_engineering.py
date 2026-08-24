@@ -159,11 +159,26 @@ class MatchFeatureTracker:
         stats = player_stats
         if "Teams" in stats.columns:
             stats["Teams"] = stats["Teams"].astype(str).str.strip()
+        numeric_keys: list[str] = []
+        work = stats[["Tournament", "Stage", "Match Type", "Teams"]].copy()
+        for key, col in PLAYER_STAT_SOURCE_COLUMNS.items():
+            candidates = PLAYER_STAT_COLUMN_FALLBACKS.get(key, (col,))
+            chosen = next((c for c in candidates if c in stats.columns), None)
+            if chosen is None:
+                continue
+            work[key] = _parse_stat_values(stats[chosen])
+            numeric_keys.append(key)
+        if not numeric_keys:
+            self._player_stats_index = {}
+            return
+        means = work.groupby(["Tournament", "Stage", "Match Type", "Teams"], sort=False)[
+            numeric_keys
+        ].mean()
         grouped: dict[tuple, dict[str, float]] = {}
-        for keys, group in stats.groupby(["Tournament", "Stage", "Match Type", "Teams"], sort=False):
-            snap = aggregate_player_rows(group)
+        for idx, row in means.iterrows():
+            snap = {k: float(v) for k, v in row.items() if pd.notna(v)}
             if snap:
-                grouped[keys] = snap
+                grouped[idx if isinstance(idx, tuple) else (idx,)] = snap
         self._player_stats_index = grouped
 
     def release_replay_indexes(self) -> None:
@@ -469,21 +484,32 @@ def build_live_feature_tracker(
     tracker.index_player_stats(player_stats)
     maps = map_scores if map_scores is not None else _load_map_scores_optional()
     tracker.index_map_scores(maps)
-    for _, row in scores.iterrows():
-        team_a = row["Team A"]
-        team_b = row["Team B"]
-        team_a_won = str(row["Match Result"]) == f"{team_a} won"
-        score_a, score_b = _score_pair(row)
-        tracker.prepare_match_block(row["Tournament"], row["Stage"], row["Match Type"])
+    team_a_vals = scores["Team A"].to_numpy()
+    team_b_vals = scores["Team B"].to_numpy()
+    result_vals = scores["Match Result"].astype(str).to_numpy()
+    tournament_vals = scores["Tournament"].to_numpy()
+    stage_vals = scores["Stage"].to_numpy()
+    match_type_vals = scores["Match Type"].to_numpy()
+    score_a_vals = (
+        scores["Team A Score"].to_numpy() if "Team A Score" in scores.columns else [None] * len(scores)
+    )
+    score_b_vals = (
+        scores["Team B Score"].to_numpy() if "Team B Score" in scores.columns else [None] * len(scores)
+    )
+    for i in range(len(scores)):
+        team_a = team_a_vals[i]
+        team_b = team_b_vals[i]
+        team_a_won = result_vals[i] == f"{team_a} won"
+        tracker.prepare_match_block(tournament_vals[i], stage_vals[i], match_type_vals[i])
         tracker.record(
-            tournament=row["Tournament"],
-            stage=row["Stage"],
-            match_type=row["Match Type"],
+            tournament=tournament_vals[i],
+            stage=stage_vals[i],
+            match_type=match_type_vals[i],
             team_a=team_a,
             team_b=team_b,
             team_a_won=team_a_won,
-            score_a=score_a,
-            score_b=score_b,
+            score_a=score_a_vals[i],
+            score_b=score_b_vals[i],
         )
     tracker.flush_pending_player_stats()
     tracker.release_replay_indexes()
