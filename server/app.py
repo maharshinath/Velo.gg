@@ -5,7 +5,6 @@ from flask import Flask, request, send_from_directory
 from flask_restful import Api, Resource
 from flask_cors import CORS
 
-from models.RandomForestPredictor import RandomForestPredictor as Predictor
 from roster import get_team_roster
 from vct_config import ALL_STANDARD_MAPS, COMP_POOL_MAPS
 
@@ -16,13 +15,17 @@ app = Flask(__name__, static_url_path="/static", static_folder="static")
 CORS(app)
 api = Api(app)
 
-_predictor: Predictor | None = None
+_predictor = None
 METRICS_PATH = SERVER_DIR / "data" / "model_metrics.json"
 
-def get_predictor() -> Predictor:
+
+def get_predictor():
+    """Load sklearn/pandas only on first real request so boot stays under free-tier RAM."""
     global _predictor
     if _predictor is None:
         print("Loading model and dataset...", flush=True)
+        from models.RandomForestPredictor import RandomForestPredictor as Predictor
+
         _predictor = Predictor()
         print("Model ready.", flush=True)
     return _predictor
