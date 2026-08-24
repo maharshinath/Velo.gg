@@ -35,16 +35,33 @@ function About() {
                         Valorant Champion Tour 2021–2026 (Kaggle)
                     </a>
                 </p>
+                <p>
+                    Current training set: <strong>1,269</strong> pro series, <strong>90</strong> teams
+                    (VCT 2021–2026, including Stage 2 2026). Refresh with{' '}
+                    <code>python scripts/sync_vlr_data.py</code> from <code>server/</code>.
+                </p>
                 {metrics && (
                     <p>
-                        Model accuracy — random split: {metrics.random_split_accuracy}%
-                        {metrics.time_ordered_split_accuracy != null && (
-                            <> · time-ordered (all matches): {metrics.time_ordered_split_accuracy}%</>
+                        Model accuracy — time-ordered holdout:{' '}
+                        {metrics.time_ordered_split_accuracy ?? metrics.deployed_model_holdout_accuracy}%
+                        {metrics.walk_forward_accuracy != null && (
+                            <> · walk-forward: {metrics.walk_forward_accuracy}%</>
+                        )}
+                        {metrics.vct_regional_split_accuracy != null && (
+                            <> · regional: {metrics.vct_regional_split_accuracy}%</>
                         )}
                         {metrics.international_split_accuracy != null && (
                             <> · international: {metrics.international_split_accuracy}%</>
                         )}
-                        . The time-ordered figure is the honest all-match baseline for forecasting.
+                        {metrics.selective_65_accuracy != null && (
+                            <>
+                                {' '}
+                                · selective ≥{metrics.betting_confidence_gate ?? 65}%:{' '}
+                                {metrics.selective_65_accuracy}% on {metrics.selective_65_coverage}% of
+                                games
+                            </>
+                        )}
+                        . Time-ordered holdout is the honest all-match baseline.
                     </p>
                 )}
             </div>

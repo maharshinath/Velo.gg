@@ -1,9 +1,23 @@
 # Deploy on Render
 
+Repo: [maharshinath/VCT-Match-Predictor](https://github.com/maharshinath/VCT-Match-Predictor)  
+Connect Render to the **maharshinath** GitHub account.
+
+Current shipped snapshot (also in the root README):
+
+| | |
+|---|---|
+| Matches | **1,269** pro series |
+| Teams | **90** |
+| Model | Elo + margin K, residual only if it beats Elo on holdout |
+| Holdout | **63.2%** time-ordered (`rf.pkl` + `server/data/model_metrics.json`) |
+
 Live setup uses **two** Render services (reliable on the free tier):
 
 1. **Web Service (Python)** — Flask API (`server/`)
 2. **Static Site** — React build (`client/`)
+
+After you sync/retrain locally, **commit `models/rf.pkl`, CSVs, and `model_metrics.json`**, push to `main`, then redeploy the API so production loads the new bundle. Restart/redeploy is required; Render will not pick up a new pickle until the service boots again.
 
 ## Steps (Dashboard)
 
@@ -13,6 +27,7 @@ Live setup uses **two** Render services (reliable on the free tier):
    `https://vct-match-predictor-api.onrender.com`  
    (use the exact hostname Render assigns after the API service is created — you can create the API first, then set this and redeploy the static site).
 4. Deploy. First API boot loads the model (can take 1–3 minutes). Free API instances **sleep** when idle; the first hit afterward is slow.
+5. Smoke-test `https://YOUR-API.onrender.com/api/health` and `https://YOUR-API.onrender.com/api/meta` (metrics should match the README snapshot).
 
 ### Manual (no Blueprint)
 
