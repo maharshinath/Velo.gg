@@ -1,6 +1,6 @@
 import '../css/Home.css'
 import {useState, useEffect, useNavigate} from "react"
-import { getPrediction, getMatchupData , getTeamData, getTeams} from '../services/api'
+import { getPrediction, getMatchupData , getTeamData, getTeams, getMatchOdds} from '../services/api'
 import Matchup from '../components/Matchup'
 import TeamButton from '../components/TeamButton'
 import Prediction from '../components/Prediction'
@@ -59,10 +59,18 @@ function Home() {
         setPredictionLoading(true)
             try {
                 const result = await getPrediction(match[0], match[1])
-                const matchup = await getMatchupData(match[0], match[1])  // <- fetch matchup data
+                const matchup = await getMatchupData(match[0], match[1])
                 setResult(result)
-                setMatchupData(matchup)  // <- store it
+                setMatchupData(matchup)
                 setPredict(true)
+                getMatchOdds(match[0], match[1])
+                    .then((oddsPayload) => {
+                        if (!oddsPayload?.betting) return
+                        setResult((prev) =>
+                            prev ? { ...prev, betting: oddsPayload.betting, odds: oddsPayload.odds } : prev
+                        )
+                    })
+                    .catch((err) => console.error(err))
             } catch (err) {
                 console.error('Prediction failed:', err)
                 setError('Failed to get prediction')

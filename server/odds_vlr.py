@@ -23,8 +23,8 @@ from vlr_ingest import (
 _ODDS_CACHE: dict[str, tuple[float, dict | None]] = {}
 _CACHE_TTL_SEC = 180.0
 # Keep odds fetch snappy so /api/predict stays usable when VLR is slow.
-_ODDS_TIMEOUT = 12
-_ODDS_RETRIES = 1
+_ODDS_TIMEOUT = 20
+_ODDS_RETRIES = 2
 _MISS = object()
 
 _BOOKIE_LABELS = {
@@ -54,6 +54,7 @@ def _session() -> requests.Session:
             ),
             "Accept": "text/html,application/json",
             "Accept-Language": "en-US,en;q=0.9",
+            "Referer": "https://www.vlr.gg/",
         }
     )
     return s

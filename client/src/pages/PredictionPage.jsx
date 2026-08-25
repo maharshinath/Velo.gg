@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { getTeamData, getPrediction, getRoster, getMatchupData } from '../services/api'
+import { getTeamData, getPrediction, getRoster, getMatchupData, getMatchOdds } from '../services/api'
 import Prediction from '../components/Prediction'
 import '../css/PredictionPage.css'
 
@@ -18,6 +18,7 @@ function PredictionPage() {
     const [matchupData, setMatchupData] = useState(null)
     const [rosterLoading, setRosterLoading] = useState(false)
     const [rosterError, setRosterError] = useState(null)
+    const [oddsLoading, setOddsLoading] = useState(false)
 
     useEffect(() => {
         let cancelled = false
@@ -33,6 +34,7 @@ function PredictionPage() {
             setMatchupData(null)
             setRosterLoading(false)
             setRosterError(null)
+            setOddsLoading(false)
 
             const t1 = decodeURIComponent(team1 || '')
             const t2 = decodeURIComponent(team2 || '')
@@ -47,6 +49,18 @@ function PredictionPage() {
                 const prediction = await getPrediction(t1, t2)
                 if (cancelled) return
                 setPredictionResult(prediction)
+                setOddsLoading(true)
+                getMatchOdds(t1, t2)
+                    .then((oddsPayload) => {
+                        if (cancelled || !oddsPayload?.betting) return
+                        setPredictionResult((prev) =>
+                            prev ? { ...prev, betting: oddsPayload.betting, odds: oddsPayload.odds } : prev
+                        )
+                    })
+                    .catch((err) => console.error(err))
+                    .finally(() => {
+                        if (!cancelled) setOddsLoading(false)
+                    })
 
                 const [t1Rows, t2Rows] = await Promise.all([
                     getTeamData(t1),
@@ -140,6 +154,7 @@ function PredictionPage() {
                     team2Roster={team2Roster}
                     rosterLoading={rosterLoading}
                     rosterError={rosterError}
+                    oddsLoading={oddsLoading}
                     onRosterTabOpen={loadRosters}
                 />
             </section>

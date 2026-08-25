@@ -38,7 +38,12 @@ function plainRecReason(betting, hasOdds) {
   return 'Book prices already look in line with (or better than) our estimates.'
 }
 
-function BettingInsightsPanel({ team1, team2, betting }) {
+function BettingInsightsPanel({ team1, team2, betting, oddsLoading }) {
+  if (oddsLoading && !betting?.odds_available) {
+    return (
+      <p className="tab-panel-message">Looking up book prices on VLR…</p>
+    )
+  }
   if (!betting) {
     return (
       <p className="tab-panel-message">
@@ -150,6 +155,7 @@ function Prediction({
   team2Roster,
   rosterLoading,
   rosterError,
+  oddsLoading,
   onRosterTabOpen,
 }) {
   const [revealed, setRevealed] = useState(false)
@@ -357,6 +363,7 @@ function Prediction({
                 team1={team1}
                 team2={team2}
                 betting={result.betting}
+                oddsLoading={oddsLoading}
               />
             )}
 

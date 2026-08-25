@@ -12,6 +12,15 @@ export const getPrediction = async (team1, team2) => {
 }
 
 
+export const getMatchOdds = async (team1, team2) => {
+    const result = await fetch(
+        `${BASE_URL}/odds/${encodeURIComponent(team1)}/${encodeURIComponent(team2)}`
+    )
+    if (!result.ok) throw new Error('Failed to load odds')
+    return await result.json()
+}
+
+
 export const getMatchupData = async (team1, team2) => {
     const result = await fetch(
         `${BASE_URL}/matchup_data/${encodeURIComponent(team1)}/${encodeURIComponent(team2)}`
