@@ -134,11 +134,13 @@ class TeamRoster(Resource):
     def get(self, team):
         if not team:
             return {"error": "Team name is required"}, 400
-        rows = load_team_table()
-        rows = rows[rows["Team"] == team]
+        table = load_team_table()
+        rows = table[table["Team"] == team]
+        if rows.empty:
+            rows = table[table["Team"].astype(str).str.casefold() == str(team).casefold()]
         if rows.empty:
             return {"error": f"Team '{team}' not found"}, 404
-        return get_team_roster(team), 200
+        return get_team_roster(str(rows.iloc[0]["Team"])), 200
 
 
 class MetaData(Resource):

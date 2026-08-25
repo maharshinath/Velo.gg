@@ -13,6 +13,9 @@ import requests
 
 SERVER_DIR = Path(__file__).resolve().parent
 KAGGLE_DIR = SERVER_DIR / "data" / "kaggle"
+VLR_TEAM_IDS_PATH = SERVER_DIR / "data" / "vlr_team_ids.json"
+PLAYER_STATS_MERGED = SERVER_DIR / "csv" / "player_stats_merged.csv"
+VLR_PLAYER_STATS = SERVER_DIR / "data" / "vlr_player_stats.csv"
 ROSTER_CACHE_PATH = SERVER_DIR / "data" / "team_rosters.json"
 VLR_TEAM_API = "https://vlr.orlandomm.net/api/v1/teams/{team_id}"
 
@@ -32,9 +35,17 @@ def normalize_team(name: str) -> str:
 
 
 def build_vlr_id_lookup() -> dict[str, int]:
-    """Map canonical team name to the newest VLR team id seen in Kaggle id files."""
-    best_year: dict[str, int] = {}
+    """Map team name to VLR id. Prefer shipped JSON (Render has no Kaggle dump)."""
     lookup: dict[str, int] = {}
+    if VLR_TEAM_IDS_PATH.exists():
+        try:
+            raw = json.loads(VLR_TEAM_IDS_PATH.read_text(encoding="utf-8"))
+            lookup.update({str(k): int(v) for k, v in raw.items()})
+        except (json.JSONDecodeError, OSError, TypeError, ValueError):
+            pass
+    if not KAGGLE_DIR.is_dir():
+        return lookup
+    best_year: dict[str, int] = {}
     for path in sorted(KAGGLE_DIR.glob("vct_*/ids/teams_ids.csv")):
         year_match = re.search(r"vct_(\d{4})", path.as_posix())
         if not year_match:
@@ -79,34 +90,48 @@ def _parse_vlr_payload(payload: dict) -> dict:
     }
 
 
+def _players_from_stats_csv(path: Path, team: str) -> list[dict]:
+    if not path.exists():
+        return []
+    try:
+        df = pd.read_csv(path, usecols=["Player", "Teams"])
+    except (ValueError, OSError):
+        return []
+    df["Teams"] = df["Teams"].astype(str).map(normalize_team)
+    filtered = df[df["Teams"] == team]
+    if filtered.empty:
+        return []
+    players = []
+    seen: set[str] = set()
+    for player in reversed(filtered["Player"].tolist()):
+        name = str(player).strip()
+        if not name or name in seen:
+            continue
+        seen.add(name)
+        players.append({"ign": name, "name": None})
+        if len(players) == 5:
+            break
+    return players
+
+
 def _roster_from_player_stats(team: str) -> dict:
-    """Fallback: last five unique players from the newest Kaggle season available."""
-    year_dirs = sorted(
-        (p for p in KAGGLE_DIR.iterdir() if p.is_dir() and p.name.startswith("vct_")),
-        key=lambda p: p.name,
-        reverse=True,
-    )
-    for season_dir in year_dirs:
-        stats_path = season_dir / "players_stats" / "players_stats.csv"
-        if not stats_path.exists():
-            continue
-        df = pd.read_csv(stats_path)
-        df["Teams"] = df["Teams"].astype(str).map(normalize_team)
-        filtered = df[df["Teams"] == team]
-        if filtered.empty:
-            continue
-        players = []
-        seen: set[str] = set()
-        for player in reversed(filtered["Player"].tolist()):
-            name = str(player).strip()
-            if not name or name in seen:
-                continue
-            seen.add(name)
-            players.append({"ign": name, "name": None})
-            if len(players) == 5:
-                break
+    """Fallback when VLR is unreachable: latest players from shipped CSVs, then Kaggle."""
+    for path in (VLR_PLAYER_STATS, PLAYER_STATS_MERGED):
+        players = _players_from_stats_csv(path, team)
         if players:
             return {"players": players, "coaches": [], "source": "dataset"}
+    if KAGGLE_DIR.is_dir():
+        year_dirs = sorted(
+            (p for p in KAGGLE_DIR.iterdir() if p.is_dir() and p.name.startswith("vct_")),
+            key=lambda p: p.name,
+            reverse=True,
+        )
+        for season_dir in year_dirs:
+            players = _players_from_stats_csv(
+                season_dir / "players_stats" / "players_stats.csv", team
+            )
+            if players:
+                return {"players": players, "coaches": [], "source": "dataset"}
     return {"players": [], "coaches": [], "source": "unavailable"}
 
 
@@ -144,16 +169,21 @@ def get_team_roster(team: str) -> dict:
     roster: dict
     if team_id:
         try:
-            resp = requests.get(VLR_TEAM_API.format(team_id=team_id), timeout=20)
+            resp = requests.get(
+                VLR_TEAM_API.format(team_id=team_id),
+                timeout=20,
+                headers={"User-Agent": "Velo.gg roster (https://velo-gg.onrender.com)"},
+            )
             resp.raise_for_status()
             roster = _parse_vlr_payload(resp.json())
-        except requests.RequestException:
+        except (requests.RequestException, ValueError, KeyError):
             roster = _roster_from_player_stats(canonical)
     else:
         roster = _roster_from_player_stats(canonical)
 
     roster = {"team": team, **roster}
     _memory_cache[canonical] = (now, roster)
-    disk[canonical] = {**roster, "_cached_at": now}
-    _save_disk_cache(disk)
+    if roster.get("players") or roster.get("source") == "vlr":
+        disk[canonical] = {**roster, "_cached_at": now}
+        _save_disk_cache(disk)
     return roster
