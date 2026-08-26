@@ -16,10 +16,11 @@ ALL_STANDARD_MAPS = [
     "Abyss",
 ]
 
-# Maps rotated out of the current competitive pool (V26 Act 4 / Patch 13.00)
+# Maps rotated out of the current competitive pool (V26 Act 5 / Patch 13.04)
+# Pool: Abyss, Ascent, Haven, Lotus, Split, Summit, Sunset (Breeze out, Abyss in)
 OUT_OF_POOL_MAPS = frozenset({
-    "Abyss",
     "Bind",
+    "Breeze",
     "Corrode",
     "Fracture",
     "Icebox",
