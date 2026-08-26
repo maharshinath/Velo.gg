@@ -96,11 +96,24 @@ def download_logo(url: str, dest: Path) -> bool:
 
 
 # White-on-transparent logos from VLR disappear on the app's white logo plates
-LIGHT_LOGO_TEAMS = {"NRG", "Paper Rex"}
+LIGHT_LOGO_TEAMS = {"NRG"}
+
+
+def _logo_pixel_counts(src) -> tuple[int, int, int]:
+    light = dark = transparent = 0
+    for r, g, b, a in src.getdata():
+        if a < 10:
+            transparent += 1
+            continue
+        if r > 200 and g > 200 and b > 200:
+            light += 1
+        elif r < 50 and g < 50 and b < 50:
+            dark += 1
+    return light, dark, transparent
 
 
 def fix_light_logo(dest: Path, *, force: bool = False) -> None:
-    """Composite white-on-transparent logos onto a dark plate."""
+    """Keep logos readable: dark marks on a white plate, white marks on a dark plate."""
     try:
         from PIL import Image
     except ImportError:
@@ -111,11 +124,22 @@ def fix_light_logo(dest: Path, *, force: bool = False) -> None:
     except OSError:
         return
 
-    pixels = src.getdata()
-    light = sum(
-        1 for r, g, b, a in pixels if a > 10 and r > 200 and g > 200 and b > 200
-    )
-    dark = sum(1 for r, g, b, a in pixels if a > 10 and r < 50 and g < 50 and b < 50)
+    light, dark, transparent = _logo_pixel_counts(src)
+    n = src.size[0] * src.size[1]
+
+    # Black mark baked onto a near-black plate (e.g. Paper Rex) — lift onto white
+    if transparent == 0 and light == 0 and dark == n:
+        out = Image.new("RGBA", src.size, (255, 255, 255, 255))
+        src_px = src.load()
+        out_px = out.load()
+        for y in range(src.size[1]):
+            for x in range(src.size[0]):
+                r, g, b, _a = src_px[x, y]
+                if r < 8 and g < 8 and b < 8:
+                    out_px[x, y] = (0, 0, 0, 255)
+        out.save(dest, optimize=True)
+        return
+
     if not force and (light == 0 or dark > light // 4):
         return
 

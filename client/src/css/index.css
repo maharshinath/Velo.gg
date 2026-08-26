@@ -306,13 +306,11 @@ input:focus, select:focus, textarea:focus {
 }
 
 /* VLR serves some logos as white-on-transparent; keep visible on white logo plates */
-img[src*="nrg-logo"],
-img[src*="paper-rex-logo"] {
+img[src*="nrg-logo"] {
   background-color: #111111;
   border-radius: var(--radius-sm);
 }
 
-.matchup-logo-wrap:has(img[src*="nrg-logo"]),
-.matchup-logo-wrap:has(img[src*="paper-rex-logo"]) {
+.matchup-logo-wrap:has(img[src*="nrg-logo"]) {
   background: #111111;
 }
