@@ -5,7 +5,7 @@ Frontend for **Velo.gg**. Full pipeline, model, and API docs live in the root [R
 | Snapshot (Aug 2026) | |
 |---|---|
 | Dataset | **1,271** pro series · **90** teams · 2021–2026 |
-| Match model | Elo + series-margin K, gated sparse residual (**11** features when it ships) |
+| Match model | Elo + series-margin K, gated sparse residual (**11** cols) |
 | Honest holdout | **63.2%** time-ordered · **71.4%** when confidence ≥ 65% (~20% of games) |
 | App (local) | http://localhost:5173 |
 | API (local) | http://127.0.0.1:5001/api |

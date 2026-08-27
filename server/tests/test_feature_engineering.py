@@ -8,7 +8,11 @@ import pandas as pd
 SERVER_DIR = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(SERVER_DIR))
 
-from feature_engineering import DEFAULT_PLAYER_STATS, MatchFeatureTracker  # noqa: E402
+from feature_engineering import (  # noqa: E402
+    DEFAULT_PLAYER_STATS,
+    MatchFeatureTracker,
+    build_live_feature_tracker,
+)
 from vlr_ingest import repair_vlr_player_stats  # noqa: E402
 
 
@@ -71,6 +75,41 @@ def test_map_pool_strength_is_point_in_time():
     )
     after = tracker.features_for("Alpha", "Gamma", tournament="VCT 2026: Americas Stage 1")
     assert after["Team A Map Pool Strength"] > 50.0
+
+
+def test_seed_map_stats_live_strength_not_stuck_at_50():
+    """RAM-safe live path: seed from map_team lookup instead of replaying map scores."""
+    lookup = {
+        ("Alpha", "Ascent"): {"wins": 8, "played": 10},
+        ("Alpha", "Bind"): {"wins": 6, "played": 10},
+        ("Beta", "Ascent"): {"wins": 2, "played": 10},
+        ("Beta", "Bind"): {"wins": 3, "played": 10},
+    }
+    scores = pd.DataFrame(
+        [
+            {
+                "Tournament": "VCT 2026: Americas Stage 1",
+                "Stage": "Regular Season",
+                "Match Type": "Week 1",
+                "Team A": "Alpha",
+                "Team B": "Beta",
+                "Match Result": "Team A",
+                "Team A Score": 2,
+                "Team B Score": 0,
+            }
+        ]
+    )
+    tracker = build_live_feature_tracker(
+        scores,
+        pd.DataFrame(),
+        map_lookup=lookup,
+        map_scores=pd.DataFrame(),
+    )
+    feat = tracker.features_for("Alpha", "Beta")
+    assert feat["Team A Map Pool Strength"] != 50.0
+    assert feat["Team B Map Pool Strength"] != 50.0
+    assert feat["Team A Map Pool Strength"] > feat["Team B Map Pool Strength"]
+    assert feat["Map pool strength delta"] != 0.0
 
 
 def test_same_week_player_stats_consume_bucket_once():

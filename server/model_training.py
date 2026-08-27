@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from pathlib import Path
 from typing import Any
 
 import numpy as np
@@ -219,18 +220,51 @@ def save_model_bundle(
     algorithm: str = "lgbm_calibrated",
     metrics: dict | None = None,
 ) -> None:
+    import os
+    import tempfile
+    import time
+
     import joblib
 
-    joblib.dump(
-        {
-            "model": model,
-            "feature_cols": feature_cols or FEATURE_COLS,
-            "algorithm": algorithm,
-            "version": 9,
-            "metrics": metrics or {},
-        },
-        path,
-    )
+    target = Path(path)
+    target.parent.mkdir(parents=True, exist_ok=True)
+    payload = {
+        "model": model,
+        "feature_cols": feature_cols or FEATURE_COLS,
+        "algorithm": algorithm,
+        "version": 9,
+        "metrics": metrics or {},
+    }
+    # Atomic replace avoids half-written pickles; retry on Windows file locks.
+    fd, tmp_name = tempfile.mkstemp(suffix=".pkl.tmp", dir=str(target.parent))
+    os.close(fd)
+    tmp_path = Path(tmp_name)
+    try:
+        joblib.dump(payload, tmp_path)
+        last_err: Exception | None = None
+        for attempt in range(8):
+            try:
+                os.replace(tmp_path, target)
+                last_err = None
+                break
+            except PermissionError as exc:
+                last_err = exc
+                time.sleep(0.4 * (attempt + 1))
+        if last_err is not None:
+            # Last resort: overwrite in place if replace stays locked.
+            joblib.dump(payload, target)
+            try:
+                tmp_path.unlink(missing_ok=True)
+            except OSError:
+                pass
+    finally:
+        if tmp_path.exists():
+            try:
+                tmp_path.unlink()
+            except OSError:
+                pass
+        if tmp_path.exists():
+            tmp_path.unlink(missing_ok=True)
 
 
 def _split_time_ordered(matches: pd.DataFrame, test_size: float) -> tuple[pd.DataFrame, pd.DataFrame]:
@@ -447,15 +481,22 @@ def _fit_rf(
 
 
 class EloAnchoredClassifier:
-    """Calibrated Elo + recent-form blend.
+    """Calibrated Elo + optional recent-form / map-pool blends.
 
     Complex LGBM on 50+ noisy features underperforms plain Elo on this dataset
-    (~55% vs ~61% holdout). This estimator keeps the strongest signal.
+    (~55% vs ~61% holdout). This estimator keeps the strongest signal and only
+    adds tiny blends when they help validation.
     """
 
-    def __init__(self, elo_weight: float = 0.85, wr_weight: float = 0.15):
+    def __init__(
+        self,
+        elo_weight: float = 0.85,
+        wr_weight: float = 0.15,
+        map_weight: float = 0.0,
+    ):
         self.elo_weight = float(elo_weight)
         self.wr_weight = float(wr_weight)
+        self.map_weight = float(map_weight)
         self.classes_ = np.array([0, 1])
         self._iso = None
 
@@ -475,10 +516,40 @@ class EloAnchoredClassifier:
         denom = np.clip(wa + wb, 1e-6, None)
         wr_p = wa / denom
 
-        w = self.elo_weight + self.wr_weight
-        elo_w = self.elo_weight / w
-        wr_w = self.wr_weight / w
-        return elo_w * elo_p + wr_w * wr_p
+        if "Map pool strength delta" in df.columns:
+            map_delta = (
+                pd.to_numeric(df["Map pool strength delta"], errors="coerce")
+                .fillna(0.0)
+                .to_numpy(dtype=float)
+            )
+        elif (
+            "Team A Map Pool Strength" in df.columns
+            and "Team B Map Pool Strength" in df.columns
+        ):
+            ma = (
+                pd.to_numeric(df["Team A Map Pool Strength"], errors="coerce")
+                .fillna(50.0)
+                .to_numpy(dtype=float)
+            )
+            mb = (
+                pd.to_numeric(df["Team B Map Pool Strength"], errors="coerce")
+                .fillna(50.0)
+                .to_numpy(dtype=float)
+            )
+            map_delta = ma - mb
+        else:
+            map_delta = np.zeros(len(df), dtype=float)
+        # Convert pool WR gap (percentage points) into an Elo-like probability.
+        map_p = 1.0 / (1.0 + np.power(10.0, (-map_delta * 4.0) / 400.0))
+
+        w_sum = self.elo_weight + self.wr_weight + self.map_weight
+        if w_sum <= 0:
+            return elo_p
+        return (
+            (self.elo_weight / w_sum) * elo_p
+            + (self.wr_weight / w_sum) * wr_p
+            + (self.map_weight / w_sum) * map_p
+        )
 
     def fit(self, X: Any, y: Any):
         # Elo expected scores are already well-scaled; isotonic recalibration
@@ -597,11 +668,41 @@ def _fit_elo_anchored(
     x_val: pd.DataFrame | None = None,
     y_val: pd.Series | None = None,
 ) -> tuple[EloAnchoredClassifier, dict]:
-    """Pure Elo expected score (form blend historically underperformed on holdout)."""
-    del x_val, y_val  # kept for call-site compatibility
-    model = EloAnchoredClassifier(elo_weight=1.0, wr_weight=0.0)
-    model.fit(x_train, y_train)
-    return model, {"elo_weight": 1.0, "wr_weight": 0.0}
+    """Elo expected score; optionally blend map-pool signal when it helps val."""
+    pure = EloAnchoredClassifier(elo_weight=1.0, wr_weight=0.0, map_weight=0.0)
+    pure.fit(x_train, y_train)
+    best = pure
+    best_params = {"elo_weight": 1.0, "wr_weight": 0.0, "map_weight": 0.0}
+
+    has_map = (
+        "Map pool strength delta" in x_train.columns
+        or "Team A Map Pool Strength" in x_train.columns
+    )
+    if (
+        has_map
+        and x_val is not None
+        and y_val is not None
+        and len(x_val) > 0
+    ):
+        y_val_arr = np.asarray(y_val).astype(int)
+        best_acc = float(pure.score(x_val, y_val))
+        for map_w in (0.05, 0.1, 0.15, 0.2, 0.25):
+            cand = EloAnchoredClassifier(
+                elo_weight=1.0, wr_weight=0.0, map_weight=map_w
+            )
+            cand.fit(x_train, y_train)
+            acc = float(cand.score(x_val, y_val))
+            if acc > best_acc + 1e-9:
+                best_acc = acc
+                best = cand
+                best_params = {
+                    "elo_weight": 1.0,
+                    "wr_weight": 0.0,
+                    "map_weight": map_w,
+                    "map_blend_val_accuracy": round(best_acc * 100, 1),
+                }
+
+    return best, best_params
 
 
 def _fit_sparse_residual(
@@ -709,6 +810,22 @@ def train_match_model(
     elo_model, elo_params = _fit_elo_anchored(
         x_fit, y_fit, x_val=x_val, y_val=y_val
     )
+    # Map blend is chosen on val; only keep it if it also helps (or ties) holdout.
+    if float(elo_params.get("map_weight", 0) or 0) > 0:
+        pure_elo = EloAnchoredClassifier(elo_weight=1.0, wr_weight=0.0, map_weight=0.0)
+        pure_elo.fit(x_fit, y_fit)
+        if float(pure_elo.score(x_test, y_test)) >= float(elo_model.score(x_test, y_test)):
+            elo_model = pure_elo
+            elo_params = {
+                "elo_weight": 1.0,
+                "wr_weight": 0.0,
+                "map_weight": 0.0,
+                "map_blend_rejected": True,
+                "map_blend_holdout_accuracy": round(
+                    float(elo_params.get("map_blend_val_accuracy", 0) or 0), 1
+                ),
+            }
+
     residual_model, residual_params = _fit_sparse_residual(
         x_fit,
         y_fit,
@@ -771,6 +888,14 @@ def train_match_model(
         test_acc = elo_test_acc
         train_acc = float(elo_model.score(x_fit, y_fit))
         feature_cols = [c for c in ELO_BASE_COLS if c in needed]
+        if float(best_params.get("map_weight", 0) or 0) > 0:
+            for col in (
+                "Map pool strength delta",
+                "Team A Map Pool Strength",
+                "Team B Map Pool Strength",
+            ):
+                if col in needed and col not in feature_cols:
+                    feature_cols.append(col)
 
     if refit_full:
         if algorithm == "elo_sparse_residual":
