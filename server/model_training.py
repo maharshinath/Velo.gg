@@ -579,32 +579,39 @@ class EloAnchoredClassifier:
         return float((self.predict(X) == y_arr).mean())
 
 
+def _numeric_col(df: pd.DataFrame, name: str, default: float) -> pd.Series:
+    """Safe column → numeric Series (df.get returns None when missing → scalar nan)."""
+    if name in df.columns:
+        return pd.to_numeric(df[name], errors="coerce").fillna(default)
+    return pd.Series(np.full(len(df), float(default), dtype=float), index=df.index)
+
+
 def build_sparse_residual_features(df: pd.DataFrame) -> pd.DataFrame:
     """Trusted deltas: intl Elo Δ, map-pool strength/diff Δ, shrunk H2H when enough."""
-    intl_a = pd.to_numeric(df.get("Team A International Elo"), errors="coerce").fillna(1500.0)
-    intl_b = pd.to_numeric(df.get("Team B International Elo"), errors="coerce").fillna(1500.0)
+    intl_a = _numeric_col(df, "Team A International Elo", 1500.0)
+    intl_b = _numeric_col(df, "Team B International Elo", 1500.0)
     intl_delta = (intl_a - intl_b) / 400.0
 
     if "Map pool strength delta" in df.columns:
-        map_delta = pd.to_numeric(df["Map pool strength delta"], errors="coerce").fillna(0.0)
+        map_delta = _numeric_col(df, "Map pool strength delta", 0.0)
     else:
-        ma = pd.to_numeric(df.get("Team A Map Pool Strength"), errors="coerce").fillna(0.0)
-        mb = pd.to_numeric(df.get("Team B Map Pool Strength"), errors="coerce").fillna(0.0)
-        map_delta = ma - mb
+        map_delta = (
+            _numeric_col(df, "Team A Map Pool Strength", 0.0)
+            - _numeric_col(df, "Team B Map Pool Strength", 0.0)
+        )
     map_delta = map_delta / 100.0
 
     if "Map pool differential delta" in df.columns:
-        map_diff_delta = pd.to_numeric(
-            df["Map pool differential delta"], errors="coerce"
-        ).fillna(0.0)
+        map_diff_delta = _numeric_col(df, "Map pool differential delta", 0.0)
     else:
-        da = pd.to_numeric(df.get("Team A Map Pool Differential"), errors="coerce").fillna(0.0)
-        db = pd.to_numeric(df.get("Team B Map Pool Differential"), errors="coerce").fillna(0.0)
-        map_diff_delta = da - db
+        map_diff_delta = (
+            _numeric_col(df, "Team A Map Pool Differential", 0.0)
+            - _numeric_col(df, "Team B Map Pool Differential", 0.0)
+        )
     map_diff_delta = map_diff_delta / 100.0
 
-    h2h_wr = pd.to_numeric(df.get("Team A Winrate vs B"), errors="coerce").fillna(50.0)
-    h2h_n = pd.to_numeric(df.get("Team A H2H Count"), errors="coerce").fillna(0.0)
+    h2h_wr = _numeric_col(df, "Team A Winrate vs B", 50.0)
+    h2h_n = _numeric_col(df, "Team A H2H Count", 0.0)
     trusted_h2h = np.where(
         h2h_n.to_numpy(dtype=float) >= float(H2H_MIN_TRUST_MATCHES),
         (h2h_wr.to_numpy(dtype=float) - 50.0) / 50.0,
@@ -643,10 +650,27 @@ class EloSparseResidualClassifier:
             return X
         return pd.DataFrame(X, columns=self.feature_cols)
 
+    def _residual_frame(self, df: pd.DataFrame) -> pd.DataFrame:
+        x_res = build_sparse_residual_features(df)
+        # Older pickles were fit without map_diff_delta; align columns.
+        names = None
+        if hasattr(self.residual_model, "feature_names_in_"):
+            names = list(self.residual_model.feature_names_in_)
+        elif hasattr(self.residual_model, "named_steps"):
+            scaler = self.residual_model.named_steps.get("scaler")
+            if scaler is not None and hasattr(scaler, "feature_names_in_"):
+                names = list(scaler.feature_names_in_)
+        if names:
+            for col in names:
+                if col not in x_res.columns:
+                    x_res[col] = 0.0
+            return x_res[names]
+        return x_res
+
     def predict_proba(self, X: Any) -> np.ndarray:
         df = self._frame(X)
         p_elo = self.elo_model.raw_probability(df)
-        x_res = build_sparse_residual_features(df)
+        x_res = self._residual_frame(df)
         p_res = self.residual_model.predict_proba(x_res)[:, 1]
         w = self.blend_weight
         p = (1.0 - w) * p_elo + w * p_res
