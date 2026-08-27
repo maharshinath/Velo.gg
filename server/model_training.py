@@ -542,13 +542,17 @@ class EloAnchoredClassifier:
         # Convert pool WR gap (percentage points) into an Elo-like probability.
         map_p = 1.0 / (1.0 + np.power(10.0, (-map_delta * 4.0) / 400.0))
 
-        w_sum = self.elo_weight + self.wr_weight + self.map_weight
+        elo_w = float(getattr(self, "elo_weight", 1.0) or 0.0)
+        wr_w = float(getattr(self, "wr_weight", 0.0) or 0.0)
+        # Older pickles (pre map-blend) have no map_weight attribute.
+        map_w = float(getattr(self, "map_weight", 0.0) or 0.0)
+        w_sum = elo_w + wr_w + map_w
         if w_sum <= 0:
             return elo_p
         return (
-            (self.elo_weight / w_sum) * elo_p
-            + (self.wr_weight / w_sum) * wr_p
-            + (self.map_weight / w_sum) * map_p
+            (elo_w / w_sum) * elo_p
+            + (wr_w / w_sum) * wr_p
+            + (map_w / w_sum) * map_p
         )
 
     def fit(self, X: Any, y: Any):
