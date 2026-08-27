@@ -24,6 +24,9 @@ SPARSE_RESIDUAL_SOURCE_COLS = [
     "Map pool strength delta",
     "Team A Map Pool Strength",
     "Team B Map Pool Strength",
+    "Map pool differential delta",
+    "Team A Map Pool Differential",
+    "Team B Map Pool Differential",
     "Team A Winrate vs B",
     "Team A H2H Count",
 ]
@@ -502,7 +505,7 @@ class EloAnchoredClassifier:
 
 
 def build_sparse_residual_features(df: pd.DataFrame) -> pd.DataFrame:
-    """Trusted deltas only: intl Elo Δ, map-pool Δ, shrunk H2H when count is enough."""
+    """Trusted deltas: intl Elo Δ, map-pool strength/diff Δ, shrunk H2H when enough."""
     intl_a = pd.to_numeric(df.get("Team A International Elo"), errors="coerce").fillna(1500.0)
     intl_b = pd.to_numeric(df.get("Team B International Elo"), errors="coerce").fillna(1500.0)
     intl_delta = (intl_a - intl_b) / 400.0
@@ -514,6 +517,16 @@ def build_sparse_residual_features(df: pd.DataFrame) -> pd.DataFrame:
         mb = pd.to_numeric(df.get("Team B Map Pool Strength"), errors="coerce").fillna(0.0)
         map_delta = ma - mb
     map_delta = map_delta / 100.0
+
+    if "Map pool differential delta" in df.columns:
+        map_diff_delta = pd.to_numeric(
+            df["Map pool differential delta"], errors="coerce"
+        ).fillna(0.0)
+    else:
+        da = pd.to_numeric(df.get("Team A Map Pool Differential"), errors="coerce").fillna(0.0)
+        db = pd.to_numeric(df.get("Team B Map Pool Differential"), errors="coerce").fillna(0.0)
+        map_diff_delta = da - db
+    map_diff_delta = map_diff_delta / 100.0
 
     h2h_wr = pd.to_numeric(df.get("Team A Winrate vs B"), errors="coerce").fillna(50.0)
     h2h_n = pd.to_numeric(df.get("Team A H2H Count"), errors="coerce").fillna(0.0)
@@ -527,6 +540,7 @@ def build_sparse_residual_features(df: pd.DataFrame) -> pd.DataFrame:
         {
             "intl_elo_delta": intl_delta.to_numpy(dtype=float),
             "map_pool_delta": map_delta.to_numpy(dtype=float),
+            "map_diff_delta": map_diff_delta.to_numpy(dtype=float),
             "trusted_h2h": trusted_h2h,
         },
         index=df.index,
@@ -705,16 +719,35 @@ def train_match_model(
     )
 
     elo_test_acc = float(elo_model.score(x_test, y_test))
+    y_test_arr = y_test.to_numpy(dtype=int)
+    p_elo_test = elo_model.predict_proba(x_test)[:, 1]
+    elo_test_brier = float(np.mean((p_elo_test - y_test_arr) ** 2))
     if residual_model is not None:
         residual_test_acc = float(residual_model.score(x_test, y_test))
+        p_res_test = residual_model.predict_proba(x_test)[:, 1]
+        residual_test_brier = float(np.mean((p_res_test - y_test_arr) ** 2))
     else:
         residual_test_acc = -1.0
+        residual_test_brier = float("inf")
 
-    # Strict gate: residual must beat pure Elo on the untouched holdout.
-    if residual_model is not None and residual_test_acc > elo_test_acc:
+    # Ship residual when it beats Elo on holdout accuracy, or ties accuracy with
+    # better calibration (lower Brier). Live map-pool features feed this residual.
+    ship_residual = residual_model is not None and (
+        residual_test_acc > elo_test_acc
+        or (
+            residual_test_acc >= elo_test_acc
+            and residual_test_brier < elo_test_brier - 1e-6
+        )
+    )
+    if ship_residual:
         holdout_model = residual_model
         algorithm = "elo_sparse_residual"
-        best_params = {**elo_params, **residual_params}
+        best_params = {
+            **elo_params,
+            **residual_params,
+            "elo_holdout_brier": round(elo_test_brier, 4),
+            "residual_holdout_brier": round(residual_test_brier, 4),
+        }
         test_acc = residual_test_acc
         train_acc = float(residual_model.score(x_fit, y_fit))
         feature_cols = needed
@@ -727,6 +760,12 @@ def train_match_model(
             "residual_rejected": True,
             "residual_holdout_accuracy": (
                 None if residual_test_acc < 0 else round(residual_test_acc * 100, 1)
+            ),
+            "elo_holdout_brier": round(elo_test_brier, 4),
+            "residual_holdout_brier": (
+                None
+                if residual_test_brier == float("inf")
+                else round(residual_test_brier, 4)
             ),
         }
         test_acc = elo_test_acc

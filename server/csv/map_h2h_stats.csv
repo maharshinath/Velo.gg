@@ -91,6 +91,7 @@ Global Esports,Team Secret,Abyss,0,1,0.0
 Global Esports,TALON,Abyss,0,1,0.0
 Global Esports,VARREL,Abyss,1,1,100.0
 Global Esports,ZETA DIVISION,Abyss,1,1,100.0
+Global Esports,Kiwoom DRX,Abyss,1,1,100.0
 JDG Esports,Titan Esports Club,Abyss,2,2,100.0
 KOI,Team Liquid,Abyss,0,1,0.0
 KRÜ Esports,NRG,Abyss,1,1,100.0
@@ -106,7 +107,7 @@ MIBR,Sentinels,Abyss,0,1,0.0
 NRG,Xi Lai Gaming,Abyss,1,1,100.0
 NRG,Team Liquid,Abyss,1,1,100.0
 NRG,Nongshim RedForce,Abyss,0,1,0.0
-Nongshim RedForce,Paper Rex,Abyss,1,1,100.0
+Nongshim RedForce,Paper Rex,Abyss,2,2,100.0
 Nongshim RedForce,Rex Regum Qeon,Abyss,0,1,0.0
 Nova Esports,Wolves Esports,Abyss,1,2,50.0
 PCIFIC Esports,ULF Esports,Abyss,0,1,0.0
@@ -316,6 +317,7 @@ Gentle Mates,NRG,Ascent,0,1,0.0
 Gentle Mates,PCIFIC Esports,Ascent,1,1,100.0
 Global Esports,Paper Rex,Ascent,0,1,0.0
 Global Esports,Nongshim RedForce,Ascent,1,1,100.0
+Global Esports,Kiwoom DRX,Ascent,0,1,0.0
 Guild Esports,Paper Rex,Ascent,0,1,0.0
 JD Gaming,TYLOO,Ascent,1,1,100.0
 JDG Esports,TYLOO,Ascent,0,1,0.0
@@ -1804,6 +1806,7 @@ Global Esports,Team Secret,Lotus,1,2,50.0
 Global Esports,Paper Rex,Lotus,0,3,0.0
 Global Esports,TALON,Lotus,0,1,0.0
 Global Esports,MIBR,Lotus,0,1,0.0
+Global Esports,Kiwoom DRX,Lotus,1,1,100.0
 JDG Esports,Trace Esports,Lotus,2,3,66.67
 JDG Esports,Titan Esports Club,Lotus,1,1,100.0
 JDG Esports,Xi Lai Gaming,Lotus,0,2,0.0
@@ -2289,7 +2292,7 @@ Nongshim RedForce,T1,Split,0,2,0.0
 Nongshim RedForce,Team Secret,Split,2,2,100.0
 Nongshim RedForce,ZETA DIVISION,Split,2,2,100.0
 Nongshim RedForce,TALON,Split,0,1,0.0
-Nongshim RedForce,Paper Rex,Split,1,2,50.0
+Nongshim RedForce,Paper Rex,Split,2,3,66.67
 Nongshim RedForce,Team Vitality,Split,1,1,100.0
 Nova Esports,TYLOO,Split,2,3,66.67
 Nova Esports,Titan Esports Club,Split,0,1,0.0

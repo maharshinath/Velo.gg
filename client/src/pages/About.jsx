@@ -23,7 +23,7 @@ function About() {
                     Velo.gg predicts VCT match and map winners using a margin-aware Elo model plus a
                     small residual (international Elo, map pool, trusted H2H) trained on
                     pro match outcomes — rolling Elo, recent win rates, and map history.
-                    Map predictions cover the current competitive pool plus standard maps (including Summit).
+                    Map predictions cover the current competitive map pool.
                 </p>
                 <p>
                     Live app:{' '}
@@ -42,7 +42,7 @@ function About() {
                     </a>
                 </p>
                 <p>
-                    Current training set: <strong>1,269</strong> pro series, <strong>90</strong> teams
+                    Current training set: <strong>1,271</strong> pro series, <strong>90</strong> teams
                     (VCT 2021–2026, including Stage 2 2026). Refresh with{' '}
                     <code>python scripts/sync_vlr_data.py</code> from <code>server/</code>.
                 </p>

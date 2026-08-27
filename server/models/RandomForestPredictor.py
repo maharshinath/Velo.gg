@@ -9,6 +9,7 @@ if SERVER_DIR not in sys.path:
     sys.path.insert(0, SERVER_DIR)
 
 from feature_engineering import PLAYER_STAT_LOAD_COLUMNS, build_live_feature_tracker
+from map_features import load_map_team_lookup
 from model_training import add_engineered_features, load_model_bundle
 from map_predictions import MapPredictor
 from prediction_extras import (
@@ -38,6 +39,8 @@ class RandomForestPredictor:
                 for team, region in zip(self.team_data["Team"], self.team_data.get("Region", []))
                 if pd.notna(region) and str(region).strip()
             },
+            # Seed pool strength from map_team_stats.csv (RAM-safe; no full map replay).
+            map_lookup=load_map_team_lookup(),
             map_scores=pd.DataFrame(),
         )
         del player_stats

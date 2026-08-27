@@ -206,6 +206,20 @@ class MatchFeatureTracker:
             grouped[keys] = group.drop(columns=["_pair"])
         self._map_scores_index = grouped
 
+    def seed_map_stats(self, lookup: dict[tuple[str, str], dict] | None) -> None:
+        """Seed cumulative map WRs (RAM-safe live path; skips full map-score replay)."""
+        if not lookup:
+            return
+        for (team, map_name), entry in lookup.items():
+            played = int(entry.get("played", 0) or 0)
+            wins = int(entry.get("wins", 0) or 0)
+            if played <= 0:
+                continue
+            self._map_stats[(str(team), str(map_name))] = {
+                "wins": wins,
+                "played": played,
+            }
+
     def _map_lookup(self) -> dict[tuple[str, str], dict]:
         return {
             key: {
@@ -479,11 +493,16 @@ def build_live_feature_tracker(
     map_lookup: dict | None = None,
     map_scores: pd.DataFrame | None = None,
 ) -> MatchFeatureTracker:
-    del map_lookup
     tracker = MatchFeatureTracker(regions=regions)
     tracker.index_player_stats(player_stats)
-    maps = map_scores if map_scores is not None else _load_map_scores_optional()
-    tracker.index_map_scores(maps)
+    # Prefer an explicit CSV lookup for live/API (cheap). Otherwise replay map scores
+    # when provided/available. Empty DataFrame means "skip heavy map replay".
+    if map_lookup:
+        tracker.seed_map_stats(map_lookup)
+    elif map_scores is None:
+        tracker.index_map_scores(_load_map_scores_optional())
+    elif not map_scores.empty:
+        tracker.index_map_scores(map_scores)
     team_a_vals = scores["Team A"].to_numpy()
     team_b_vals = scores["Team B"].to_numpy()
     result_vals = scores["Match Result"].astype(str).to_numpy()

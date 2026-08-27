@@ -11,7 +11,7 @@ function App() {
 
 
   return (
-    <div>
+    <div className="app-shell">
       <NavBar />
       <main className="main-content">
           <Routes>

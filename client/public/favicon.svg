@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Velo.gg">
+  <defs>
+    <linearGradient id="tile" x1="8" y1="4" x2="56" y2="60" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#1a2332"/>
+      <stop offset="1" stop-color="#0c1017"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="64" height="64" rx="14" fill="url(#tile)"/>
+  <rect x="2" y="2" width="60" height="60" rx="12.5" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+
+  <!-- Left crimson blade -->
+  <path d="M15.5 15 L28.5 48 H22.2 L12.8 15 Z" fill="#ff4655"/>
+  <!-- Right teal blade with velocity notch -->
+  <path d="M48.5 15 L41.2 15 L34.6 31.2 L38.8 29 L35.5 36.5 L35.5 48 L41.8 48 Z" fill="#24d2ba"/>
+  <!-- Cream V core -->
+  <path d="M22.5 15 L32 40.5 L41.5 15 H35.6 L32 27.8 L28.4 15 Z" fill="#f4f7fb"/>
+  <!-- Gold call spark -->
+  <path d="M32 11.5 L35.2 18.2 L32 16.4 L28.8 18.2 Z" fill="#f0c14d"/>
+</svg>

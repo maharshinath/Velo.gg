@@ -20,6 +20,13 @@
   letter-spacing: -0.02em;
 }
 
+.navbar-left {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  min-width: 0;
+}
+
 .app-name a {
   color: var(--color-text-primary);
   text-decoration: none;
@@ -55,6 +62,93 @@
   color: var(--color-text-primary);
   background: rgba(255, 70, 85, 0.12);
   border-color: var(--color-border-accent);
+}
+
+.navbar-signal {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.4rem 0.75rem;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(240, 193, 77, 0.28);
+  background:
+    linear-gradient(135deg, rgba(255, 70, 85, 0.1) 0%, rgba(36, 210, 186, 0.08) 100%);
+  color: var(--color-text-primary);
+  text-decoration: none;
+  transition:
+    transform var(--transition-fast),
+    border-color var(--transition-fast),
+    background var(--transition-fast),
+    box-shadow var(--transition-fast);
+}
+
+.navbar-signal:hover {
+  transform: translateY(-1px);
+  border-color: rgba(240, 193, 77, 0.55);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+  color: var(--color-text-primary);
+}
+
+.navbar-signal:focus-visible {
+  outline: 2px solid var(--color-accent-gold);
+  outline-offset: 2px;
+}
+
+.navbar-signal-label {
+  font-size: 0.65rem;
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-accent-gold);
+}
+
+.navbar-signal-x {
+  width: 1.05rem;
+  height: 1.05rem;
+  flex-shrink: 0;
+  color: #ffffff;
+  filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.25));
+  transition: color var(--transition-fast), transform var(--transition-fast), filter var(--transition-fast);
+}
+
+.navbar-signal:hover .navbar-signal-x {
+  color: var(--color-accent-secondary);
+  transform: scale(1.12);
+  filter: drop-shadow(0 0 8px rgba(36, 210, 186, 0.45));
+}
+
+.navbar-signal-handle {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: -0.02em;
+  background: linear-gradient(90deg, #fff 0%, var(--color-accent-secondary) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .navbar-signal {
+    transition: none;
+  }
+
+  .navbar-signal:hover {
+    transform: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .navbar-left {
+    gap: var(--spacing-sm);
+  }
+
+  .navbar-signal {
+    padding: 0.35rem 0.55rem;
+  }
+
+  .navbar-signal-handle {
+    font-size: var(--font-size-xs);
+  }
 }
 
 @media (max-width: 480px) {
