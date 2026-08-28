@@ -272,6 +272,25 @@ def _split_time_ordered(matches: pd.DataFrame, test_size: float) -> tuple[pd.Dat
     return matches.iloc[:split], matches.iloc[split:]
 
 
+def score_time_ordered_holdout(
+    model: Any,
+    matches: pd.DataFrame,
+    feature_cols: list[str],
+    *,
+    test_size: float = 0.2,
+) -> float:
+    """Accuracy (0–100) of model on the latest time-ordered holdout slice."""
+    _, test_base = _split_time_ordered(matches, test_size)
+    if test_base.empty:
+        return 0.0
+    cols = [c for c in feature_cols if c in test_base.columns]
+    if not cols:
+        cols = [c for c in ELO_BASE_COLS if c in test_base.columns]
+    y = test_base["Team A Win"].astype(int).to_numpy()
+    preds = model.predict_proba(test_base[cols])[:, 1] >= 0.5
+    return float((preds == y).mean()) * 100.0
+
+
 def _prepare_xy(matches: pd.DataFrame, time_ordered: bool, test_size: float, random_state: int):
     from sklearn.model_selection import train_test_split
     if time_ordered:

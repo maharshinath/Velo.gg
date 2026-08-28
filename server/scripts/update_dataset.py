@@ -16,7 +16,6 @@ import sys
 from collections import Counter, defaultdict
 from pathlib import Path
 
-import json
 import pandas as pd
 
 SERVER_DIR = Path(__file__).resolve().parents[1]
@@ -33,16 +32,31 @@ from model_training import (  # noqa: E402
     FEATURE_COLS,
     create_order_invariant_data,
     evaluate_time_ordered_accuracy,
+    load_model_bundle,
     save_model_bundle,
+    score_time_ordered_holdout,
     train_match_model,
 )
 import vct_config  # noqa: E402
 
 CSV_DIR = SERVER_DIR / "csv"
 MODEL_DIR = SERVER_DIR / "models"
+MODEL_PATH = MODEL_DIR / "rf.pkl"
 KAGGLE_DIR = SERVER_DIR / "data" / "kaggle"
 RAW_DIR = SERVER_DIR / "data" / "raw"
 VLR_PLAYER_STATS_PATH = SERVER_DIR / "data" / "vlr_player_stats.csv"
+# Candidate must beat deployed model on the same holdout by at least this much.
+PROMOTION_MARGIN = 0.5
+
+
+def deployed_holdout_on_matches(filtered_matches: pd.DataFrame) -> float | None:
+    """Deployed model accuracy on the current time-ordered holdout."""
+    if not MODEL_PATH.exists():
+        return None
+    deployed, feature_cols = load_model_bundle(MODEL_PATH)
+    return score_time_ordered_holdout(
+        deployed, filtered_matches, feature_cols, test_size=0.2
+    )
 
 TEAM_ALIASES = {
     "Mega Minors": "NRG",
@@ -367,8 +381,16 @@ def rebuild_pipeline(
     player_stats: pd.DataFrame,
     *,
     tune: bool = True,
+    min_holdout_accuracy: float | None = None,
 ) -> dict:
     """Rebuild team CSVs, filtered matches, and retrain the match-winner model."""
+    model_backup: bytes | None = None
+    vct_config_backup: str | None = None
+    if MODEL_PATH.exists():
+        model_backup = MODEL_PATH.read_bytes()
+        vct_config_path = SERVER_DIR / "vct_config.py"
+        if vct_config_path.exists():
+            vct_config_backup = vct_config_path.read_text(encoding="utf-8")
     scores = sort_scores_chronologically(scores)
     player_stats = player_stats.copy()
     player_stats["Teams"] = player_stats["Teams"].map(normalize_team)
@@ -431,10 +453,23 @@ def rebuild_pipeline(
             f"({best_acc * 100:.1f}% Elo holdout)",
             flush=True,
         )
-        _persist_elo_tuning(best_k, best_sweep, best_close)
     else:
         print("Building filtered_matches.csv (point-in-time features)...", flush=True)
         filtered_matches = build_match_features(scores, player_stats, map_scores=map_scores)
+
+    deployed_holdout = deployed_holdout_on_matches(filtered_matches)
+    if min_holdout_accuracy is not None:
+        promotion_target = float(min_holdout_accuracy)
+    elif deployed_holdout is not None:
+        promotion_target = deployed_holdout + PROMOTION_MARGIN
+        print(
+            f"Promotion gate: candidate must beat deployed "
+            f"({deployed_holdout:.1f}%) by ≥{PROMOTION_MARGIN:.1f}% "
+            f"→ {promotion_target:.1f}%",
+            flush=True,
+        )
+    else:
+        promotion_target = None
 
     print("Training model (time-ordered split)...", flush=True)
 
@@ -464,22 +499,66 @@ def rebuild_pipeline(
             "best_params": report.get("best_params"),
         },
     )
+    new_holdout = float(report["test_accuracy"])
     print(f"Train accuracy: {report['train_accuracy']}%")
-    print(f"Holdout test accuracy: {report['test_accuracy']}%")
+    print(f"Holdout test accuracy: {new_holdout}%")
     print(f"Elo-only holdout: {report.get('elo_test_accuracy')}%")
     print(f"Best params: {report['best_params']}")
     print(f"Algorithm: {report.get('algorithm', 'unknown')}")
 
-    subprocess.run(
-        [sys.executable, "scripts/evaluate_model.py"],
-        cwd=SERVER_DIR,
-        check=True,
+    promoted = (
+        promotion_target is None or new_holdout + 1e-9 >= promotion_target
     )
+    report["model_promoted"] = promoted
+    report["deployed_holdout_accuracy"] = deployed_holdout
+    report["promotion_target"] = promotion_target
+
+    if promoted:
+        if elo_tune:
+            _persist_elo_tuning(
+                float(elo_tune["elo_k"]),
+                float(elo_tune["elo_margin_sweep"]),
+                float(elo_tune["elo_margin_close"]),
+            )
+        subprocess.run(
+            [sys.executable, "scripts/evaluate_model.py"],
+            cwd=SERVER_DIR,
+            check=True,
+        )
+        print(f"Promoted model ({new_holdout}% holdout). Saved to {MODEL_PATH}")
+    else:
+        if model_backup is not None:
+            MODEL_PATH.write_bytes(model_backup)
+        if vct_config_backup is not None:
+            (SERVER_DIR / "vct_config.py").write_text(
+                vct_config_backup, encoding="utf-8"
+            )
+            print("Rebuilding team CSVs with deployed Elo config...", flush=True)
+            filtered_matches = build_match_features(
+                scores, player_stats, map_scores=map_scores
+            )
+            team_data = build_team_data(scores, player_stats)
+            filtered_matches.to_csv(CSV_DIR / "filtered_matches.csv", index=False)
+            team_data.to_csv(CSV_DIR / "team_data.csv", index=False)
+        baseline = (
+            f"{deployed_holdout:.1f}% deployed"
+            if deployed_holdout is not None
+            else f"{promotion_target:.1f}%"
+        )
+        print(
+            f"Holdout {new_holdout:.1f}% did not beat {baseline} "
+            f"(need ≥{promotion_target:.1f}%) — CSVs updated; kept deployed model.",
+            flush=True,
+        )
+        subprocess.run(
+            [sys.executable, "scripts/evaluate_model.py"],
+            cwd=SERVER_DIR,
+            check=True,
+        )
 
     print(f"scores.csv: {len(scores)} matches")
     print(f"team_data.csv: {len(team_data)} teams")
     print(f"filtered_matches.csv: {len(filtered_matches)} training rows")
-    print(f"Saved model to {MODEL_DIR / 'rf.pkl'}")
     return report
 
 

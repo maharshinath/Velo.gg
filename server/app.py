@@ -145,10 +145,25 @@ class TeamRoster(Resource):
 
 class MetaData(Resource):
     def get(self):
+        match_count = None
+        team_count = None
+        scores_path = SERVER_DIR / "csv" / "scores.csv"
+        try:
+            table = load_team_table()
+            team_count = len(table)
+            if scores_path.exists():
+                match_count = len(pd.read_csv(scores_path))
+        except Exception:
+            pass
+        metrics = load_model_metrics()
+        if match_count is None and metrics.get("match_count"):
+            match_count = metrics["match_count"]
         return {
             "comp_pool_maps": COMP_POOL_MAPS,
             "standard_maps": len(ALL_STANDARD_MAPS),
-            "model_metrics": load_model_metrics(),
+            "model_metrics": metrics,
+            "match_count": match_count,
+            "team_count": team_count,
         }, 200
 
 

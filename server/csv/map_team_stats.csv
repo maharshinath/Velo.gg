@@ -36,8 +36,9 @@ NRG,Abyss,8,12,66.67
 Natus Vincere,Abyss,1,2,50.0
 Nongshim RedForce,Abyss,3,5,60.0
 Nova Esports,Abyss,2,3,66.67
+ONSIDE GAMING,Abyss,0,1,0.0
 PCIFIC Esports,Abyss,1,3,33.33
-Paper Rex,Abyss,0,3,0.0
+Paper Rex,Abyss,1,4,25.0
 Precise Defeat,Abyss,1,1,100.0
 Pure Aim,Abyss,0,1,0.0
 Rex Regum Qeon,Abyss,2,6,33.33
@@ -118,11 +119,11 @@ Natus Vincere,Ascent,5,10,50.0
 Ninjas In Pyjamas,Ascent,1,1,100.0
 Nongshim RedForce,Ascent,5,12,41.67
 Nova Esports,Ascent,3,6,50.0
-ONSIDE GAMING,Ascent,1,2,50.0
+ONSIDE GAMING,Ascent,1,3,33.33
 OpTic Gaming,Ascent,3,11,27.27
 PCIFIC Esports,Ascent,1,5,20.0
 Papara SuperMassive,Ascent,1,2,50.0
-Paper Rex,Ascent,15,24,62.5
+Paper Rex,Ascent,16,25,64.0
 Peeky Blinders,Ascent,0,2,0.0
 Penguins and Frogs,Ascent,0,1,0.0
 QT DIG∞,Ascent,0,1,0.0
@@ -459,7 +460,7 @@ Evil Geniuses,Haven,5,14,35.71
 F4Q,Haven,0,2,0.0
 FNATIC,Haven,21,37,56.76
 FULL SENSE,Haven,1,8,12.5
-FURIA,Haven,7,20,35.0
+FURIA,Haven,7,21,33.33
 FUT Esports,Haven,10,16,62.5
 FunPlus Phoenix,Haven,6,15,40.0
 G2 Esports,Haven,21,31,67.74
@@ -475,7 +476,7 @@ Karmine Corp,Haven,10,16,62.5
 Keyd Stars,Haven,0,2,0.0
 Kiwoom DRX,Haven,6,10,60.0
 LEVIATÁN,Haven,11,18,61.11
-LOUD,Haven,9,22,40.91
+LOUD,Haven,10,23,43.48
 Lavie,Haven,1,1,100.0
 Liberty,Haven,0,1,0.0
 MIBR,Haven,11,20,55.0
@@ -748,7 +749,7 @@ Gambit Esports,Split,2,5,40.0
 Gen.G,Split,4,9,44.44
 Gentle Mates,Split,4,11,36.36
 Giants Gaming,Split,1,2,50.0
-Global Esports,Split,7,15,46.67
+Global Esports,Split,8,16,50.0
 Guild Esports,Split,1,1,100.0
 JD Gaming,Split,2,3,66.67
 JDG Esports,Split,4,8,50.0
@@ -794,7 +795,7 @@ The Guard,Split,0,1,0.0
 Titan Esports Club,Split,5,11,45.45
 Trace Esports,Split,8,12,66.67
 ULF Esports,Split,2,2,100.0
-VARREL,Split,3,6,50.0
+VARREL,Split,3,7,42.86
 VICTORY,Split,2,2,100.0
 Version1,Split,0,2,0.0
 Vision Strikers,Split,2,2,100.0
@@ -822,14 +823,14 @@ Eternal Fire,Summit,1,1,100.0
 Evil Geniuses,Summit,2,2,100.0
 FNATIC,Summit,0,3,0.0
 FULL SENSE,Summit,1,4,25.0
-FURIA,Summit,0,2,0.0
+FURIA,Summit,0,3,0.0
 FUT Esports,Summit,1,2,50.0
 Fire Flux Esports,Summit,2,3,66.67
 FunPlus Phoenix,Summit,1,1,100.0
 GIANTX,Summit,1,1,100.0
 Gen.G,Summit,2,2,100.0
 Gentle Mates,Summit,0,1,0.0
-Global Esports,Summit,1,2,50.0
+Global Esports,Summit,2,3,66.67
 JD Gaming,Summit,2,4,50.0
 JDG Esports,Summit,0,1,0.0
 KRÜ Esports,Summit,1,3,33.33
@@ -837,7 +838,7 @@ Karmine Corp,Summit,0,1,0.0
 KeepBest Gaming,Summit,0,1,0.0
 Kiwoom DRX,Summit,1,2,50.0
 LEVIATÁN,Summit,1,2,50.0
-LOUD,Summit,1,2,50.0
+LOUD,Summit,2,3,66.67
 NRG,Summit,2,2,100.0
 Natus Vincere,Summit,1,2,50.0
 Nongshim RedForce,Summit,1,1,100.0
@@ -854,7 +855,7 @@ Team Secret,Summit,1,3,33.33
 Team Vitality,Summit,1,1,100.0
 Titan Esports Club,Summit,2,3,66.67
 Trace Esports,Summit,1,2,50.0
-VARREL,Summit,0,1,0.0
+VARREL,Summit,0,2,0.0
 Wolves Esports,Summit,1,1,100.0
 Xipto Esports,Summit,0,1,0.0
 100 Thieves,Sunset,3,8,37.5

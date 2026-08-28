@@ -5,7 +5,9 @@ from __future__ import annotations
 import json
 import re
 import sys
+from datetime import datetime, timezone
 from pathlib import Path
+from typing import Any
 
 import pandas as pd
 from sklearn.metrics import accuracy_score
@@ -16,8 +18,10 @@ sys.path.insert(0, str(SERVER_DIR))
 from model_training import (  # noqa: E402
     ELO_BASE_COLS,
     MATCH_MODEL_SOURCE_COLS,
+    _split_time_ordered,
     load_model_bundle,
     probability_scores,
+    score_time_ordered_holdout,
     train_match_model,
     walk_forward_accuracy,
 )
@@ -25,6 +29,7 @@ from tournament_utils import is_international_tournament  # noqa: E402
 from vct_config import BETTING_CONFIDENCE_GATE  # noqa: E402
 
 METRICS_PATH = SERVER_DIR / "data" / "model_metrics.json"
+HOLDOUT_TEST_SIZE = 0.2
 
 
 def _feature_cols_for(df: pd.DataFrame) -> list[str]:
@@ -44,7 +49,6 @@ def _evaluate_random_split(df: pd.DataFrame, test_frac: float = 0.2) -> dict[str
     model, report = train_match_model(
         df, tune=False, test_size=test_frac, time_ordered=False, refit_full=False
     )
-    # Approximate probability metrics on a fresh stratified holdout; accuracy from report.
     from sklearn.model_selection import train_test_split
 
     cols = list(report.get("feature_cols") or _feature_cols_for(df))
@@ -109,8 +113,25 @@ def _selective_accuracy(
     }
 
 
+def _deployed_selective_on_holdout(
+    deployed: Any,
+    feature_cols: list[str],
+    df: pd.DataFrame,
+) -> dict[str, float] | None:
+    _, test_base = _split_time_ordered(df, HOLDOUT_TEST_SIZE)
+    if test_base.empty:
+        return None
+    cols = [c for c in feature_cols if c in test_base.columns]
+    if not cols:
+        return None
+    probs = deployed.predict_proba(test_base[cols])[:, 1]
+    y = test_base["Team A Win"].astype(int).to_numpy()
+    return _selective_accuracy(probs, y, BETTING_CONFIDENCE_GATE)
+
+
 def main() -> None:
     matches_path = SERVER_DIR / "csv" / "filtered_matches.csv"
+    scores_path = SERVER_DIR / "csv" / "scores.csv"
     df = pd.read_csv(matches_path)
     deployed, feature_cols = load_model_bundle(SERVER_DIR / "models" / "rf.pkl")
     import joblib
@@ -125,29 +146,34 @@ def main() -> None:
     intl_scores = _evaluate_segment(intl_df)
     vct_scores = _evaluate_segment(vct_df)
 
-    # Prefer the true time-ordered holdout from training when the deployed model
-    # was refit on all rows (circular holdout would read ~100%).
-    if bundle_metrics.get("refit_full") and bundle_metrics.get("holdout_test_accuracy") is not None:
-        deployed_acc = float(bundle_metrics["holdout_test_accuracy"]) / 100.0
-    else:
-        split = int(len(df) * 0.8)
-        holdout = df.iloc[split:]
-        cols = [c for c in feature_cols if c in holdout.columns]
-        deployed_probs = deployed.predict_proba(holdout[cols])[:, 1]
-        deployed_preds = (deployed_probs >= 0.5).astype(int)
-        deployed_acc = accuracy_score(holdout["Team A Win"].astype(int), deployed_preds)
+    deployed_at_training = bundle_metrics.get("holdout_test_accuracy")
+    if deployed_at_training is not None:
+        deployed_at_training = float(deployed_at_training)
+
+    current_holdout = score_time_ordered_holdout(
+        deployed, df, feature_cols, test_size=HOLDOUT_TEST_SIZE
+    )
+    selective = _deployed_selective_on_holdout(deployed, feature_cols, df)
 
     wf = walk_forward_accuracy(df)
-    selective = (all_scores or {}).get("selective") if all_scores else None
 
     metrics = {
         "random_split_accuracy": round(random_scores["accuracy"] * 100, 1) if random_scores else None,
-        "time_ordered_split_accuracy": round(all_scores["accuracy"] * 100, 1) if all_scores else None,
+        "time_ordered_split_accuracy": round(current_holdout, 1),
+        "current_holdout_accuracy": round(current_holdout, 1),
+        "deployed_at_training_holdout_accuracy": (
+            round(deployed_at_training, 1) if deployed_at_training is not None else None
+        ),
+        "deployed_model_holdout_accuracy": (
+            round(deployed_at_training, 1) if deployed_at_training is not None else round(current_holdout, 1)
+        ),
+        "fresh_retrain_holdout_accuracy": (
+            round(all_scores["accuracy"] * 100, 1) if all_scores else None
+        ),
         "vct_regional_split_accuracy": round(vct_scores["accuracy"] * 100, 1) if vct_scores else None,
         "international_split_accuracy": round(intl_scores["accuracy"] * 100, 1) if intl_scores else None,
         "brier_score": round(all_scores["brier_score"], 4) if all_scores else None,
         "log_loss": round(all_scores["log_loss"], 4) if all_scores else None,
-        "deployed_model_holdout_accuracy": round(deployed_acc * 100, 1),
         "walk_forward_accuracy": (
             round(wf["walk_forward_accuracy"] * 100, 1) if wf else None
         ),
@@ -160,11 +186,12 @@ def main() -> None:
         "selective_65_n": selective.get("n") if selective else None,
         "betting_confidence_gate": round(BETTING_CONFIDENCE_GATE * 100, 1),
         "feature_count": len(feature_cols),
+        "match_count": int(len(pd.read_csv(scores_path))) if scores_path.exists() else len(df),
+        "evaluated_at": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
         "note": (
-            "Segment splits use time-ordered holdout. "
-            "selective_65_* = accuracy/coverage when only picking favorites "
-            f"at confidence ≥ {BETTING_CONFIDENCE_GATE*100:.0f}%. "
-            "Lower Brier score = better calibrated probabilities."
+            "current_holdout_accuracy = deployed model on the latest 20% of matches "
+            "(refreshed features). deployed_at_training_holdout_accuracy = score when "
+            "the pickle was saved. selective_65_* uses the deployed model on that holdout."
         ),
     }
     METRICS_PATH.parent.mkdir(parents=True, exist_ok=True)

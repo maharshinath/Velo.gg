@@ -110,6 +110,7 @@ NRG,Nongshim RedForce,Abyss,0,1,0.0
 Nongshim RedForce,Paper Rex,Abyss,2,2,100.0
 Nongshim RedForce,Rex Regum Qeon,Abyss,0,1,0.0
 Nova Esports,Wolves Esports,Abyss,1,2,50.0
+ONSIDE GAMING,Paper Rex,Abyss,0,1,0.0
 PCIFIC Esports,ULF Esports,Abyss,0,1,0.0
 Precise Defeat,Pure Aim,Abyss,1,1,100.0
 Rex Regum Qeon,T1,Abyss,0,1,0.0
@@ -366,6 +367,7 @@ Nova Esports,Xi Lai Gaming,Ascent,0,1,0.0
 Nova Esports,Trace Esports,Ascent,1,1,100.0
 ONSIDE GAMING,Team Secret,Ascent,1,1,100.0
 ONSIDE GAMING,Sharper Esports,Ascent,0,1,0.0
+ONSIDE GAMING,Paper Rex,Ascent,0,1,0.0
 OpTic Gaming,Team Liquid,Ascent,1,1,100.0
 OpTic Gaming,XSET,Ascent,0,1,0.0
 OpTic Gaming,XERXIA Esports,Ascent,0,1,0.0
@@ -1242,6 +1244,7 @@ FURIA,NRG,Haven,0,1,0.0
 FURIA,Paper Rex,Haven,1,1,100.0
 FURIA,MIBR,Haven,1,2,50.0
 FURIA,G2 Esports,Haven,1,1,100.0
+FURIA,LOUD,Haven,0,1,0.0
 FUT Esports,T1,Haven,1,1,100.0
 FUT Esports,Team Vitality,Haven,1,2,50.0
 FUT Esports,GIANTX,Haven,1,1,100.0
@@ -2240,7 +2243,7 @@ Gentle Mates,Team Vitality,Split,0,1,0.0
 Global Esports,Paper Rex,Split,1,4,25.0
 Global Esports,Team Secret,Split,2,2,100.0
 Global Esports,TALON,Split,1,1,100.0
-Global Esports,VARREL,Split,1,1,100.0
+Global Esports,VARREL,Split,2,2,100.0
 Global Esports,ZETA DIVISION,Split,1,1,100.0
 Guild Esports,OpTic Gaming,Split,1,1,100.0
 JD Gaming,Trace Esports,Split,0,1,0.0
@@ -2363,12 +2366,14 @@ FULL SENSE,Global Esports,Summit,0,1,0.0
 FULL SENSE,Rex Regum Qeon,Summit,0,2,0.0
 FULL SENSE,QT DIG∞,Summit,1,1,100.0
 FURIA,NRG,Summit,0,1,0.0
+FURIA,LOUD,Summit,0,1,0.0
 FUT Esports,Team Liquid,Summit,1,1,100.0
 Fire Flux Esports,PCIFIC Esports,Summit,1,1,100.0
 Fire Flux Esports,Team Heretics,Summit,0,1,0.0
 FunPlus Phoenix,JDG Esports,Summit,1,1,100.0
 Gen.G,Rex Regum Qeon,Summit,1,1,100.0
 Gen.G,Global Esports,Summit,1,1,100.0
+Global Esports,VARREL,Summit,1,1,100.0
 JD Gaming,Nova Esports,Summit,1,1,100.0
 JD Gaming,TYLOO,Summit,0,1,0.0
 KRÜ Esports,Sentinels,Summit,0,1,0.0
