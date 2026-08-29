@@ -10,7 +10,7 @@
   object-fit: contain;
   margin: 0 auto var(--spacing-md);
   border-radius: var(--radius-md);
-  background: var(--color-bg-secondary);
+  background: var(--logo-plate, #f3f5f8);
   padding: var(--spacing-sm);
   border: 1px solid var(--color-border-primary);
   display: block;

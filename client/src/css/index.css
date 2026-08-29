@@ -305,12 +305,38 @@ input:focus, select:focus, textarea:focus {
   h2 { font-size: var(--font-size-2xl); }
 }
 
-/* VLR serves some logos as white-on-transparent; keep visible on white logo plates */
-img[src*="nrg-logo"] {
-  background-color: #111111;
-  border-radius: var(--radius-sm);
+/* Logo contrast: light plate + dual outline so white and black marks both read */
+:root {
+  --logo-plate: #f3f5f8;
 }
 
-.matchup-logo-wrap:has(img[src*="nrg-logo"]) {
-  background: #111111;
+.logo-plate,
+.matchup-logo-wrap {
+  background: var(--logo-plate);
+}
+
+.map-pick-winner-logo,
+.stats-diff-logo,
+.team-logo,
+.winner-announcement-logo,
+.today-logo,
+.button_icon,
+.card img {
+  background-color: var(--logo-plate);
+}
+
+.matchup-logo,
+.map-pick-winner-logo,
+.stats-diff-logo,
+.team-logo,
+.winner-announcement-logo,
+.today-logo,
+.button_icon,
+.card img {
+  /* Hairline black + white edge — works on light or dark marks */
+  filter:
+    drop-shadow(0 0 0.7px #000)
+    drop-shadow(0 0 0.7px #000)
+    drop-shadow(0 0 0.7px #fff)
+    drop-shadow(0 0 0.7px #fff);
 }

@@ -117,6 +117,9 @@
   height: 22px;
   object-fit: contain;
   flex-shrink: 0;
+  border-radius: 3px;
+  padding: 1px;
+  background: var(--logo-plate, #f3f5f8);
 }
 
 .today-score {

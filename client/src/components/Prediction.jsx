@@ -39,16 +39,30 @@ function plainRecReason(betting, hasOdds) {
 }
 
 function BettingInsightsPanel({ team1, team2, betting, oddsLoading }) {
+  const riskDisclaimer = (
+    <p className="prediction-disclaimer betting-disclaimer">
+      This betting tab is for experimentation and for fun — learning statistics and
+      mathematics, not for making money. It is not financial advice. Betting is risky;
+      you can lose money. I am not responsible for any losses.
+    </p>
+  )
+
   if (oddsLoading && !betting?.odds_available) {
     return (
-      <p className="tab-panel-message">Looking up book prices on VLR…</p>
+      <div className="betting-insights">
+        <p className="tab-panel-message">Looking up book prices on VLR…</p>
+        {riskDisclaimer}
+      </div>
     )
   }
   if (!betting) {
     return (
-      <p className="tab-panel-message">
-        Betting info isn't available for this matchup.
-      </p>
+      <div className="betting-insights">
+        <p className="tab-panel-message">
+          Betting info isn't available for this matchup.
+        </p>
+        {riskDisclaimer}
+      </div>
     )
   }
 
@@ -139,9 +153,7 @@ function BettingInsightsPanel({ team1, team2, betting, oddsLoading }) {
         </div>
       )}
 
-      <p className="prediction-disclaimer">
-        For fun / learning only — not financial advice. Betting involves risk.
-      </p>
+      {riskDisclaimer}
     </div>
   )
 }
@@ -158,20 +170,22 @@ function Prediction({
   oddsLoading,
   onRosterTabOpen,
 }) {
-  const [revealed, setRevealed] = useState(false)
+  const [phase, setPhase] = useState('idle') // idle | lock | reveal
   const [activeTab, setActiveTab] = useState('winner')
 
   useEffect(() => {
-    setRevealed(false)
-    let frame2 = 0
-    const frame1 = requestAnimationFrame(() => {
-      frame2 = requestAnimationFrame(() => setRevealed(true))
+    setPhase('idle')
+    let lock
+    let reveal
+    // Double-rAF so the browser paints idle before lock/reveal classes apply
+    const raf = requestAnimationFrame(() => {
+      lock = window.setTimeout(() => setPhase('lock'), 80)
+      reveal = window.setTimeout(() => setPhase('reveal'), 1100)
     })
-    const fallback = window.setTimeout(() => setRevealed(true), 120)
     return () => {
-      cancelAnimationFrame(frame1)
-      cancelAnimationFrame(frame2)
-      window.clearTimeout(fallback)
+      cancelAnimationFrame(raf)
+      window.clearTimeout(lock)
+      window.clearTimeout(reveal)
     }
   }, [result, team1?.Team, team2?.Team])
 
@@ -186,14 +200,48 @@ function Prediction({
 
   if (!team1 || !team2 || !result) return null
 
-  const team1Wins = result.team1_win_prediction
+  const team1Wins =
+    result.team1_win_prediction ??
+    (Number(result.team1_win_probability) >= Number(result.team2_win_probability))
   const winner = team1Wins ? team1 : team2
   const confidence = result.confidence
   const winnerProb = team1Wins ? result.team1_win_probability : result.team2_win_probability
+  const revealed = phase === 'reveal'
+
+  const winnerFx = (
+    <>
+      <div className="matchup-winner-glow" aria-hidden="true" />
+      <div className="matchup-winner-shimmer" aria-hidden="true" />
+      <div className="matchup-shockwave" aria-hidden="true" />
+      <div className="matchup-sparks" aria-hidden="true">
+        {Array.from({ length: 14 }, (_, i) => (
+          <span key={i} className="matchup-spark" style={{ '--i': i }} />
+        ))}
+      </div>
+      <span className="matchup-pick-label">Predicted</span>
+    </>
+  )
 
   return (
-    <div className={`prediction-container ${revealed ? 'is-revealed' : ''}`}>
-      {revealed && <div className="winner-celebration-burst" aria-hidden="true" />}
+    <div
+      key={`${team1.Team}-${team2.Team}-${winner.Team}-${winnerProb}`}
+      className={`prediction-container is-phase-${phase}`}
+    >
+      <div className="winner-callout" aria-live="polite">
+        {phase === 'lock' && <span className="winner-callout__lock">Calling it…</span>}
+        {phase === 'reveal' && (
+          <span className="winner-callout__reveal">
+            <strong>{winner.Team}</strong>
+            <em>predicted winner</em>
+          </span>
+        )}
+      </div>
+      {revealed && (
+        <>
+          <div className="winner-celebration-burst" aria-hidden="true" />
+          <div className="winner-flash" aria-hidden="true" />
+        </>
+      )}
       <div className="prediction-header">
         <h3>Match winner prediction</h3>
         {confidence && (
@@ -203,18 +251,12 @@ function Prediction({
         )}
       </div>
 
-      <div className={`prediction-teams-strip${revealed ? ' is-revealed' : ''}`}>
+      <div className={`prediction-teams-strip is-phase-${phase}`}>
         <div className="matchup-stage">
           <article
             className={`matchup-slot${team1Wins ? ' matchup-slot--winner' : ' matchup-slot--loser'}`}
           >
-            {team1Wins && (
-              <>
-                <div className="matchup-winner-glow" aria-hidden="true" />
-                <div className="matchup-winner-shimmer" aria-hidden="true" />
-                <span className="matchup-pick-label">Predicted</span>
-              </>
-            )}
+            {team1Wins && winnerFx}
             <div className="matchup-slot-content">
               <div className="matchup-logo-wrap">
                 <img
@@ -242,13 +284,7 @@ function Prediction({
           <article
             className={`matchup-slot${!team1Wins ? ' matchup-slot--winner' : ' matchup-slot--loser'}`}
           >
-            {!team1Wins && (
-              <>
-                <div className="matchup-winner-glow" aria-hidden="true" />
-                <div className="matchup-winner-shimmer" aria-hidden="true" />
-                <span className="matchup-pick-label">Predicted</span>
-              </>
-            )}
+            {!team1Wins && winnerFx}
             <div className="matchup-slot-content">
               <div className="matchup-logo-wrap">
                 <img
@@ -295,14 +331,16 @@ function Prediction({
             {activeTab === 'winner' && (
               <div className="prediction-content prediction-tab-winner">
                 <div className="prediction-result glass">
-                  <div className="winner-announcement">
+                  <div className={`winner-announcement${revealed ? ' is-live' : ''}`}>
                     <span className="predicted-text">Predicted winner</span>
-                    <img
-                      className="winner-announcement-logo"
-                      src={logoUrl(winner['Image Path'])}
-                      alt=""
-                      onError={(e) => { e.currentTarget.src = DEFAULT_LOGO }}
-                    />
+                    <div className="winner-announcement-logo-wrap">
+                      <img
+                        className="winner-announcement-logo"
+                        src={logoUrl(winner['Image Path'])}
+                        alt=""
+                        onError={(e) => { e.currentTarget.src = DEFAULT_LOGO }}
+                      />
+                    </div>
                     <span className="winner-name">{winner.Team}</span>
                     {winnerProb != null && (
                       <span className="winner-chance-badge">{winnerProb}% win chance</span>

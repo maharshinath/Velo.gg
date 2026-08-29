@@ -96,7 +96,18 @@ def download_logo(url: str, dest: Path) -> bool:
 
 
 # White-on-transparent logos from VLR disappear on the app's white logo plates
-LIGHT_LOGO_TEAMS = {"NRG"}
+LIGHT_LOGO_TEAMS = {
+    "NRG",
+    "Evil Geniuses",
+    "GIANTX",
+    "Karmine Corp",
+    "Team Liquid",
+    "Gen.G",
+    "Gentle Mates",
+    "ZETA DIVISION",
+    "Global Esports",
+    "DetonatioN FocusMe",
+}
 
 
 def _logo_pixel_counts(src) -> tuple[int, int, int]:
@@ -126,6 +137,7 @@ def fix_light_logo(dest: Path, *, force: bool = False) -> None:
 
     light, dark, transparent = _logo_pixel_counts(src)
     n = src.size[0] * src.size[1]
+    opaque = max(1, n - transparent)
 
     # Black mark baked onto a near-black plate (e.g. Paper Rex) — lift onto white
     if transparent == 0 and light == 0 and dark == n:
@@ -140,12 +152,50 @@ def fix_light_logo(dest: Path, *, force: bool = False) -> None:
         out.save(dest, optimize=True)
         return
 
-    if not force and (light == 0 or dark > light // 4):
+    auto_light = light > max(dark * 2, opaque * 0.35)
+    if not force and not auto_light and (light == 0 or dark > light // 4):
         return
 
     bg = Image.new("RGBA", src.size, (17, 17, 17, 255))
     bg.paste(src, (0, 0), src)
     bg.save(dest, optimize=True)
+
+
+def normalize_existing_logos() -> int:
+    """Re-process all PNGs so light marks stay visible on white UI plates."""
+    fixed = 0
+    for dest in sorted(LOGO_DIR.glob("*.png")):
+        before = dest.read_bytes()
+        fix_light_logo(dest, force=False)
+        # Also force known light-logo filenames
+        name = dest.name.lower()
+        if any(
+            key in name
+            for key in (
+                "nrg",
+                "evil-geniuses",
+                "giantx",
+                "karmine",
+                "liquid",
+                "gen.g",
+                "gentle-mates",
+                "zeta",
+                "global-esports",
+                "detonation",
+                "heretics-logo",
+                "fut-logo",
+                "secret-logo",
+                "vitality-logo",
+                "nova-logo",
+                "titan-logo",
+                "mibr",
+                "x10",
+            )
+        ):
+            fix_light_logo(dest, force=True)
+        if dest.read_bytes() != before:
+            fixed += 1
+    return fixed
 
 
 def main(dry_run: bool) -> None:
@@ -165,6 +215,8 @@ def main(dry_run: bool) -> None:
 
         if dest.exists() and dest.stat().st_size > 500:
             skipped += 1
+            # Re-normalize so light marks stay visible after UI plate changes
+            fix_light_logo(dest, force=team in LIGHT_LOGO_TEAMS)
             team_data.loc[team_data["Team"] == row["Team"], "Image Path"] = image_path
             continue
 
@@ -183,8 +235,7 @@ def main(dry_run: bool) -> None:
             continue
 
         if download_logo(url, dest):
-            if team in LIGHT_LOGO_TEAMS:
-                fix_light_logo(dest, force=True)
+            fix_light_logo(dest, force=team in LIGHT_LOGO_TEAMS)
             downloaded += 1
             team_data.loc[team_data["Team"] == row["Team"], "Image Path"] = image_path
             print(f"OK  {team} -> {filename}")
@@ -203,6 +254,8 @@ def main(dry_run: bool) -> None:
             lambda t: f"/static/logos/{logo_filename(t)}"
         )
         team_data.to_csv(TEAM_DATA_PATH, index=False)
+        normalized = normalize_existing_logos()
+        print(f"Normalized existing logos: {normalized}")
 
     print(f"\nDownloaded: {downloaded}, already had: {skipped}, failed: {len(failed)}")
     for team, reason in failed:

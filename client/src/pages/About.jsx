@@ -6,17 +6,79 @@ import '../css/Home.css'
 const FALLBACK_METRICS = {
   current_holdout_accuracy: 61.4,
   deployed_at_training_holdout_accuracy: 61.4,
+  time_ordered_split_accuracy: 61.4,
   walk_forward_accuracy: 58.7,
+  vct_regional_split_accuracy: 61.1,
+  international_split_accuracy: 62.2,
   selective_65_accuracy: 69.0,
   selective_65_coverage: 28.5,
+  selective_65_n: 71,
   betting_confidence_gate: 65,
+  brier_score: 0.2339,
+  log_loss: 0.6606,
+  feature_count: 4,
   match_count: 1279,
   evaluated_at: '2026-08-29',
 }
 
+const FALLBACK_MAP_POOL = [
+  'Abyss',
+  'Ascent',
+  'Haven',
+  'Lotus',
+  'Split',
+  'Summit',
+  'Sunset',
+]
+
 function fmtPct(value) {
   if (value == null || Number.isNaN(Number(value))) return '—'
   return `${Number(value).toFixed(1)}%`
+}
+
+function fmtNum(value, digits = 0) {
+  if (value == null || Number.isNaN(Number(value))) return '—'
+  if (digits > 0) return Number(value).toFixed(digits)
+  return Number(value).toLocaleString()
+}
+
+function AboutTable({ columns, rows }) {
+  return (
+    <div className="about-table-wrap">
+      <table className="about-table">
+        <thead>
+          <tr>
+            {columns.map((col) => (
+              <th key={col.key} scope="col">
+                {col.label}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((row) => (
+            <tr key={row.metric}>
+              <th scope="row">{row.metric}</th>
+              {columns.slice(1).map((col) => (
+                <td
+                  key={col.key}
+                  className={
+                    col.numeric
+                      ? 'about-table__num'
+                      : col.note
+                        ? 'about-table__note'
+                        : undefined
+                  }
+                >
+                  {row[col.key]}
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  )
 }
 
 function About() {
@@ -35,30 +97,110 @@ function About() {
   const matchCount = meta?.match_count ?? metrics.match_count ?? 1279
   const teamCount = meta?.team_count ?? 90
   const confidenceGate = metrics.betting_confidence_gate ?? 65
+  const mapPool = meta?.comp_pool_maps?.length
+    ? meta.comp_pool_maps
+    : FALLBACK_MAP_POOL
+  const holdoutN =
+    metrics.selective_65_n != null && metrics.selective_65_coverage != null
+      ? Math.round(
+          (Number(metrics.selective_65_n) / Number(metrics.selective_65_coverage)) * 100
+        )
+      : null
 
-  const statCards = [
+  const datasetRows = [
+    { metric: 'Pro series (matches)', value: fmtNum(matchCount) },
+    { metric: 'Teams', value: fmtNum(teamCount) },
+    { metric: 'Seasons covered', value: 'VCT 2021 – Stage 2 2026' },
+    { metric: 'Data sources', value: 'Kaggle base + VLR sync' },
+    { metric: 'Feature count (live model)', value: fmtNum(metrics.feature_count) },
+    { metric: 'Last metrics eval', value: metrics.evaluated_at ?? '—' },
+  ]
+
+  const accuracyRows = [
     {
-      label: 'Current holdout',
+      metric: 'Current holdout',
       value: fmtPct(currentHoldout),
-      hint: 'Deployed model on the latest 20% of pro series',
-      primary: true,
+      detail: holdoutN
+        ? `Latest ~20% of series (~${fmtNum(holdoutN)} matches)`
+        : 'Latest ~20% of series, point-in-time features',
     },
     {
-      label: `High-confidence picks (≥${confidenceGate}%)`,
-      value: fmtPct(metrics.selective_65_accuracy),
-      hint: metrics.selective_65_coverage != null
-        ? `${metrics.selective_65_coverage}% of recent holdout games`
-        : 'Favorites the model is most sure about',
-    },
-    {
-      label: 'At model deployment',
+      metric: 'At model deployment',
       value: fmtPct(atTraining),
-      hint: 'Benchmark when the live model was saved',
+      detail: 'Score when the live pickle was saved',
     },
     {
-      label: 'Walk-forward',
+      metric: 'Walk-forward',
       value: fmtPct(metrics.walk_forward_accuracy),
-      hint: 'Rolling out-of-sample check across seasons',
+      detail: 'Rolling out-of-sample across seasons',
+    },
+    {
+      metric: 'Regional VCT',
+      value: fmtPct(metrics.vct_regional_split_accuracy),
+      detail: 'Time-ordered holdout on regional leagues',
+    },
+    {
+      metric: 'International',
+      value: fmtPct(metrics.international_split_accuracy),
+      detail: 'Time-ordered holdout on international events',
+    },
+    {
+      metric: `High-confidence (≥${confidenceGate}%)`,
+      value: fmtPct(metrics.selective_65_accuracy),
+      detail:
+        metrics.selective_65_coverage != null
+          ? `${Number(metrics.selective_65_coverage).toFixed(1)}% of holdout · n=${fmtNum(metrics.selective_65_n)}`
+          : 'Favorites above the confidence gate',
+    },
+  ]
+
+  const calibrationRows = [
+    {
+      metric: 'Brier score',
+      value: fmtNum(metrics.brier_score, 4),
+      detail: 'Lower is better — probability calibration',
+    },
+    {
+      metric: 'Log loss',
+      value: fmtNum(metrics.log_loss, 4),
+      detail: 'Lower is better — probabilistic scoring',
+    },
+    {
+      metric: 'Confidence gate',
+      value: fmtPct(confidenceGate),
+      detail: 'Used for selective / high-confidence reporting',
+    },
+  ]
+
+  const modelRows = [
+    { metric: 'Live algorithm', value: 'Margin-aware Elo (pure Elo)' },
+    {
+      metric: 'Residual blend',
+      value: 'Gated — only ships if it beats Elo on holdout',
+    },
+    {
+      metric: 'Elo settings',
+      value: 'K=32 · sweep×1.25 · close×0.85',
+    },
+    {
+      metric: 'Core signals',
+      value: 'Team Elo, win rates, international Elo, map pool, H2H',
+    },
+    {
+      metric: 'Promotion rule',
+      value: 'Must beat deployed model on the same holdout by ≥0.5%',
+    },
+    {
+      metric: 'Map predictions',
+      value: 'Historical map win rates on the current pool',
+    },
+    {
+      metric: 'Competitive map pool',
+      value: mapPool.join(', '),
+    },
+    {
+      metric: 'Betting tab',
+      value: 'Experiment / learning only — not financial advice',
     },
   ]
 
@@ -75,65 +217,63 @@ function About() {
 
       <div className="about about-page__body">
         <section className="about-section">
-          <h2 className="about-section__title">How it works</h2>
-          <p>
-            Match predictions start with a margin-aware Elo rating built from pro series
-            results. A small residual layer (international Elo gap, map-pool strength,
-            trusted head-to-head) is only used when it beats pure Elo on holdout; the
-            current live model is pure Elo.
-          </p>
-          <p>
-            Map tabs use historical win rates on the current competitive pool: Abyss,
-            Ascent, Haven, Lotus, Split, Summit, and Sunset.
-          </p>
-        </section>
-
-        <section className="about-section">
           <h2 className="about-section__title">Dataset</h2>
-          <p>
-            <strong>{matchCount.toLocaleString()}</strong> pro series across{' '}
-            <strong>{teamCount}</strong> teams — VCT 2021 through Stage 2 2026, synced
-            from{' '}
+          <AboutTable
+            columns={[
+              { key: 'metric', label: 'Metric' },
+              { key: 'value', label: 'Value' },
+            ]}
+            rows={datasetRows}
+          />
+          <p className="about-section__footnote">
+            Base data from{' '}
             <a
               href="https://www.kaggle.com/datasets/ryanluong1/valorant-champion-tour-2021-2023-data"
               target="_blank"
               rel="noopener noreferrer"
             >
               Kaggle
-            </a>{' '}
-            and refreshed with newer results from VLR.
+            </a>
+            ; newer Stage 2 results synced from VLR.
           </p>
         </section>
 
         <section className="about-section">
           <h2 className="about-section__title">Model accuracy</h2>
-          <p className="about-section__intro">
-            Holdout accuracy is measured on the most recent 20% of matches with
-            point-in-time features — the same way we gate new model releases.
-            {metrics.evaluated_at && (
-              <> Last evaluated {metrics.evaluated_at}.</>
-            )}
+          <AboutTable
+            columns={[
+              { key: 'metric', label: 'Metric' },
+              { key: 'value', label: 'Accuracy', numeric: true },
+              { key: 'detail', label: 'Notes', note: true },
+            ]}
+            rows={accuracyRows}
+          />
+          <p className="about-section__footnote">
+            Holdout uses the most recent 20% of matches with point-in-time features.
           </p>
-          <div className="about-stats" role="list">
-            {statCards.map((card) => (
-              <article
-                key={card.label}
-                className={`about-stat${card.primary ? ' about-stat--primary' : ''}`}
-                role="listitem"
-              >
-                <span className="about-stat__label">{card.label}</span>
-                <span className="about-stat__value">{card.value}</span>
-                <span className="about-stat__hint">{card.hint}</span>
-              </article>
-            ))}
-          </div>
-          {atTraining != null && currentHoldout != null && atTraining !== currentHoldout && (
-            <p className="about-section__footnote">
-              The live model was saved at {fmtPct(atTraining)} holdout; current holdout
-              is {fmtPct(currentHoldout)} because recent 2026 matches dominate the test
-              window and features are rebuilt as new results arrive.
-            </p>
-          )}
+        </section>
+
+        <section className="about-section">
+          <h2 className="about-section__title">Calibration</h2>
+          <AboutTable
+            columns={[
+              { key: 'metric', label: 'Metric' },
+              { key: 'value', label: 'Value', numeric: true },
+              { key: 'detail', label: 'Notes', note: true },
+            ]}
+            rows={calibrationRows}
+          />
+        </section>
+
+        <section className="about-section">
+          <h2 className="about-section__title">Model & product</h2>
+          <AboutTable
+            columns={[
+              { key: 'metric', label: 'Item' },
+              { key: 'value', label: 'Detail' },
+            ]}
+            rows={modelRows}
+          />
         </section>
 
         <section className="about-section about-section--compact">
