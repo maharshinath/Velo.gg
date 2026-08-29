@@ -8863,7 +8863,7 @@ VCT 2026: Pacific Stage 2,Playoffs,Lower Round 2,invy,PRX,"Fade, Viper",,1.0,186
 VCT 2026: Pacific Stage 2,Playoffs,Lower Round 2,d4v41,PRX,"Viper, Sage",,0.98,187.0,1.022222222222222,74.0,123.0,,,4.0,7.0,37.0,,,46.0,46.0,45.0,17.0,4.0,7.0
 VCT 2026: Pacific Stage 2,Playoffs,Lower Round 2,something,PRX,"Yoru, Sova",,0.85,153.0,0.851063829787234,66.0,104.0,,,7.0,5.0,33.0,,,40.0,40.0,47.0,12.0,7.0,5.0
 VCT 2026: Pacific Stage 2,Playoffs,Lower Round 2,f0rsakeN,PRX,Omen,,0.7,151.0,0.6727272727272727,67.0,97.0,,,5.0,7.0,29.0,,,37.0,37.0,55.0,24.0,5.0,7.0
-VCT 2026: EMEA Stage 2,Playoffs,Upper Final,yetujey,FUT Esports,"Viper, Cypher",,1.19,263.0,1.3461538461538463,73.0,181.0,,,3.0,1.0,36.0,,,35.0,35.0,26.0,8.0,3.0,1.0
+VCT 2026: EMEA Stage 2,Playoffs,Upper Final,yetujey,FUT Esports,"Viper, Cypher",,1.19,263.0,1.3461538461538465,73.0,181.0,,,3.0,1.0,36.0,,,35.0,35.0,26.0,8.0,3.0,1.0
 VCT 2026: EMEA Stage 2,Playoffs,Upper Final,s0pp,FUT Esports,"Neon, Jett",,0.93,203.0,0.967741935483871,63.0,133.0,,,5.0,6.0,23.0,,,30.0,30.0,31.0,7.0,5.0,6.0
 VCT 2026: EMEA Stage 2,Playoffs,Upper Final,KROSTALY,FUT Esports,"Skye, Sova",,0.73,124.0,0.6206896551724138,60.0,91.0,,,2.0,4.0,33.0,,,18.0,18.0,29.0,10.0,2.0,4.0
 VCT 2026: EMEA Stage 2,Playoffs,Upper Final,sociablEE,FUT Esports,Omen,,0.68,166.0,0.7352941176470589,58.0,107.0,,,2.0,8.0,38.0,,,25.0,25.0,34.0,10.0,2.0,8.0
@@ -8875,7 +8875,7 @@ VCT 2026: EMEA Stage 2,Playoffs,Upper Final,SUYGETSU,KC,"Viper, Cypher",,0.91,12
 VCT 2026: EMEA Stage 2,Playoffs,Upper Final,dos9,KC,Omen,,0.82,141.0,0.72,80.0,84.0,,,4.0,4.0,25.0,,,18.0,18.0,25.0,22.0,4.0,4.0
 VCT 2026: EMEA Stage 2,Playoffs,Lower Round 3,trexx,TL,"Sova, Fade",,1.37,263.0,1.4482758620689655,80.0,170.0,,,2.0,2.0,22.0,,,42.0,42.0,29.0,17.0,2.0,2.0
 VCT 2026: EMEA Stage 2,Playoffs,Lower Round 3,nAts,TL,Cypher,,1.21,242.0,1.3571428571428572,72.0,151.0,,,7.0,5.0,24.0,,,38.0,38.0,28.0,15.0,7.0,5.0
-VCT 2026: EMEA Stage 2,Playoffs,Lower Round 3,Kicks,TL,Omen,,1.04,167.0,1.0344827586206897,70.0,106.0,,,3.0,2.0,31.0,,,30.0,30.0,29.0,12.0,3.0,2.0
+VCT 2026: EMEA Stage 2,Playoffs,Lower Round 3,Kicks,TL,Omen,,1.04,167.0,1.0344827586206895,70.0,106.0,,,3.0,2.0,31.0,,,30.0,30.0,29.0,12.0,3.0,2.0
 VCT 2026: EMEA Stage 2,Playoffs,Lower Round 3,kamo,TL,"Phoenix, Raze",,0.94,201.0,0.8823529411764706,72.0,139.0,,,6.0,8.0,23.0,,,30.0,30.0,34.0,16.0,6.0,8.0
 VCT 2026: EMEA Stage 2,Playoffs,Lower Round 3,purp0,TL,Jett,,0.87,159.0,0.9655172413793104,70.0,108.0,,,4.0,7.0,43.0,,,28.0,28.0,29.0,4.0,4.0,7.0
 VCT 2026: EMEA Stage 2,Playoffs,Lower Round 3,hezacoil,FF,Vyse,,1.01,193.0,1.0,74.0,125.0,,,5.0,5.0,35.0,,,31.0,31.0,31.0,9.0,5.0,5.0
@@ -8889,28 +8889,48 @@ VCT 2026: Americas Stage 2,Playoffs,Upper Semifinals,skuba,NRG,"Cypher, Viper",,
 VCT 2026: Americas Stage 2,Playoffs,Upper Semifinals,keiko,NRG,"Jett, Omen",,0.98,180.0,1.0,77.0,127.0,,,8.0,8.0,32.0,,,41.0,41.0,41.0,13.0,8.0,8.0
 VCT 2026: Americas Stage 2,Playoffs,Upper Semifinals,Ethan,NRG,"Omen, Fade",,0.87,143.0,0.7857142857142857,69.0,97.0,,,3.0,7.0,19.0,,,33.0,33.0,42.0,26.0,3.0,7.0
 VCT 2026: Americas Stage 2,Playoffs,Upper Semifinals,lukxo,LOUD,"Chamber, Yoru",,1.13,251.0,1.2666666666666666,66.0,164.0,,,12.0,14.0,28.0,,,57.0,57.0,45.0,5.0,12.0,14.0
-VCT 2026: Americas Stage 2,Playoffs,Upper Semifinals,erde,LOUD,Omen,,0.95,178.0,0.9111111111111111,77.0,115.0,,,2.0,5.0,21.0,,,41.0,41.0,45.0,28.0,2.0,5.0
+VCT 2026: Americas Stage 2,Playoffs,Upper Semifinals,erde,LOUD,Omen,,0.95,178.0,0.9111111111111112,77.0,115.0,,,2.0,5.0,21.0,,,41.0,41.0,45.0,28.0,2.0,5.0
 VCT 2026: Americas Stage 2,Playoffs,Upper Semifinals,Darker,LOUD,"Phoenix, Harbor, Viper",,0.78,185.0,0.8541666666666666,74.0,123.0,,,5.0,3.0,23.0,,,41.0,41.0,48.0,16.0,5.0,3.0
 VCT 2026: Americas Stage 2,Playoffs,Upper Semifinals,tkzin,LOUD,"Neon, Waylay",,0.66,179.0,0.7551020408163265,61.0,120.0,,,8.0,8.0,33.0,,,37.0,37.0,49.0,7.0,8.0,8.0
-VCT 2026: Americas Stage 2,Playoffs,Upper Semifinals,DaviH,LOUD,"Sova, Fade",,0.65,101.0,0.46511627906976744,60.0,82.0,,,1.0,3.0,22.0,,,20.0,20.0,43.0,14.0,1.0,3.0
+VCT 2026: Americas Stage 2,Playoffs,Upper Semifinals,DaviH,LOUD,"Sova, Fade",,0.65,101.0,0.4651162790697674,60.0,82.0,,,1.0,3.0,22.0,,,20.0,20.0,43.0,14.0,1.0,3.0
 VCT 2026: Americas Stage 2,Playoffs,Upper Semifinals,vora,100T,"Skye, Fade",,1.47,236.0,2.1875,77.0,143.0,,,3.0,1.0,30.0,,,35.0,35.0,16.0,11.0,3.0,1.0
 VCT 2026: Americas Stage 2,Playoffs,Upper Semifinals,Timotino,100T,Neon,,1.25,258.0,1.2916666666666667,83.0,163.0,,,10.0,5.0,22.0,,,31.0,31.0,24.0,15.0,10.0,5.0
 VCT 2026: Americas Stage 2,Playoffs,Upper Semifinals,bang,100T,"Viper, Harbor",,1.24,204.0,1.2941176470588236,71.0,129.0,,,2.0,0.0,30.0,,,22.0,22.0,17.0,13.0,2.0,0.0
 VCT 2026: Americas Stage 2,Playoffs,Upper Semifinals,Cryocells,100T,"Chamber, Cypher",,0.98,180.0,1.25,71.0,120.0,,,3.0,5.0,21.0,,,25.0,25.0,20.0,3.0,3.0,5.0
 VCT 2026: Americas Stage 2,Playoffs,Upper Semifinals,Asuna,100T,"Omen, Phoenix",,0.88,193.0,0.8846153846153846,77.0,119.0,,,3.0,2.0,18.0,,,23.0,23.0,26.0,18.0,3.0,2.0
-VCT 2026: Americas Stage 2,Playoffs,Upper Semifinals,spike,LEV,"Omen, Neon",,1.05,246.0,0.9354838709677419,71.0,160.0,,,4.0,4.0,29.0,,,29.0,29.0,31.0,13.0,4.0,4.0
+VCT 2026: Americas Stage 2,Playoffs,Upper Semifinals,spike,LEV,"Omen, Neon",,1.05,246.0,0.935483870967742,71.0,160.0,,,4.0,4.0,29.0,,,29.0,29.0,31.0,13.0,4.0,4.0
 VCT 2026: Americas Stage 2,Playoffs,Upper Semifinals,Sato,LEV,"Raze, Omen",,0.78,167.0,0.6785714285714286,69.0,108.0,,,4.0,4.0,51.0,,,19.0,19.0,28.0,10.0,4.0,4.0
 VCT 2026: Americas Stage 2,Playoffs,Upper Semifinals,Neon,LEV,"Jett, Yoru",,0.77,161.0,0.8148148148148148,57.0,120.0,,,3.0,6.0,27.0,,,22.0,22.0,27.0,2.0,3.0,6.0
-VCT 2026: Americas Stage 2,Playoffs,Upper Semifinals,kiNgg,LEV,"Vyse, Viper",,0.69,102.0,0.46153846153846156,63.0,76.0,,,0.0,3.0,22.0,,,12.0,12.0,26.0,10.0,0.0,3.0
+VCT 2026: Americas Stage 2,Playoffs,Upper Semifinals,kiNgg,LEV,"Vyse, Viper",,0.69,102.0,0.4615384615384615,63.0,76.0,,,0.0,3.0,22.0,,,12.0,12.0,26.0,10.0,0.0,3.0
 VCT 2026: Americas Stage 2,Playoffs,Upper Semifinals,blowz,LEV,"Skye, Fade",,0.64,204.0,0.7241379310344828,80.0,134.0,,,3.0,5.0,28.0,,,21.0,21.0,29.0,11.0,3.0,5.0
-VCT 2026: Pacific Stage 2,Playoffs,Lower Round 2,Foxy9,VL,"Viper, Chamber",,1.16,264.0,1.2037037037037037,69.0,158.0,,,13.0,8.0,37.0,,,65.0,65.0,54.0,11.0,13.0,8.0
-VCT 2026: Pacific Stage 2,Playoffs,Lower Round 2,Zexy,VL,"Raze, Neon",,1.09,216.0,1.1521739130434783,77.0,145.0,,,9.0,14.0,23.0,,,53.0,53.0,46.0,9.0,9.0,14.0
+VCT 2026: Pacific Stage 2,Playoffs,Lower Round 2,Foxy9,VL,"Viper, Chamber",,1.16,264.0,1.2037037037037035,69.0,158.0,,,13.0,8.0,37.0,,,65.0,65.0,54.0,11.0,13.0,8.0
+VCT 2026: Pacific Stage 2,Playoffs,Lower Round 2,Zexy,VL,"Raze, Neon",,1.09,216.0,1.1521739130434785,77.0,145.0,,,9.0,14.0,23.0,,,53.0,53.0,46.0,9.0,9.0,14.0
 VCT 2026: Pacific Stage 2,Playoffs,Lower Round 2,Klaus,VL,Omen,,1.05,145.0,0.7692307692307693,70.0,84.0,,,2.0,0.0,31.0,,,10.0,10.0,13.0,18.0,2.0,0.0
 VCT 2026: Pacific Stage 2,Playoffs,Lower Round 2,XuNa,VL,Fade,,1.01,199.0,1.1590909090909092,83.0,130.0,,,4.0,6.0,36.0,,,51.0,51.0,44.0,11.0,4.0,6.0
 VCT 2026: Pacific Stage 2,Playoffs,Lower Round 2,C1ndeR,VL,Omen,,0.96,160.0,0.8928571428571429,72.0,96.0,,,2.0,3.0,28.0,,,25.0,25.0,28.0,15.0,2.0,3.0
 VCT 2026: Pacific Stage 2,Playoffs,Lower Round 2,oonzmlp,VL,"Vyse, Sage",,0.93,180.0,0.9767441860465116,69.0,120.0,,,4.0,5.0,40.0,,,42.0,42.0,43.0,12.0,4.0,5.0
 VCT 2026: Pacific Stage 2,Playoffs,Lower Round 2,Jinggg,PRX,Raze,,1.12,233.0,1.18,70.0,156.0,,,13.0,9.0,23.0,,,59.0,59.0,50.0,12.0,13.0,9.0
-VCT 2026: Pacific Stage 2,Playoffs,Lower Round 2,invy,PRX,"Fade, Viper",,1.0,186.0,0.9387755102040817,76.0,125.0,,,7.0,6.0,25.0,,,46.0,46.0,49.0,27.0,7.0,6.0
-VCT 2026: Pacific Stage 2,Playoffs,Lower Round 2,d4v41,PRX,"Viper, Sage",,0.98,187.0,1.0222222222222221,74.0,123.0,,,4.0,7.0,37.0,,,46.0,46.0,45.0,17.0,4.0,7.0
+VCT 2026: Pacific Stage 2,Playoffs,Lower Round 2,invy,PRX,"Fade, Viper",,1.0,186.0,0.9387755102040816,76.0,125.0,,,7.0,6.0,25.0,,,46.0,46.0,49.0,27.0,7.0,6.0
+VCT 2026: Pacific Stage 2,Playoffs,Lower Round 2,d4v41,PRX,"Viper, Sage",,0.98,187.0,1.022222222222222,74.0,123.0,,,4.0,7.0,37.0,,,46.0,46.0,45.0,17.0,4.0,7.0
 VCT 2026: Pacific Stage 2,Playoffs,Lower Round 2,something,PRX,"Yoru, Sova",,0.85,153.0,0.851063829787234,66.0,104.0,,,7.0,5.0,33.0,,,40.0,40.0,47.0,12.0,7.0,5.0
 VCT 2026: Pacific Stage 2,Playoffs,Lower Round 2,f0rsakeN,PRX,Omen,,0.7,151.0,0.6727272727272727,67.0,97.0,,,5.0,7.0,29.0,,,37.0,37.0,55.0,24.0,5.0,7.0
+VCT 2026: EMEA Stage 2,Playoffs,Lower Final,KROSTALY,FUT Esports,"Skye, Sova, Fade",,1.08,226.0,1.1063829787234043,66.0,139.0,,,6.0,3.0,26.0,,,52.0,52.0,47.0,7.0,6.0,3.0
+VCT 2026: EMEA Stage 2,Playoffs,Lower Final,s0pp,FUT Esports,"Neon, Jett",,0.81,188.0,0.8163265306122449,60.0,120.0,,,8.0,10.0,22.0,,,40.0,40.0,49.0,11.0,8.0,10.0
+VCT 2026: EMEA Stage 2,Playoffs,Lower Final,yetujey,FUT Esports,"Viper, Cypher",,0.76,152.0,0.7021276595744681,60.0,97.0,,,4.0,10.0,19.0,,,33.0,33.0,47.0,11.0,4.0,10.0
+VCT 2026: EMEA Stage 2,Playoffs,Lower Final,sociablEE,FUT Esports,Omen,,0.57,114.0,0.40384615384615385,63.0,82.0,,,1.0,2.0,22.0,,,21.0,21.0,52.0,27.0,1.0,2.0
+VCT 2026: EMEA Stage 2,Playoffs,Lower Final,xeus,FUT Esports,"Raze, Phoenix, Waylay",,0.55,154.0,0.6111111111111112,58.0,104.0,,,8.0,10.0,37.0,,,33.0,33.0,54.0,8.0,8.0,10.0
+VCT 2026: EMEA Stage 2,Playoffs,Lower Final,kamo,TL,"Raze, Phoenix",,1.45,314.0,1.6829268292682926,81.0,210.0,,,12.0,10.0,43.0,,,69.0,69.0,41.0,17.0,12.0,10.0
+VCT 2026: EMEA Stage 2,Playoffs,Lower Final,nAts,TL,"Viper, Cypher",,1.3,223.0,1.5151515151515151,82.0,148.0,,,4.0,3.0,28.0,,,50.0,50.0,33.0,21.0,4.0,3.0
+VCT 2026: EMEA Stage 2,Playoffs,Lower Final,purp0,TL,Jett,,1.18,217.0,1.4,82.0,129.0,,,10.0,7.0,27.0,,,49.0,49.0,35.0,6.0,10.0,7.0
+VCT 2026: EMEA Stage 2,Playoffs,Lower Final,Kicks,TL,Omen,,1.15,185.0,1.1714285714285715,79.0,124.0,,,6.0,6.0,33.0,,,41.0,41.0,35.0,26.0,6.0,6.0
+VCT 2026: EMEA Stage 2,Playoffs,Lower Final,trexx,TL,"Skye, Sova, Fade",,1.11,182.0,1.1428571428571428,82.0,124.0,,,3.0,1.0,21.0,,,40.0,40.0,35.0,30.0,3.0,1.0
+VCT 2026: Pacific Stage 2,Playoffs,Lower Round 2,Raxcal,GEN,Vyse,,0.97,172.0,0.896551724137931,69.0,119.0,,,2.0,3.0,31.0,,,26.0,26.0,29.0,7.0,2.0,3.0
+VCT 2026: Pacific Stage 2,Playoffs,Lower Round 2,t3xture,GEN,Raze,,0.91,244.0,0.9411764705882353,60.0,155.0,,,7.0,6.0,17.0,,,32.0,32.0,34.0,7.0,7.0,6.0
+VCT 2026: Pacific Stage 2,Playoffs,Lower Round 2,Karon,GEN,"Omen, Astra",,0.85,139.0,0.7777777777777778,74.0,83.0,,,2.0,4.0,29.0,,,21.0,21.0,27.0,18.0,2.0,4.0
+VCT 2026: Pacific Stage 2,Playoffs,Lower Round 2,Ash,GEN,Neon,,0.76,199.0,0.8529411764705882,64.0,122.0,,,6.0,8.0,42.0,,,29.0,29.0,34.0,5.0,6.0,8.0
+VCT 2026: Pacific Stage 2,Playoffs,Lower Round 2,Efina,GEN,Fade,,0.68,124.0,0.6,57.0,86.0,,,2.0,3.0,19.0,,,18.0,18.0,30.0,8.0,2.0,3.0
+VCT 2026: Pacific Stage 2,Playoffs,Lower Round 2,iZu,T1,Fade,,1.37,206.0,1.6,81.0,152.0,,,2.0,2.0,30.0,,,32.0,32.0,20.0,11.0,2.0,2.0
+VCT 2026: Pacific Stage 2,Playoffs,Lower Round 2,BuZz,T1,"Neon, Raze",,1.15,273.0,1.2258064516129032,69.0,175.0,,,8.0,6.0,20.0,,,38.0,38.0,31.0,9.0,8.0,6.0
+VCT 2026: Pacific Stage 2,Playoffs,Lower Round 2,Meteor,T1,"Chamber, Yoru",,1.12,248.0,1.3703703703703705,62.0,149.0,,,7.0,5.0,27.0,,,37.0,37.0,27.0,5.0,7.0,5.0
+VCT 2026: Pacific Stage 2,Playoffs,Lower Round 2,stax,T1,Omen,,1.04,127.0,1.0,79.0,71.0,,,0.0,1.0,16.0,,,21.0,21.0,21.0,21.0,0.0,1.0
+VCT 2026: Pacific Stage 2,Playoffs,Lower Round 2,Munchkin,T1,Viper,,0.9,175.0,0.8888888888888888,74.0,118.0,,,6.0,4.0,17.0,,,24.0,24.0,27.0,13.0,6.0,4.0

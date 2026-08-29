@@ -278,6 +278,7 @@ FUT Esports,Team Vitality,Ascent,1,1,100.0
 FUT Esports,Team Heretics,Ascent,0,1,0.0
 FUT Esports,Natus Vincere,Ascent,0,1,0.0
 FUT Esports,PCIFIC Esports,Ascent,1,1,100.0
+FUT Esports,Team Liquid,Ascent,0,1,0.0
 Fire Flux Esports,Team Heretics,Ascent,1,1,100.0
 Fire Flux Esports,Team Vitality,Ascent,1,1,100.0
 Fluxo W7M,KRÜ Esports,Ascent,0,1,0.0
@@ -1757,7 +1758,7 @@ FURIA,KRÜ Esports,Lotus,0,1,0.0
 FUT Esports,Gentle Mates,Lotus,2,2,100.0
 FUT Esports,Team Vitality,Lotus,0,2,0.0
 FUT Esports,KOI,Lotus,1,1,100.0
-FUT Esports,Team Liquid,Lotus,0,1,0.0
+FUT Esports,Team Liquid,Lotus,0,2,0.0
 FUT Esports,Karmine Corp,Lotus,2,3,66.67
 FUT Esports,Team Heretics,Lotus,0,2,0.0
 FUT Esports,PCIFIC Esports,Lotus,0,1,0.0
@@ -1798,7 +1799,7 @@ Gen.G,Nongshim RedForce,Lotus,0,1,0.0
 Gen.G,Paper Rex,Lotus,2,2,100.0
 Gen.G,Rex Regum Qeon,Lotus,2,3,66.67
 Gen.G,TALON,Lotus,1,1,100.0
-Gen.G,T1,Lotus,0,1,0.0
+Gen.G,T1,Lotus,0,2,0.0
 Gen.G,Kiwoom DRX,Lotus,0,1,0.0
 Gentle Mates,Team Vitality,Lotus,1,1,100.0
 Gentle Mates,KOI,Lotus,0,1,0.0
@@ -2206,7 +2207,7 @@ FURIA,NRG,Split,1,1,100.0
 FURIA,Sentinels,Split,2,2,100.0
 FURIA,Paper Rex,Split,0,1,0.0
 FURIA,G2 Esports,Split,1,2,50.0
-FUT Esports,Team Liquid,Split,0,1,0.0
+FUT Esports,Team Liquid,Split,0,2,0.0
 FUT Esports,Team Vitality,Split,1,4,25.0
 FUT Esports,Natus Vincere,Split,1,2,50.0
 FUT Esports,Team Heretics,Split,0,1,0.0
@@ -2238,7 +2239,7 @@ GIANTX,PCIFIC Esports,Split,2,2,100.0
 Gambit Esports,Team Vikings,Split,1,1,100.0
 Gambit Esports,Vision Strikers,Split,0,1,0.0
 Gen.G,Wolves Esports,Split,0,1,0.0
-Gen.G,T1,Split,1,1,100.0
+Gen.G,T1,Split,1,2,50.0
 Gen.G,Global Esports,Split,0,1,0.0
 Gen.G,Team Secret,Split,0,1,0.0
 Gen.G,Nongshim RedForce,Split,1,1,100.0

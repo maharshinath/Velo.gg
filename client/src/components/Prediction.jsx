@@ -92,16 +92,6 @@ function BettingInsightsPanel({ team1, team2, betting, oddsLoading }) {
 
       <div className="betting-simple-row">
         <div className="betting-simple-block">
-          <span className="betting-simple-label">Our win chance</span>
-          <p>
-            {team1.Team} <strong>{team1Pct}%</strong>
-          </p>
-          <p>
-            {team2.Team} <strong>{team2Pct}%</strong>
-          </p>
-        </div>
-
-        <div className="betting-simple-block">
           <span className="betting-simple-label">
             {hasOdds ? 'Book win chance' : 'Book prices'}
           </span>
@@ -123,6 +113,16 @@ function BettingInsightsPanel({ team1, team2, betting, oddsLoading }) {
           ) : (
             <p className="betting-sub">No prices found on VLR for this match right now.</p>
           )}
+        </div>
+
+        <div className="betting-simple-block">
+          <span className="betting-simple-label">Our win chance</span>
+          <p>
+            {team1.Team} <strong>{team1Pct}%</strong>
+          </p>
+          <p>
+            {team2.Team} <strong>{team2Pct}%</strong>
+          </p>
         </div>
       </div>
 
