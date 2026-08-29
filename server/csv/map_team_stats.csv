@@ -30,9 +30,9 @@ KRÜ Esports,Abyss,3,6,50.0
 Karmine Corp,Abyss,2,5,40.0
 Kiwoom DRX,Abyss,1,2,50.0
 LEVIATÁN,Abyss,2,3,66.67
-LOUD,Abyss,0,2,0.0
+LOUD,Abyss,1,3,33.33
 MIBR,Abyss,5,11,45.45
-NRG,Abyss,8,12,66.67
+NRG,Abyss,8,13,61.54
 Natus Vincere,Abyss,1,2,50.0
 Nongshim RedForce,Abyss,3,5,60.0
 Nova Esports,Abyss,2,3,66.67
@@ -105,7 +105,7 @@ Karmine Corp,Ascent,2,4,50.0
 KeepBest Gaming,Ascent,0,1,0.0
 Kiwoom DRX,Ascent,1,3,33.33
 LEVIATÁN,Ascent,10,15,66.67
-LOUD,Ascent,12,17,70.59
+LOUD,Ascent,12,18,66.67
 Lavie,Ascent,1,1,100.0
 Liberty,Ascent,0,1,0.0
 M80,Ascent,0,1,0.0
@@ -113,7 +113,7 @@ MIBR,Ascent,3,10,30.0
 MadHood,Ascent,1,1,100.0
 Made In Vietnam,Ascent,1,1,100.0
 NORTHEPTION,Ascent,0,2,0.0
-NRG,Ascent,3,10,30.0
+NRG,Ascent,4,11,36.36
 NUTURN,Ascent,3,3,100.0
 Natus Vincere,Ascent,5,10,50.0
 Ninjas In Pyjamas,Ascent,1,1,100.0
@@ -461,7 +461,8 @@ F4Q,Haven,0,2,0.0
 FNATIC,Haven,21,37,56.76
 FULL SENSE,Haven,1,8,12.5
 FURIA,Haven,7,21,33.33
-FUT Esports,Haven,10,16,62.5
+FUT Esports,Haven,10,17,58.82
+Fire Flux Esports,Haven,0,1,0.0
 FunPlus Phoenix,Haven,6,15,40.0
 G2 Esports,Haven,21,31,67.74
 GIANTX,Haven,9,17,52.94
@@ -472,7 +473,7 @@ Global Esports,Haven,4,10,40.0
 JDG Esports,Haven,8,20,40.0
 KOI,Haven,1,4,25.0
 KRÜ Esports,Haven,13,26,50.0
-Karmine Corp,Haven,10,16,62.5
+Karmine Corp,Haven,11,17,64.71
 Keyd Stars,Haven,0,2,0.0
 Kiwoom DRX,Haven,6,10,60.0
 LEVIATÁN,Haven,11,18,61.11
@@ -502,7 +503,7 @@ T1,Haven,16,27,59.26
 TALON,Haven,6,9,66.67
 TYLOO,Haven,6,16,37.5
 Team Heretics,Haven,18,26,69.23
-Team Liquid,Haven,11,22,50.0
+Team Liquid,Haven,12,23,52.17
 Team Secret,Haven,4,10,40.0
 Team Vikings,Haven,1,4,25.0
 Team Vitality,Haven,8,21,38.1
@@ -593,7 +594,7 @@ XERXIA Esports,Icebox,2,4,50.0
 XSET,Icebox,1,1,100.0
 Xi Lai Gaming,Icebox,1,5,20.0
 ZETA DIVISION,Icebox,4,8,50.0
-100 Thieves,Lotus,4,8,50.0
+100 Thieves,Lotus,5,9,55.56
 2Game Esports,Lotus,1,6,16.67
 A Team,Lotus,0,1,0.0
 All Gamers,Lotus,11,21,52.38
@@ -615,8 +616,8 @@ Evil Geniuses,Lotus,8,15,53.33
 FNATIC,Lotus,15,28,53.57
 FULL SENSE,Lotus,4,7,57.14
 FURIA,Lotus,3,7,42.86
-FUT Esports,Lotus,6,15,40.0
-Fire Flux Esports,Lotus,1,2,50.0
+FUT Esports,Lotus,6,16,37.5
+Fire Flux Esports,Lotus,1,3,33.33
 Fluxo W7M,Lotus,1,2,50.0
 FunPlus Phoenix,Lotus,1,9,11.11
 G2 Esports,Lotus,26,34,76.47
@@ -630,18 +631,18 @@ JDG Esports,Lotus,6,11,54.55
 Joblife,Lotus,3,4,75.0
 KOI,Lotus,2,7,28.57
 KRÜ Esports,Lotus,9,18,50.0
-Karmine Corp,Lotus,9,18,50.0
+Karmine Corp,Lotus,10,19,52.63
 Kiwoom DRX,Lotus,4,8,50.0
-LEVIATÁN,Lotus,5,10,50.0
-LOUD,Lotus,7,14,50.0
+LEVIATÁN,Lotus,5,11,45.45
+LOUD,Lotus,7,15,46.67
 MIBR,Lotus,4,14,28.57
-NRG,Lotus,17,25,68.0
+NRG,Lotus,18,26,69.23
 Natus Vincere,Lotus,2,8,25.0
 Nongshim RedForce,Lotus,10,17,58.82
 Nova Esports,Lotus,4,11,36.36
 ONSIDE GAMING,Lotus,0,1,0.0
 PCIFIC Esports,Lotus,2,5,40.0
-Paper Rex,Lotus,22,34,64.71
+Paper Rex,Lotus,22,35,62.86
 QT DIG∞,Lotus,1,1,100.0
 Rex Regum Qeon,Lotus,9,16,56.25
 Sentinels,Lotus,16,26,61.54
@@ -649,12 +650,12 @@ T1,Lotus,12,23,52.17
 TALON,Lotus,5,10,50.0
 TYLOO,Lotus,4,7,57.14
 Team Heretics,Lotus,18,30,60.0
-Team Liquid,Lotus,12,20,60.0
+Team Liquid,Lotus,13,21,61.9
 Team Secret,Lotus,3,9,33.33
 Team Vitality,Lotus,11,18,61.11
 Titan Esports Club,Lotus,1,7,14.29
 Trace Esports,Lotus,12,23,52.17
-VARREL,Lotus,0,3,0.0
+VARREL,Lotus,1,4,25.0
 Wolves Esports,Lotus,7,21,33.33
 Xi Lai Gaming,Lotus,22,36,61.11
 ZETA DIVISION,Lotus,4,10,40.0
@@ -776,7 +777,7 @@ ONSIDE GAMING,Split,1,1,100.0
 OpTic Gaming,Split,3,5,60.0
 PCIFIC Esports,Split,2,11,18.18
 Papara SuperMassive,Split,1,2,50.0
-Paper Rex,Split,18,29,62.07
+Paper Rex,Split,19,30,63.33
 Peeky Blinders,Split,0,1,0.0
 Penguins and Frogs,Split,0,1,0.0
 QT DIG∞,Split,0,1,0.0
@@ -795,7 +796,7 @@ The Guard,Split,0,1,0.0
 Titan Esports Club,Split,5,11,45.45
 Trace Esports,Split,8,12,66.67
 ULF Esports,Split,2,2,100.0
-VARREL,Split,3,7,42.86
+VARREL,Split,3,8,37.5
 VICTORY,Split,2,2,100.0
 Version1,Split,0,2,0.0
 Vision Strikers,Split,2,2,100.0
@@ -806,7 +807,7 @@ XSET,Split,1,1,100.0
 Xi Lai Gaming,Split,10,14,71.43
 Xipto Esports,Split,1,1,100.0
 ZETA DIVISION,Split,8,21,38.1
-100 Thieves,Summit,1,1,100.0
+100 Thieves,Summit,2,2,100.0
 A Team,Summit,0,1,0.0
 All Gamers,Summit,2,3,66.67
 BBL Esports,Summit,1,2,50.0
@@ -837,7 +838,7 @@ KRÜ Esports,Summit,1,3,33.33
 Karmine Corp,Summit,0,1,0.0
 KeepBest Gaming,Summit,0,1,0.0
 Kiwoom DRX,Summit,1,2,50.0
-LEVIATÁN,Summit,1,2,50.0
+LEVIATÁN,Summit,1,3,33.33
 LOUD,Summit,2,3,66.67
 NRG,Summit,2,2,100.0
 Natus Vincere,Summit,1,2,50.0
@@ -902,7 +903,7 @@ Nongshim RedForce,Sunset,2,6,33.33
 Nova Esports,Sunset,3,5,60.0
 ONSIDE GAMING,Sunset,1,2,50.0
 PCIFIC Esports,Sunset,0,3,0.0
-Paper Rex,Sunset,8,12,66.67
+Paper Rex,Sunset,8,13,61.54
 Rex Regum Qeon,Sunset,6,13,46.15
 Sentinels,Sunset,8,14,57.14
 Sharper Esports,Sunset,0,3,0.0
@@ -915,7 +916,7 @@ Team Secret,Sunset,3,4,75.0
 Team Vitality,Sunset,3,6,50.0
 Titan Esports Club,Sunset,1,11,9.09
 Trace Esports,Sunset,6,15,40.0
-VARREL,Sunset,2,2,100.0
+VARREL,Sunset,3,3,100.0
 Wolves Esports,Sunset,3,6,50.0
 Xi Lai Gaming,Sunset,3,7,42.86
 Xipto Esports,Sunset,0,2,0.0

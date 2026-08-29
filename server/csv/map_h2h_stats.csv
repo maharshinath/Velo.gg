@@ -101,6 +101,7 @@ Karmine Corp,Team Vitality,Abyss,0,1,0.0
 Karmine Corp,Team Liquid,Abyss,1,1,100.0
 Karmine Corp,Team Heretics,Abyss,1,1,100.0
 LEVIATÁN,Team Heretics,Abyss,1,1,100.0
+LOUD,NRG,Abyss,1,1,100.0
 MIBR,Rex Regum Qeon,Abyss,1,1,100.0
 MIBR,NRG,Abyss,0,3,0.0
 MIBR,Sentinels,Abyss,0,1,0.0
@@ -350,6 +351,7 @@ LOUD,ZETA DIVISION,Ascent,2,2,100.0
 LOUD,OpTic Gaming,Ascent,4,5,80.0
 LOUD,Team Liquid,Ascent,1,1,100.0
 LOUD,Natus Vincere,Ascent,1,1,100.0
+LOUD,NRG,Ascent,0,1,0.0
 MIBR,Team Heretics,Ascent,0,1,0.0
 MadHood,Penguins and Frogs,Ascent,1,1,100.0
 Made In Vietnam,Peeky Blinders,Ascent,1,1,100.0
@@ -1251,7 +1253,8 @@ FUT Esports,GIANTX,Haven,1,1,100.0
 FUT Esports,Team Heretics,Haven,1,2,50.0
 FUT Esports,Team Liquid,Haven,2,3,66.67
 FUT Esports,Gentle Mates,Haven,2,2,100.0
-FUT Esports,Karmine Corp,Haven,0,2,0.0
+FUT Esports,Karmine Corp,Haven,0,3,0.0
+Fire Flux Esports,Team Liquid,Haven,0,1,0.0
 FunPlus Phoenix,XERXIA Esports,Haven,1,1,100.0
 FunPlus Phoenix,Paper Rex,Haven,0,1,0.0
 FunPlus Phoenix,Nova Esports,Haven,0,1,0.0
@@ -1581,7 +1584,7 @@ Titan Esports Club,Wolves Esports,Icebox,0,1,0.0
 Wolves Esports,Xi Lai Gaming,Icebox,0,1,0.0
 XERXIA Esports,XSET,Icebox,0,1,0.0
 100 Thieves,LOUD,Lotus,1,1,100.0
-100 Thieves,LEVIATÁN,Lotus,0,1,0.0
+100 Thieves,LEVIATÁN,Lotus,1,2,50.0
 100 Thieves,MIBR,Lotus,1,1,100.0
 100 Thieves,NRG,Lotus,1,2,50.0
 100 Thieves,G2 Esports,Lotus,0,1,0.0
@@ -1755,10 +1758,11 @@ FUT Esports,Gentle Mates,Lotus,2,2,100.0
 FUT Esports,Team Vitality,Lotus,0,2,0.0
 FUT Esports,KOI,Lotus,1,1,100.0
 FUT Esports,Team Liquid,Lotus,0,1,0.0
-FUT Esports,Karmine Corp,Lotus,2,2,100.0
+FUT Esports,Karmine Corp,Lotus,2,3,66.67
 FUT Esports,Team Heretics,Lotus,0,2,0.0
 FUT Esports,PCIFIC Esports,Lotus,0,1,0.0
 Fire Flux Esports,Joblife,Lotus,1,1,100.0
+Fire Flux Esports,Team Liquid,Lotus,0,1,0.0
 Fluxo W7M,KRÜ Esports,Lotus,0,1,0.0
 FunPlus Phoenix,T1,Lotus,0,1,0.0
 FunPlus Phoenix,Team Heretics,Lotus,0,1,0.0
@@ -1837,6 +1841,7 @@ LEVIATÁN,MIBR,Lotus,2,2,100.0
 LEVIATÁN,NRG,Lotus,0,1,0.0
 LOUD,Paper Rex,Lotus,0,1,0.0
 LOUD,Sentinels,Lotus,2,3,66.67
+LOUD,NRG,Lotus,0,1,0.0
 MIBR,NRG,Lotus,0,1,0.0
 MIBR,Sentinels,Lotus,0,2,0.0
 MIBR,Team Heretics,Lotus,0,1,0.0
@@ -1860,6 +1865,7 @@ Paper Rex,ZETA DIVISION,Lotus,1,2,50.0
 Paper Rex,Rex Regum Qeon,Lotus,0,1,0.0
 Paper Rex,Team Liquid,Lotus,1,1,100.0
 Paper Rex,Wolves Esports,Lotus,1,1,100.0
+Paper Rex,VARREL,Lotus,0,1,0.0
 Rex Regum Qeon,TALON,Lotus,1,1,100.0
 Rex Regum Qeon,T1,Lotus,2,2,100.0
 Rex Regum Qeon,Team Secret,Lotus,0,2,0.0
@@ -2313,7 +2319,7 @@ Paper Rex,Sentinels,Split,1,1,100.0
 Paper Rex,Rex Regum Qeon,Split,0,1,0.0
 Paper Rex,T1,Split,1,2,50.0
 Paper Rex,Team Secret,Split,1,1,100.0
-Paper Rex,VARREL,Split,0,1,0.0
+Paper Rex,VARREL,Split,1,2,50.0
 Peeky Blinders,VICTORY,Split,0,1,0.0
 Rex Regum Qeon,ZETA DIVISION,Split,1,2,50.0
 Rex Regum Qeon,VARREL,Split,1,1,100.0
@@ -2340,6 +2346,7 @@ Trace Esports,Wolves Esports,Split,1,1,100.0
 Wolves Esports,Xi Lai Gaming,Split,0,2,0.0
 Xipto Esports,ZETA DIVISION,Split,1,1,100.0
 100 Thieves,LOUD,Summit,1,1,100.0
+100 Thieves,LEVIATÁN,Summit,1,1,100.0
 A Team,Wolves Esports,Summit,0,1,0.0
 All Gamers,Trace Esports,Summit,1,1,100.0
 All Gamers,JD Gaming,Summit,1,1,100.0
@@ -2545,7 +2552,7 @@ Paper Rex,ZETA DIVISION,Sunset,0,1,0.0
 Paper Rex,T1,Sunset,1,2,50.0
 Paper Rex,Team Liquid,Sunset,1,1,100.0
 Paper Rex,Sentinels,Sunset,1,1,100.0
-Paper Rex,VARREL,Sunset,0,1,0.0
+Paper Rex,VARREL,Sunset,0,2,0.0
 Rex Regum Qeon,Team Secret,Sunset,1,1,100.0
 Rex Regum Qeon,T1,Sunset,0,2,0.0
 Rex Regum Qeon,TALON,Sunset,1,1,100.0

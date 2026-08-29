@@ -4,14 +4,14 @@ import '../css/Home.css'
 
 /** Fallback when the API is asleep — keep in sync with server/data/model_metrics.json */
 const FALLBACK_METRICS = {
-  current_holdout_accuracy: 60.1,
-  deployed_at_training_holdout_accuracy: 63.2,
+  current_holdout_accuracy: 61.4,
+  deployed_at_training_holdout_accuracy: 61.4,
   walk_forward_accuracy: 58.7,
-  selective_65_accuracy: 69.1,
-  selective_65_coverage: 22.2,
+  selective_65_accuracy: 69.0,
+  selective_65_coverage: 28.5,
   betting_confidence_gate: 65,
-  match_count: 1274,
-  evaluated_at: '2026-08-28',
+  match_count: 1279,
+  evaluated_at: '2026-08-29',
 }
 
 function fmtPct(value) {
@@ -32,7 +32,7 @@ function About() {
   const atTraining =
     metrics.deployed_at_training_holdout_accuracy ??
     metrics.deployed_model_holdout_accuracy
-  const matchCount = meta?.match_count ?? metrics.match_count ?? 1274
+  const matchCount = meta?.match_count ?? metrics.match_count ?? 1279
   const teamCount = meta?.team_count ?? 90
   const confidenceGate = metrics.betting_confidence_gate ?? 65
 
@@ -79,8 +79,8 @@ function About() {
           <p>
             Match predictions start with a margin-aware Elo rating built from pro series
             results. A small residual layer (international Elo gap, map-pool strength,
-            trusted head-to-head) is only used when it beats pure Elo on holdout — the
-            live model includes that blend.
+            trusted head-to-head) is only used when it beats pure Elo on holdout; the
+            current live model is pure Elo.
           </p>
           <p>
             Map tabs use historical win rates on the current competitive pool: Abyss,

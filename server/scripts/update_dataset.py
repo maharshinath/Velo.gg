@@ -464,8 +464,8 @@ def rebuild_pipeline(
         promotion_target = deployed_holdout + PROMOTION_MARGIN
         print(
             f"Promotion gate: candidate must beat deployed "
-            f"({deployed_holdout:.1f}%) by ≥{PROMOTION_MARGIN:.1f}% "
-            f"→ {promotion_target:.1f}%",
+            f"({deployed_holdout:.1f}%) by >={PROMOTION_MARGIN:.1f}% "
+            f"-> {promotion_target:.1f}%",
             flush=True,
         )
     else:
@@ -547,7 +547,7 @@ def rebuild_pipeline(
         )
         print(
             f"Holdout {new_holdout:.1f}% did not beat {baseline} "
-            f"(need ≥{promotion_target:.1f}%) — CSVs updated; kept deployed model.",
+            f"(need >={promotion_target:.1f}%) - CSVs updated; kept deployed model.",
             flush=True,
         )
         subprocess.run(
