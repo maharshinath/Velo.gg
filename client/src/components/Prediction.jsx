@@ -80,6 +80,17 @@ function BettingInsightsPanel({ team1, team2, betting, oddsLoading }) {
     betting.implied_prob_team2 != null
       ? Number(betting.implied_prob_team2).toFixed(0)
       : null
+  const edge1 =
+    betting.edge_team1_pp != null ? Number(betting.edge_team1_pp) : null
+  const edge2 =
+    betting.edge_team2_pp != null ? Number(betting.edge_team2_pp) : null
+
+  const formatEdge = (pp) => {
+    if (pp == null || Number.isNaN(pp)) return null
+    const rounded = Math.round(pp)
+    const sign = rounded > 0 ? '+' : ''
+    return `${sign}${rounded} pp`
+  }
 
   return (
     <div className="betting-insights">
@@ -91,6 +102,16 @@ function BettingInsightsPanel({ team1, team2, betting, oddsLoading }) {
       </div>
 
       <div className="betting-simple-row">
+        <div className="betting-simple-block">
+          <span className="betting-simple-label">Our win chance</span>
+          <p>
+            {team1.Team} <strong>{team1Pct}%</strong>
+          </p>
+          <p>
+            {team2.Team} <strong>{team2Pct}%</strong>
+          </p>
+        </div>
+
         <div className="betting-simple-block">
           <span className="betting-simple-label">
             {hasOdds ? 'Book win chance' : 'Book prices'}
@@ -116,13 +137,44 @@ function BettingInsightsPanel({ team1, team2, betting, oddsLoading }) {
         </div>
 
         <div className="betting-simple-block">
-          <span className="betting-simple-label">Our win chance</span>
-          <p>
-            {team1.Team} <strong>{team1Pct}%</strong>
-          </p>
-          <p>
-            {team2.Team} <strong>{team2Pct}%</strong>
-          </p>
+          <span className="betting-simple-label">Odds delta</span>
+          {hasOdds && edge1 != null && edge2 != null ? (
+            <>
+              <p>
+                {team1.Team}{' '}
+                <strong
+                  className={
+                    edge1 > 0
+                      ? 'betting-edge--pos'
+                      : edge1 < 0
+                        ? 'betting-edge--neg'
+                        : undefined
+                  }
+                >
+                  {formatEdge(edge1)}
+                </strong>
+              </p>
+              <p>
+                {team2.Team}{' '}
+                <strong
+                  className={
+                    edge2 > 0
+                      ? 'betting-edge--pos'
+                      : edge2 < 0
+                        ? 'betting-edge--neg'
+                        : undefined
+                  }
+                >
+                  {formatEdge(edge2)}
+                </strong>
+              </p>
+              <p className="betting-sub">
+                Our % minus book %. Positive = we see more value than the price.
+              </p>
+            </>
+          ) : (
+            <p className="betting-sub">Needs book prices to compute the gap.</p>
+          )}
         </div>
       </div>
 

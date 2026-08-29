@@ -1117,9 +1117,17 @@
 
 .betting-simple-row {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr;
   gap: var(--spacing-md);
   margin-bottom: var(--spacing-md);
+}
+
+.betting-edge--pos {
+  color: rgba(62, 180, 110, 0.95);
+}
+
+.betting-edge--neg {
+  color: rgba(220, 100, 100, 0.95);
 }
 
 .betting-simple-block {
