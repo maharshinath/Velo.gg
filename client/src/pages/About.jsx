@@ -4,21 +4,21 @@ import '../css/Home.css'
 
 /** Fallback when the API is asleep — keep in sync with server/data/model_metrics.json */
 const FALLBACK_METRICS = {
-  current_holdout_accuracy: 61.8,
+  current_holdout_accuracy: 62.7,
   deployed_at_training_holdout_accuracy: 61.4,
-  time_ordered_split_accuracy: 61.8,
-  walk_forward_accuracy: 58.7,
-  vct_regional_split_accuracy: 61.4,
-  international_split_accuracy: 63.5,
+  time_ordered_split_accuracy: 62.7,
+  walk_forward_accuracy: 58.8,
+  vct_regional_split_accuracy: 62.5,
+  international_split_accuracy: 62.2,
   selective_65_accuracy: 69.4,
   selective_65_coverage: 28.9,
   selective_65_n: 72,
   betting_confidence_gate: 65,
-  brier_score: 0.233,
-  log_loss: 0.6588,
+  brier_score: 0.2328,
+  log_loss: 0.6584,
   feature_count: 4,
-  match_count: 1281,
-  evaluated_at: '2026-08-29',
+  match_count: 1282,
+  evaluated_at: '2026-08-30',
 }
 
 const FALLBACK_MAP_POOL = [
@@ -94,7 +94,7 @@ function About() {
   const atTraining =
     metrics.deployed_at_training_holdout_accuracy ??
     metrics.deployed_model_holdout_accuracy
-  const matchCount = meta?.match_count ?? metrics.match_count ?? 1281
+  const matchCount = meta?.match_count ?? metrics.match_count ?? 1282
   const teamCount = meta?.team_count ?? 90
   const confidenceGate = metrics.betting_confidence_gate ?? 65
   const mapPool = meta?.comp_pool_maps?.length
