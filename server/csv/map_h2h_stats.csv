@@ -74,7 +74,7 @@ FUT Esports,Gentle Mates,Abyss,0,1,0.0
 Fire Flux Esports,Team Vitality,Abyss,0,1,0.0
 FunPlus Phoenix,Team Heretics,Abyss,0,1,0.0
 FunPlus Phoenix,Titan Esports Club,Abyss,0,1,0.0
-G2 Esports,LEVIATÁN,Abyss,0,1,0.0
+G2 Esports,LEVIATÁN,Abyss,1,2,50.0
 G2 Esports,Trace Esports,Abyss,1,1,100.0
 G2 Esports,T1,Abyss,1,1,100.0
 G2 Esports,Sentinels,Abyss,1,2,50.0
@@ -338,6 +338,7 @@ KRÜ Esports,LEVIATÁN,Ascent,0,1,0.0
 KRÜ Esports,Sentinels,Ascent,1,1,100.0
 Kantic 2.0,The Mad Men,Ascent,1,1,100.0
 Karmine Corp,Natus Vincere,Ascent,0,1,0.0
+Karmine Corp,Team Liquid,Ascent,1,1,100.0
 KeepBest Gaming,Titan Esports Club,Ascent,0,1,0.0
 Kiwoom DRX,Paper Rex,Ascent,0,1,0.0
 Kiwoom DRX,Sharper Esports,Ascent,0,1,0.0
@@ -1828,7 +1829,7 @@ KRÜ Esports,LEVIATÁN,Lotus,0,1,0.0
 KRÜ Esports,Sentinels,Lotus,2,2,100.0
 KRÜ Esports,MIBR,Lotus,0,1,0.0
 KRÜ Esports,LOUD,Lotus,1,1,100.0
-Karmine Corp,Team Liquid,Lotus,1,3,33.33
+Karmine Corp,Team Liquid,Lotus,1,4,25.0
 Karmine Corp,Natus Vincere,Lotus,1,2,50.0
 Karmine Corp,Team Heretics,Lotus,1,2,50.0
 Karmine Corp,Team Vitality,Lotus,0,1,0.0
@@ -1844,6 +1845,7 @@ LEVIATÁN,NRG,Lotus,0,1,0.0
 LOUD,Paper Rex,Lotus,0,1,0.0
 LOUD,Sentinels,Lotus,2,3,66.67
 LOUD,NRG,Lotus,0,1,0.0
+LOUD,MIBR,Lotus,1,1,100.0
 MIBR,NRG,Lotus,0,1,0.0
 MIBR,Sentinels,Lotus,0,2,0.0
 MIBR,Team Heretics,Lotus,0,1,0.0
@@ -2229,7 +2231,7 @@ G2 Esports,ZETA DIVISION,Split,1,1,100.0
 G2 Esports,Paper Rex,Split,0,3,0.0
 G2 Esports,MIBR,Split,1,2,50.0
 G2 Esports,T1,Split,0,1,0.0
-G2 Esports,LEVIATÁN,Split,1,3,33.33
+G2 Esports,LEVIATÁN,Split,1,4,25.0
 G2 Esports,Nongshim RedForce,Split,0,2,0.0
 G2 Esports,NRG,Split,1,1,100.0
 GIANTX,Team Vitality,Split,0,1,0.0
@@ -2380,13 +2382,14 @@ FUT Esports,Team Liquid,Summit,1,1,100.0
 Fire Flux Esports,PCIFIC Esports,Summit,1,1,100.0
 Fire Flux Esports,Team Heretics,Summit,0,1,0.0
 FunPlus Phoenix,JDG Esports,Summit,1,1,100.0
+G2 Esports,LEVIATÁN,Summit,1,1,100.0
 Gen.G,Rex Regum Qeon,Summit,1,1,100.0
 Gen.G,Global Esports,Summit,1,1,100.0
 Global Esports,VARREL,Summit,1,1,100.0
 JD Gaming,Nova Esports,Summit,1,1,100.0
 JD Gaming,TYLOO,Summit,0,1,0.0
 KRÜ Esports,Sentinels,Summit,0,1,0.0
-Karmine Corp,Team Liquid,Summit,0,1,0.0
+Karmine Corp,Team Liquid,Summit,1,2,50.0
 KeepBest Gaming,Titan Esports Club,Summit,0,1,0.0
 Kiwoom DRX,Paper Rex,Summit,0,1,0.0
 Kiwoom DRX,VARREL,Summit,1,1,100.0
@@ -2521,7 +2524,7 @@ KRÜ Esports,LOUD,Sunset,0,1,0.0
 KRÜ Esports,Sentinels,Sunset,1,1,100.0
 KRÜ Esports,MIBR,Sunset,0,1,0.0
 Karmine Corp,Natus Vincere,Sunset,0,1,0.0
-Karmine Corp,Team Liquid,Sunset,1,1,100.0
+Karmine Corp,Team Liquid,Sunset,2,2,100.0
 Karmine Corp,Paper Rex,Sunset,0,1,0.0
 Karmine Corp,Team Heretics,Sunset,1,1,100.0
 KeepBest Gaming,Titan Esports Club,Sunset,1,1,100.0
@@ -2535,7 +2538,7 @@ LEVIATÁN,Team Vitality,Sunset,1,1,100.0
 LEVIATÁN,Team Heretics,Sunset,0,1,0.0
 LEVIATÁN,MIBR,Sunset,2,2,100.0
 LEVIATÁN,NRG,Sunset,1,1,100.0
-LOUD,MIBR,Sunset,0,1,0.0
+LOUD,MIBR,Sunset,1,2,50.0
 MIBR,Team Heretics,Sunset,1,1,100.0
 MIBR,Team Liquid,Sunset,0,1,0.0
 MIBR,NRG,Sunset,1,1,100.0

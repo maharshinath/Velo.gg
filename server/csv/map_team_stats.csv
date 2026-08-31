@@ -19,7 +19,7 @@ FURIA,Abyss,3,5,60.0
 FUT Esports,Abyss,1,4,25.0
 Fire Flux Esports,Abyss,1,2,50.0
 FunPlus Phoenix,Abyss,0,3,0.0
-G2 Esports,Abyss,8,12,66.67
+G2 Esports,Abyss,9,13,69.23
 GIANTX,Abyss,2,3,66.67
 Gen.G,Abyss,2,5,40.0
 Gentle Mates,Abyss,3,6,50.0
@@ -29,7 +29,7 @@ KOI,Abyss,0,1,0.0
 KRÜ Esports,Abyss,3,6,50.0
 Karmine Corp,Abyss,2,5,40.0
 Kiwoom DRX,Abyss,1,2,50.0
-LEVIATÁN,Abyss,2,3,66.67
+LEVIATÁN,Abyss,2,4,50.0
 LOUD,Abyss,1,3,33.33
 MIBR,Abyss,5,11,45.45
 NRG,Abyss,8,13,61.54
@@ -101,7 +101,7 @@ Joblife,Ascent,1,3,33.33
 KOI,Ascent,1,3,33.33
 KRÜ Esports,Ascent,8,17,47.06
 Kantic 2.0,Ascent,1,1,100.0
-Karmine Corp,Ascent,2,4,50.0
+Karmine Corp,Ascent,3,5,60.0
 KeepBest Gaming,Ascent,0,1,0.0
 Kiwoom DRX,Ascent,1,3,33.33
 LEVIATÁN,Ascent,10,15,66.67
@@ -136,7 +136,7 @@ TALON,Ascent,1,3,33.33
 TYLOO,Ascent,1,5,20.0
 Team Heretics,Ascent,12,19,63.16
 Team International,Ascent,0,1,0.0
-Team Liquid,Ascent,17,24,70.83
+Team Liquid,Ascent,17,25,68.0
 Team Secret,Ascent,2,7,28.57
 Team Thailand,Ascent,1,1,100.0
 Team Vikings,Ascent,1,2,50.0
@@ -631,11 +631,11 @@ JDG Esports,Lotus,6,11,54.55
 Joblife,Lotus,3,4,75.0
 KOI,Lotus,2,7,28.57
 KRÜ Esports,Lotus,9,18,50.0
-Karmine Corp,Lotus,10,19,52.63
+Karmine Corp,Lotus,10,20,50.0
 Kiwoom DRX,Lotus,4,8,50.0
 LEVIATÁN,Lotus,5,11,45.45
-LOUD,Lotus,7,15,46.67
-MIBR,Lotus,4,15,26.67
+LOUD,Lotus,8,16,50.0
+MIBR,Lotus,4,16,25.0
 NRG,Lotus,18,26,69.23
 Natus Vincere,Lotus,2,8,25.0
 Nongshim RedForce,Lotus,10,17,58.82
@@ -650,7 +650,7 @@ T1,Lotus,13,24,54.17
 TALON,Lotus,5,10,50.0
 TYLOO,Lotus,4,7,57.14
 Team Heretics,Lotus,18,30,60.0
-Team Liquid,Lotus,14,22,63.64
+Team Liquid,Lotus,15,23,65.22
 Team Secret,Lotus,3,9,33.33
 Team Vitality,Lotus,11,18,61.11
 Titan Esports Club,Lotus,1,7,14.29
@@ -744,7 +744,7 @@ FUT Esports,Split,7,19,36.84
 Fire Flux Esports,Split,3,4,75.0
 Fluxo W7M,Split,0,1,0.0
 FunPlus Phoenix,Split,3,11,27.27
-G2 Esports,Split,14,28,50.0
+G2 Esports,Split,14,29,48.28
 GIANTX,Split,5,12,41.67
 Gambit Esports,Split,2,5,40.0
 Gen.G,Split,4,10,40.0
@@ -760,7 +760,7 @@ KRÜ Esports,Split,6,16,37.5
 Karmine Corp,Split,0,6,0.0
 Keyd Stars,Split,1,2,50.0
 Kiwoom DRX,Split,3,7,42.86
-LEVIATÁN,Split,10,17,58.82
+LEVIATÁN,Split,11,18,61.11
 LOUD,Split,6,16,37.5
 Liberty,Split,0,1,0.0
 M80,Split,0,1,0.0
@@ -828,6 +828,7 @@ FURIA,Summit,0,3,0.0
 FUT Esports,Summit,1,2,50.0
 Fire Flux Esports,Summit,2,3,66.67
 FunPlus Phoenix,Summit,1,1,100.0
+G2 Esports,Summit,1,1,100.0
 GIANTX,Summit,1,1,100.0
 Gen.G,Summit,2,2,100.0
 Gentle Mates,Summit,0,1,0.0
@@ -835,10 +836,10 @@ Global Esports,Summit,2,3,66.67
 JD Gaming,Summit,2,4,50.0
 JDG Esports,Summit,0,1,0.0
 KRÜ Esports,Summit,1,3,33.33
-Karmine Corp,Summit,0,1,0.0
+Karmine Corp,Summit,1,2,50.0
 KeepBest Gaming,Summit,0,1,0.0
 Kiwoom DRX,Summit,1,2,50.0
-LEVIATÁN,Summit,1,3,33.33
+LEVIATÁN,Summit,1,4,25.0
 LOUD,Summit,2,3,66.67
 NRG,Summit,2,2,100.0
 Natus Vincere,Summit,1,2,50.0
@@ -851,7 +852,7 @@ Rex Regum Qeon,Summit,2,3,66.67
 Sentinels,Summit,1,2,50.0
 TYLOO,Summit,2,3,66.67
 Team Heretics,Summit,3,3,100.0
-Team Liquid,Summit,2,3,66.67
+Team Liquid,Summit,2,4,50.0
 Team Secret,Summit,1,3,33.33
 Team Vitality,Summit,1,1,100.0
 Titan Esports Club,Summit,2,3,66.67
@@ -890,13 +891,13 @@ JD Gaming,Sunset,0,2,0.0
 JDG Esports,Sunset,2,4,50.0
 KOI,Sunset,0,1,0.0
 KRÜ Esports,Sunset,5,8,62.5
-Karmine Corp,Sunset,4,7,57.14
+Karmine Corp,Sunset,5,8,62.5
 KeepBest Gaming,Sunset,1,2,50.0
 Kiwoom DRX,Sunset,3,6,50.0
 LEVIATÁN,Sunset,7,10,70.0
-LOUD,Sunset,4,5,80.0
+LOUD,Sunset,5,6,83.33
 M80,Sunset,0,1,0.0
-MIBR,Sunset,7,12,58.33
+MIBR,Sunset,7,13,53.85
 NRG,Sunset,1,8,12.5
 Natus Vincere,Sunset,2,8,25.0
 Nongshim RedForce,Sunset,2,6,33.33
@@ -911,7 +912,7 @@ T1,Sunset,6,9,66.67
 TALON,Sunset,0,3,0.0
 TYLOO,Sunset,6,6,100.0
 Team Heretics,Sunset,5,10,50.0
-Team Liquid,Sunset,4,9,44.44
+Team Liquid,Sunset,4,10,40.0
 Team Secret,Sunset,3,4,75.0
 Team Vitality,Sunset,3,6,50.0
 Titan Esports Club,Sunset,1,11,9.09
