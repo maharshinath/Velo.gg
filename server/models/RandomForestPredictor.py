@@ -83,6 +83,41 @@ class RandomForestPredictor:
                 df[col] = 0.0
         return df[self.feature_cols].fillna(0)
 
+    def build_matchup_view(self, teama, teamb) -> dict:
+        """Full live stats for the Stats tab (not the model feature subset)."""
+        if teama not in set(self.team_data["Team"]):
+            raise ValueError(f"Team '{teama}' not found in team data")
+        if teamb not in set(self.team_data["Team"]):
+            raise ValueError(f"Team '{teamb}' not found in team data")
+
+        feat = self.feature_tracker.features_for(teama, teamb, tournament=None)
+        wins_a, wins_b, n = self.feature_tracker.h2h_record(teama, teamb)
+        raw_a = round(wins_a / n * 100, 1) if n else None
+        raw_b = round(wins_b / n * 100, 1) if n else None
+        out: dict = {}
+        for key, value in feat.items():
+            if hasattr(value, "item"):
+                try:
+                    value = value.item()
+                except (ValueError, AttributeError):
+                    pass
+            out[key] = value
+        out.update(
+            {
+                "Team A": teama,
+                "Team B": teamb,
+                "Team A H2H Wins": wins_a,
+                "Team B H2H Wins": wins_b,
+                "Team A H2H Count": n,
+                "Team A H2H Winrate": raw_a,
+                "Team B H2H Winrate": raw_b,
+                # Stats UI should match VLR-style W–L, not the shrunk model feature.
+                "Team A Winrate vs B": raw_a if raw_a is not None else 50.0,
+                "Team B Winrate vs A": raw_b if raw_b is not None else 50.0,
+            }
+        )
+        return out
+
     def _win_probability_team1(self, team1: str, team2: str) -> float:
         df_12 = self.build_pred_df(team1, team2)
         df_21 = self.build_pred_df(team2, team1)

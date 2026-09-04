@@ -126,8 +126,10 @@ class MatchupData(Resource):
     def get(self, team1, team2):
         if not team1 or not team2:
             return {"error": "Both team1 and team2 query parameters are required"}, 400
-        data = get_predictor().build_pred_df(team1, team2)
-        return data.to_dict(orient="records")
+        try:
+            return get_predictor().build_matchup_view(team1, team2)
+        except ValueError as e:
+            return {"error": str(e)}, 400
 
 
 class TeamRoster(Resource):

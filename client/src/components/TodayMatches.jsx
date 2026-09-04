@@ -107,7 +107,7 @@ function MatchGroup({ title, matches }) {
                   {m.team1.logo && (
                     <img src={m.team1.logo} alt="" className="today-logo" />
                   )}
-                  {m.team1.name}
+                  <span className="today-team-name">{m.team1.name}</span>
                 </span>
 
                 <span className="today-score">
@@ -125,7 +125,7 @@ function MatchGroup({ title, matches }) {
                 <span
                   className={`today-team today-team--right${m.team2.won ? ' is-winner' : ''}`}
                 >
-                  {m.team2.name}
+                  <span className="today-team-name">{m.team2.name}</span>
                   {m.team2.logo && (
                     <img src={m.team2.logo} alt="" className="today-logo" />
                   )}

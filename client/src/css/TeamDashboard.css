@@ -57,6 +57,20 @@
   font-weight: var(--font-weight-bold);
 }
 
+.stats-h2h-meta {
+  display: block;
+  margin-top: var(--spacing-xs);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-tertiary);
+}
+
+.stats-h2h-note {
+  margin: 0;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  line-height: var(--line-height-relaxed);
+}
+
 .stats-h2h-card.team-a .value { color: var(--color-team-a); }
 .stats-h2h-card.team-b .value { color: var(--color-team-b); }
 
@@ -150,5 +164,14 @@
 
 @media (max-width: 600px) {
   .stats-h2h { grid-template-columns: 1fr; }
-  .stats-chart-wrap { height: 280px; }
+  .stats-chart-wrap { height: 240px; }
+  .stats-dashboard--embedded .stats-chart-wrap { height: 220px; }
+  .stats-chart-card,
+  .stats-table-card {
+    padding: var(--spacing-md);
+  }
+  .stats-table th,
+  .stats-table td {
+    padding: var(--spacing-xs) var(--spacing-sm);
+  }
 }

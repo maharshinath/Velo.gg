@@ -31,7 +31,15 @@ function NavBar() {
         </a>
       </div>
       <div className="right">
-        <NavLink to="/" end className={linkClass}>Home</NavLink>
+        <NavLink
+          to="/"
+          end
+          className={({ isActive }) =>
+            `navbar-link navbar-link--home${isActive ? ' active' : ''}`
+          }
+        >
+          Home
+        </NavLink>
         <NavLink to="/about" className={linkClass}>About</NavLink>
       </div>
     </nav>

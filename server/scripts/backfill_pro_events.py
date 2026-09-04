@@ -24,6 +24,7 @@ sys.path.insert(0, str(SERVER_DIR / "scripts"))
 from update_dataset import CSV_DIR, rebuild_pipeline  # noqa: E402
 from tournament_utils import ensure_scores_columns, is_pro_tournament  # noqa: E402
 from vlr_ingest import (  # noqa: E402
+    SCORE_DEDUPE_COLUMNS,
     _session,
     events_missing_from_scores,
     fetch_new_vlr_data,
@@ -107,7 +108,7 @@ def main(tune: bool, event_ids: list[str] | None) -> None:
     merged_scores = pd.concat([scores, new_scores], ignore_index=True)
     merged_scores = repair_vlr_scores(merged_scores)
     merged_scores = merged_scores.drop_duplicates(
-        subset=["Tournament", "Team A", "Team B", "Team A Score", "Team B Score"],
+        subset=SCORE_DEDUPE_COLUMNS,
         keep="first",
     )
 

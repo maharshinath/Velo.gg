@@ -87,4 +87,8 @@
   .rosters-panel {
     grid-template-columns: 1fr;
   }
+
+  .team-roster {
+    padding: var(--spacing-md);
+  }
 }

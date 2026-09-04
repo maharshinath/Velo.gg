@@ -2,10 +2,15 @@ import { API_BASE } from '../config'
 
 const BASE_URL = API_BASE
 
+function teamParam(team) {
+    if (team && typeof team === 'object') return team.Team
+    return team
+}
+
 
 export const getPrediction = async (team1, team2) => {
     const result = await fetch(
-        `${BASE_URL}/predict/${encodeURIComponent(team1)}/${encodeURIComponent(team2)}?odds=0`
+        `${BASE_URL}/predict/${encodeURIComponent(teamParam(team1))}/${encodeURIComponent(teamParam(team2))}?odds=0`
     )
     if (!result.ok) throw new Error('Prediction failed')
     return await result.json()
@@ -14,7 +19,7 @@ export const getPrediction = async (team1, team2) => {
 
 export const getMatchOdds = async (team1, team2) => {
     const result = await fetch(
-        `${BASE_URL}/odds/${encodeURIComponent(team1)}/${encodeURIComponent(team2)}`
+        `${BASE_URL}/odds/${encodeURIComponent(teamParam(team1))}/${encodeURIComponent(teamParam(team2))}`
     )
     if (!result.ok) throw new Error('Failed to load odds')
     return await result.json()
@@ -23,7 +28,7 @@ export const getMatchOdds = async (team1, team2) => {
 
 export const getMatchupData = async (team1, team2) => {
     const result = await fetch(
-        `${BASE_URL}/matchup_data/${encodeURIComponent(team1)}/${encodeURIComponent(team2)}`
+        `${BASE_URL}/matchup_data/${encodeURIComponent(teamParam(team1))}/${encodeURIComponent(teamParam(team2))}`
     )
     if (!result.ok) throw new Error('Failed to load matchup data')
     const data = await result.json()

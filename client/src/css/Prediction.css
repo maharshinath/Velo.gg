@@ -530,6 +530,8 @@
   letter-spacing: 0.03em;
   line-height: var(--line-height-tight);
   color: var(--color-text-primary);
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .is-phase-reveal .matchup-slot--winner .matchup-name {
@@ -730,6 +732,8 @@
   font-weight: var(--font-weight-bold);
   letter-spacing: 0.04em;
   text-transform: uppercase;
+  overflow-wrap: anywhere;
+  padding: 0 var(--spacing-sm);
 }
 
 .confidence-badge {
@@ -1063,15 +1067,19 @@
   color: var(--color-text-secondary);
 }
 
+.key-factors li {
+  margin-bottom: var(--spacing-xs);
+  overflow-wrap: anywhere;
+}
+
 .key-factors ul {
   margin: 0;
   padding-left: var(--spacing-lg);
   font-size: var(--font-size-sm);
   color: var(--color-text-secondary);
   line-height: var(--line-height-relaxed);
+  overflow-wrap: anywhere;
 }
-
-.key-factors li { margin-bottom: var(--spacing-xs); }
 
 .betting-insights {
   text-align: left;
@@ -1106,6 +1114,7 @@
 .betting-rec-label {
   font-size: var(--font-size-lg);
   color: var(--color-text-primary);
+  overflow-wrap: anywhere;
 }
 
 .betting-rec-reason {
@@ -1220,6 +1229,7 @@
   color: var(--color-text-muted);
   text-align: left;
   line-height: var(--line-height-relaxed);
+  overflow-wrap: anywhere;
 }
 
 .betting-disclaimer {
@@ -1228,8 +1238,16 @@
 }
 
 @media (max-width: 768px) {
-  .prediction-container { padding: var(--spacing-lg); margin: var(--spacing-xl) var(--spacing-md); border-radius: var(--radius-lg); }
-  .prediction-header h3 { font-size: var(--font-size-xl); }
+  .prediction-container {
+    padding: var(--spacing-lg);
+    margin: 0;
+    border-radius: var(--radius-lg);
+    max-width: 100%;
+  }
+  .prediction-header h3 {
+    font-size: var(--font-size-lg);
+    letter-spacing: 0.02em;
+  }
   .matchup-stage {
     grid-template-columns: 1fr;
     grid-template-rows: auto auto auto;
@@ -1238,7 +1256,15 @@
   .matchup-center { order: 2; flex-direction: row; gap: var(--spacing-sm); padding: var(--spacing-xs) 0; }
   .matchup-slot:first-of-type { order: 1; }
   .matchup-slot:last-of-type { order: 3; }
-  .matchup-slot { min-height: 88px; padding: var(--spacing-sm) var(--spacing-md); }
+  .matchup-slot {
+    min-height: 88px;
+    padding: 1.7rem var(--spacing-md) var(--spacing-sm);
+  }
+  .matchup-pick-label {
+    top: 6px;
+    font-size: 9px;
+    padding: 3px 10px;
+  }
   .matchup-logo { width: 52px; height: 52px; }
   .matchup-name { font-size: var(--font-size-sm); }
   .teams-comparison.glass { flex-direction: column; gap: var(--spacing-lg); padding: var(--spacing-lg); }
@@ -1248,10 +1274,40 @@
   .team-logo { width: 60px; height: 60px; }
   .team-name { font-size: var(--font-size-sm); }
   .winner-name { font-size: var(--font-size-xl); }
+  .is-phase-reveal .team-result.winner {
+    animation: none;
+    transform: none;
+    opacity: 1;
+  }
+  .winner-crown {
+    top: -6px;
+    right: 0;
+    font-size: 22px;
+  }
+  .prediction-tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    justify-content: flex-start;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+  }
+  .prediction-tab {
+    flex: 0 0 auto;
+    min-width: unset;
+    white-space: nowrap;
+    padding: 0.5rem 0.75rem;
+    font-size: var(--font-size-xs);
+  }
+  .prediction-tab-panel {
+    padding: var(--spacing-md);
+  }
+  .winner-callout__reveal strong {
+    font-size: clamp(1.2rem, 6vw, 1.7rem);
+  }
 }
 
 @media (max-width: 480px) {
-  .prediction-container { padding: var(--spacing-md); margin: var(--spacing-md); }
+  .prediction-container { padding: var(--spacing-md); margin: 0; }
   .prediction-header h3 { font-size: var(--font-size-lg); }
   .matchup-slot-content { gap: var(--spacing-sm); }
   .matchup-logo { width: 44px; height: 44px; }
@@ -1259,5 +1315,8 @@
   .team-logo { width: 50px; height: 50px; }
   .vs-text { font-size: var(--font-size-base); }
   .prediction-arrow { font-size: 20px; }
-  .winner-name { font-size: var(--font-size-lg); }
+  .winner-name { font-size: var(--font-size-lg); overflow-wrap: anywhere; }
+  .team-identity { flex-direction: column; text-align: center; }
+  .team-labels { align-items: center; }
+  .team-labels .team-name { text-align: center; }
 }

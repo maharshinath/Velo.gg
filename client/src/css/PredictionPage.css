@@ -67,5 +67,6 @@
 }
 
 @media (max-width: 768px) {
-  .prediction-page { gap: var(--spacing-2xl); }
+  .prediction-page { gap: var(--spacing-xl); width: 100%; max-width: 100%; }
+  .predicting-loader { padding: var(--spacing-xl) var(--spacing-md); }
 }

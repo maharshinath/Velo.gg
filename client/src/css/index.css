@@ -85,7 +85,11 @@ html {
   -moz-osx-font-smoothing: grayscale;
 }
 
-html, body { overflow-x: hidden; min-height: 100%; }
+html, body {
+  overflow-x: hidden;
+  min-height: 100%;
+  max-width: 100%;
+}
 
 body {
   font-family: var(--font-family-primary);
@@ -99,7 +103,14 @@ body {
   min-height: 100vh;
 }
 
-#root { width: 100%; min-height: 100vh; display: flex; flex-direction: column; }
+#root {
+  width: 100%;
+  max-width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow-x: clip;
+}
 
 h1, h2, h3, h4, h5, h6 {
   font-weight: var(--font-weight-bold);
@@ -254,6 +265,10 @@ input:focus, select:focus, textarea:focus {
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--color-accent-primary);
+  text-align: center;
+  max-width: 100%;
+  padding: 0 var(--spacing-sm);
+  overflow-wrap: anywhere;
 }
 
 .section-title {
@@ -303,6 +318,11 @@ input:focus, select:focus, textarea:focus {
 @media (max-width: 768px) {
   h1 { font-size: var(--font-size-4xl); }
   h2 { font-size: var(--font-size-2xl); }
+
+  .section-eyebrow {
+    letter-spacing: 0.08em;
+    font-size: 0.65rem;
+  }
 }
 
 /* Logo contrast: light plate + dual outline so white and black marks both read */

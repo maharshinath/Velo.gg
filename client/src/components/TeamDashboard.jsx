@@ -37,20 +37,27 @@ function diffClass(a, b) {
   return ''
 }
 
-const TeamStatsDashboard = ({ team1, team2, matchupData, embedded = false }) => {
+function TeamStatsDashboard({ team1, team2, matchupData, embedded = false }) {
+  const data = matchupData || {}
+  const h2hN = Number(data['Team A H2H Count'] ?? 0)
+  const winsA = Number(data['Team A H2H Wins'] ?? 0)
+  const winsB = Number(data['Team B H2H Wins'] ?? 0)
+  const h2hA =
+    data['Team A H2H Winrate'] ?? data['Team A Winrate vs B']
+  const h2hB =
+    data['Team B H2H Winrate'] ?? data['Team B Winrate vs A']
+
   const rawData = {
-    h2hA: matchupData['Team A Winrate vs B'],
-    h2hB: matchupData['Team B Winrate vs A'],
-    winA: team1.Winrate,
-    winB: team2.Winrate,
-    kdA: team1['K/D Ratio'],
-    kdB: team2['K/D Ratio'],
-    dmgA: team1['Average Damage'],
-    dmgB: team2['Average Damage'],
-    acsA: team1['Average Combat Score'],
-    acsB: team2['Average Combat Score'],
-    fkA: team1['Average First Kills'],
-    fkB: team2['Average First Kills'],
+    winA: data['Team A Winrate'] ?? team1.Winrate,
+    winB: data['Team B Winrate'] ?? team2.Winrate,
+    kdA: data['Team A K/D Ratio'] ?? team1['K/D Ratio'],
+    kdB: data['Team B K/D Ratio'] ?? team2['K/D Ratio'],
+    dmgA: data['Team A Average Damage'] ?? team1['Average Damage'],
+    dmgB: data['Team B Average Damage'] ?? team2['Average Damage'],
+    acsA: data['Team A Average Combat Score'] ?? team1['Average Combat Score'],
+    acsB: data['Team B Average Combat Score'] ?? team2['Average Combat Score'],
+    fkA: data['Team A Average First Kills'] ?? team1['Average First Kills'],
+    fkB: data['Team B Average First Kills'] ?? team2['Average First Kills'],
   }
 
   const t1Name = team1.Team
@@ -85,14 +92,34 @@ const TeamStatsDashboard = ({ team1, team2, matchupData, embedded = false }) => 
 
       <div className="stats-h2h">
         <div className="stats-h2h-card team-a">
-          <span className="label">{t1Name} H2H winrate</span>
-          <span className="value">{fmt(rawData.h2hA, 0)}%</span>
+          <span className="label">{t1Name} H2H</span>
+          <span className="value">
+            {h2hN > 0 ? `${winsA}–${winsB}` : '—'}
+          </span>
+          <span className="stats-h2h-meta">
+            {h2hN > 0
+              ? `${fmt(h2hA, 1)}% · ${h2hN} series`
+              : 'No meetings in our dataset'}
+          </span>
         </div>
         <div className="stats-h2h-card team-b">
-          <span className="label">{t2Name} H2H winrate</span>
-          <span className="value">{fmt(rawData.h2hB, 0)}%</span>
+          <span className="label">{t2Name} H2H</span>
+          <span className="value">
+            {h2hN > 0 ? `${winsB}–${winsA}` : '—'}
+          </span>
+          <span className="stats-h2h-meta">
+            {h2hN > 0
+              ? `${fmt(h2hB, 1)}% · ${h2hN} series`
+              : 'No meetings in our dataset'}
+          </span>
         </div>
       </div>
+      {h2hN > 0 && (
+        <p className="stats-h2h-note">
+          Head-to-head is series wins in our dataset (VCT, Masters, Champions, and EWC,
+          including EWC qualifiers). Older Challengers-era meetings on VLR are omitted.
+        </p>
+      )}
 
       <div className="stats-chart-card">
         <h3>Performance overview</h3>

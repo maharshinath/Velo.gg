@@ -39,6 +39,13 @@ def test_h2h_is_undirected_across_seat_order():
     assert rate_ab > 50
     assert rate_ba < 50
 
+    wins_ab, losses_ab, n_rec = tracker.h2h_record("Alpha", "Beta")
+    wins_ba, losses_ba, n_rec_ba = tracker.h2h_record("Beta", "Alpha")
+    assert n_rec == 1
+    assert n_rec_ba == 1
+    assert wins_ab == 1 and losses_ab == 0
+    assert wins_ba == 0 and losses_ba == 1
+
 
 def test_map_pool_strength_is_point_in_time():
     maps = pd.DataFrame(
@@ -203,3 +210,24 @@ def test_repair_vlr_player_stats_joins_to_score_keys():
         for _, r in repaired.iterrows()
     }
     assert join_keys == score_keys
+
+
+def test_score_dedupe_keeps_same_score_rematches():
+    from vlr_ingest import score_dedupe_key
+
+    mr3 = {
+        "Tournament": "VCT 2026: Americas Kickoff",
+        "Stage": "Main Event",
+        "Match Type": "Middle Round 3",
+        "Team A": "NRG",
+        "Team B": "100 Thieves",
+        "Team A Score": 2,
+        "Team B Score": 0,
+    }
+    lr5 = {
+        **mr3,
+        "Match Type": "Lower Round 5",
+    }
+    assert score_dedupe_key(mr3) != score_dedupe_key(lr5)
+    flipped = {**mr3, "Team A": "100 Thieves", "Team B": "NRG"}
+    assert score_dedupe_key(mr3) == score_dedupe_key(flipped)

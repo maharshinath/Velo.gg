@@ -29,7 +29,12 @@ from update_dataset import (  # noqa: E402
     rebuild_pipeline,
 )
 from tournament_utils import ensure_scores_columns  # noqa: E402
-from vlr_ingest import fetch_new_vlr_data, repair_vlr_player_stats, repair_vlr_scores  # noqa: E402
+from vlr_ingest import (  # noqa: E402
+    SCORE_DEDUPE_COLUMNS,
+    fetch_new_vlr_data,
+    repair_vlr_player_stats,
+    repair_vlr_scores,
+)
 
 KAGGLE_DIR = SERVER_DIR / "data" / "kaggle"
 RAW_DIR = SERVER_DIR / "data" / "raw"
@@ -90,7 +95,7 @@ def main(tune: bool, min_year: int, event_ids: list[str] | None) -> None:
         merged_scores = pd.concat([scores, new_scores], ignore_index=True)
         merged_scores = repair_vlr_scores(merged_scores)
         merged_scores = merged_scores.drop_duplicates(
-            subset=["Tournament", "Team A", "Team B", "Team A Score", "Team B Score"],
+            subset=SCORE_DEDUPE_COLUMNS,
             keep="first",
         )
 

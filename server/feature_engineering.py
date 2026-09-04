@@ -251,6 +251,16 @@ class MatchFeatureTracker:
         history = self._h2h_history.get((left, right), [])
         return history, team_a == left
 
+    def h2h_record(self, team_a: str, team_b: str) -> tuple[int, int, int]:
+        """Unshrunk series record: (wins_a, wins_b, meetings)."""
+        history, team_a_is_left = self._h2h_history_for(team_a, team_b)
+        n = len(history)
+        wins_left = int(sum(history))
+        wins_right = n - wins_left
+        if team_a_is_left:
+            return wins_left, wins_right, n
+        return wins_right, wins_left, n
+
     def _h2h_rate(self, team_a: str, team_b: str) -> tuple[float, float, int]:
         history, team_a_is_left = self._h2h_history_for(team_a, team_b)
         if not history:

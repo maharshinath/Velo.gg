@@ -13,10 +13,26 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  min-width: 0;
+  overflow-x: clip;
 }
 
 @media (max-width: 768px) {
   .main-content {
     padding: calc(64px + var(--spacing-xl)) var(--spacing-md) var(--spacing-2xl);
+    padding-top: calc(64px + var(--spacing-xl) + env(safe-area-inset-top, 0px));
+  }
+}
+
+@media (max-width: 480px) {
+  .main-content {
+    padding: calc(56px + var(--spacing-lg)) var(--spacing-sm) var(--spacing-xl);
+    padding-top: calc(56px + var(--spacing-lg) + env(safe-area-inset-top, 0px));
+  }
+}
+
+@media (max-width: 360px) {
+  .main-content {
+    padding-top: calc(96px + var(--spacing-md) + env(safe-area-inset-top, 0px));
   }
 }

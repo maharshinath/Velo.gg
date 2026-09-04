@@ -156,6 +156,21 @@ def normalize_tournament(name: str) -> str:
     return normalize_tournament_name(name)
 
 
+def _vlrgg_event_title(session: requests.Session, event_id: str) -> str | None:
+    """Resolve a human event name when the events API/list scrape misses an id."""
+    resp = _get_with_retry(session, f"https://www.vlr.gg/event/{event_id}")
+    if resp is None or resp.status_code != 200:
+        return None
+    soup = BeautifulSoup(resp.text, "html.parser")
+    h1 = soup.select_one("h1")
+    if not h1:
+        return None
+    title = normalize_tournament(h1.get_text(" ", strip=True))
+    if not title or title.lower().startswith("vlr event"):
+        return None
+    return title
+
+
 def is_pro_event(name: str) -> bool:
     return is_pro_event_name(name)
 
@@ -289,10 +304,11 @@ def fetch_pro_events(
             scraped_ids = {e["id"] for e in scraped}
             for eid in allowed_ids:
                 if eid not in scraped_ids:
+                    title = _vlrgg_event_title(session, eid)
                     scraped.append(
                         {
                             "id": eid,
-                            "name": f"VLR Event {eid}",
+                            "name": title or f"VLR Event {eid}",
                             "status": "ongoing",
                         }
                     )
@@ -1079,31 +1095,26 @@ def match_to_score_row(match: VlrMatch) -> dict:
     }
 
 
+SCORE_DEDUPE_COLUMNS = ["Tournament", "Stage", "Match Type", "Team A", "Team B"]
+
+
 def score_dedupe_key(row: dict) -> tuple:
-    a, b = sorted([row["Team A"], row["Team B"]])
+    """Identity for a series. Scores are omitted so rematches with the same
+    map-wins (e.g. two 2-0s in one Kickoff) are not collapsed."""
+    a, b = sorted([str(row["Team A"]), str(row["Team B"])])
     return (
-        row["Tournament"],
+        str(row.get("Tournament", "")),
+        str(row.get("Stage", "")),
+        str(row.get("Match Type", "")),
         a,
         b,
-        int(row["Team A Score"]),
-        int(row["Team B Score"]),
     )
 
 
 def existing_score_keys(scores: pd.DataFrame) -> set[tuple]:
     keys: set[tuple] = set()
     for _, row in scores.iterrows():
-        keys.add(
-            score_dedupe_key(
-                {
-                    "Tournament": row["Tournament"],
-                    "Team A": row["Team A"],
-                    "Team B": row["Team B"],
-                    "Team A Score": row["Team A Score"],
-                    "Team B Score": row["Team B Score"],
-                }
-            )
-        )
+        keys.add(score_dedupe_key(row.to_dict()))
     return keys
 
 

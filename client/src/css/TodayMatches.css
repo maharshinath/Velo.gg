@@ -84,6 +84,8 @@
 .today-event {
   font-size: var(--font-size-xs);
   color: var(--color-text-muted);
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .today-card__teams {
@@ -101,6 +103,13 @@
   font-size: var(--font-size-sm);
   color: var(--color-text-primary);
   min-width: 0;
+}
+
+.today-team-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .today-team--right {
@@ -162,18 +171,31 @@
   color: var(--color-text-secondary);
 }
 
-@media (max-width: 560px) {
+@media (max-width: 640px) {
   .today-card__teams {
     grid-template-columns: 1fr;
-    justify-items: start;
+    justify-items: stretch;
+    gap: var(--spacing-xs);
   }
 
+  .today-team,
   .today-team--right {
     justify-content: flex-start;
     text-align: left;
   }
 
+  .today-team--right {
+    flex-direction: row-reverse;
+    justify-content: flex-start;
+  }
+
   .today-score {
-    order: -1;
+    justify-content: center;
+    padding: 0.15rem 0;
+    font-size: var(--font-size-base);
+  }
+
+  .today-event {
+    flex: 1 1 100%;
   }
 }
