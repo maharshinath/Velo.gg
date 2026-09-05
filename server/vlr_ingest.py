@@ -36,6 +36,7 @@ TEAM_ALIASES = {
     "NRG Esports": "NRG",
     "Talon Esports": "TALON",
     "Envy": "ENVY",
+    "JD Gaming": "JDG Esports",
 }
 
 REGION_SHORT = {
@@ -392,6 +393,21 @@ def _event_team_ids(session: requests.Session, event_id: str) -> list[str]:
     return ids
 
 
+def _stage_match_type_from_event_card(text: str) -> tuple[str, str]:
+    """Map a vlr.gg match-item event label onto scores.csv Stage / Match Type."""
+    text = " ".join((text or "").split())
+    if text.endswith("Playoffs"):
+        return "Playoffs", text[: -len("Playoffs")].strip() or "Match"
+    if text.endswith("Play-Ins"):
+        round_name = text[: -len("Play-Ins")].strip()
+        match_type = f"Play-Ins: {round_name}" if round_name else "Play-Ins"
+        return "Main Event", match_type
+    if "Group Stage" in text:
+        rest = text.replace("Group Stage", "").replace(":", "").strip()
+        return "Group Stage", rest or "Match"
+    return "Main Event", text or "Match"
+
+
 def _collect_event_match_stubs_from_vlrgg(
     session: requests.Session,
     event_id: str,
@@ -443,11 +459,17 @@ def _collect_event_match_stubs_from_vlrgg(
         if len(teams) != 2 or teams[0]["points"] == teams[1]["points"]:
             continue
 
+        event_el = anchor.select_one(".match-item-event")
+        stage, match_type = _stage_match_type_from_event_card(
+            event_el.get_text(" ", strip=True) if event_el else ""
+        )
         stubs[mid] = {
             "match_id": mid,
             "url": href if href.startswith("http") else f"https://www.vlr.gg{href}",
             "tournament": target,
             "teams": teams,
+            "stage": stage,
+            "match_type": match_type,
         }
     return stubs
 
@@ -1165,11 +1187,33 @@ def fetch_new_vlr_data(
         if verbose:
             print(f"  Scanning {event['name']} (id {event['id']})...", flush=True)
         found = _collect_event_match_stubs(session, event["id"], event["name"])
+        recovered = 0
         for mid, stub in found.items():
             if mid not in ingested:
                 stubs[mid] = stub
+                continue
+            # Same-score rematches can be marked ingested after colliding with an
+            # earlier series, then never land in scores.csv. Retry those IDs.
+            teams = stub.get("teams") or []
+            if len(teams) != 2 or not stub.get("stage") or not stub.get("match_type"):
+                continue
+            team_a = normalize_team(teams[0].get("name", ""), canonical)
+            team_b = normalize_team(teams[1].get("name", ""), canonical)
+            key = (
+                stub.get("tournament") or event["name"],
+                stub["stage"],
+                stub["match_type"],
+                *sorted([team_a, team_b]),
+            )
+            if key not in existing_keys:
+                stubs[mid] = stub
+                recovered += 1
         if verbose:
-            print(f"    {len(found)} matches, {len(stubs)} pending after dedupe", flush=True)
+            extra = f", {recovered} ingested-id retries" if recovered else ""
+            print(
+                f"    {len(found)} matches, {len(stubs)} pending after dedupe{extra}",
+                flush=True,
+            )
 
     new_scores: list[dict] = []
     new_players: list[dict] = []

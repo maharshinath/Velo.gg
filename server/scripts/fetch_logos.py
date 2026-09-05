@@ -28,6 +28,7 @@ TEAM_ALIASES = {
     "NRG Esports": "NRG",
     "Talon Esports": "TALON",
     "Envy": "ENVY",
+    "JD Gaming": "JDG Esports",
 }
 
 # Prefer existing filenames when slug does not match

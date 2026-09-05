@@ -24,6 +24,7 @@ TEAM_ALIASES = {
     "NRG Esports": "NRG",
     "Talon Esports": "TALON",
     "Envy": "ENVY",
+    "JD Gaming": "JDG Esports",
 }
 
 CACHE_TTL_SECONDS = 6 * 60 * 60

@@ -4,21 +4,22 @@ import '../css/Home.css'
 
 /** Fallback when the API is asleep — keep in sync with server/data/model_metrics.json */
 const FALLBACK_METRICS = {
-  current_holdout_accuracy: 60.5,
+  current_holdout_accuracy: 61.1,
   deployed_at_training_holdout_accuracy: 61.4,
-  time_ordered_split_accuracy: 60.5,
-  walk_forward_accuracy: 59.5,
-  vct_regional_split_accuracy: 63.3,
+  time_ordered_split_accuracy: 61.1,
+  walk_forward_accuracy: 59.2,
+  vct_regional_split_accuracy: 61.3,
   international_split_accuracy: 57.3,
-  selective_65_accuracy: 67.4,
-  selective_65_coverage: 32.3,
-  selective_65_n: 86,
+  selective_65_accuracy: 64.3,
+  selective_65_coverage: 31.1,
+  selective_65_n: 84,
   betting_confidence_gate: 65,
-  brier_score: 0.2339,
-  log_loss: 0.6602,
+  brier_score: 0.2357,
+  log_loss: 0.6637,
   feature_count: 4,
-  match_count: 1364,
-  evaluated_at: '2026-09-04',
+  match_count: 1378,
+  team_count: 89,
+  evaluated_at: '2026-09-05',
 }
 
 const FALLBACK_MAP_POOL = [
@@ -94,8 +95,8 @@ function About() {
   const atTraining =
     metrics.deployed_at_training_holdout_accuracy ??
     metrics.deployed_model_holdout_accuracy
-  const matchCount = meta?.match_count ?? metrics.match_count ?? 1364
-  const teamCount = meta?.team_count ?? 90
+  const matchCount = meta?.match_count ?? metrics.match_count ?? 1378
+  const teamCount = meta?.team_count ?? metrics.team_count ?? 89
   const confidenceGate = metrics.betting_confidence_gate ?? 65
   const mapPool = meta?.comp_pool_maps?.length
     ? meta.comp_pool_maps
@@ -110,7 +111,7 @@ function About() {
   const datasetRows = [
     { metric: 'Pro series (matches)', value: fmtNum(matchCount) },
     { metric: 'Teams', value: fmtNum(teamCount) },
-    { metric: 'Seasons covered', value: 'VCT 2021 – Stage 2 2026' },
+    { metric: 'Seasons covered', value: 'VCT 2021–2026 · EWC 2025–2026' },
     { metric: 'Data sources', value: 'Kaggle base + VLR sync' },
     { metric: 'Feature count (live model)', value: fmtNum(metrics.feature_count) },
     { metric: 'Last metrics eval', value: metrics.evaluated_at ?? '—' },
@@ -234,7 +235,7 @@ function About() {
             >
               Kaggle
             </a>
-            ; newer Stage 2 results synced from VLR.
+            ; 2026 Stage 2 playoffs and EWC results synced from VLR.
           </p>
         </section>
 

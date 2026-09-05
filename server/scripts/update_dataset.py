@@ -63,6 +63,7 @@ TEAM_ALIASES = {
     "NRG Esports": "NRG",
     "Talon Esports": "TALON",
     "Envy": "ENVY",
+    "JD Gaming": "JDG Esports",
 }
 
 LOGO_FILE_OVERRIDES = {
@@ -391,6 +392,17 @@ def rebuild_pipeline(
         vct_config_path = SERVER_DIR / "vct_config.py"
         if vct_config_path.exists():
             vct_config_backup = vct_config_path.read_text(encoding="utf-8")
+    scores = normalize_scores(scores)
+    before = len(scores)
+    scores = scores.drop_duplicates(
+        subset=["Tournament", "Stage", "Match Type", "Team A", "Team B"],
+        keep="first",
+    )
+    if len(scores) < before:
+        print(
+            f"Dropped {before - len(scores)} duplicate series after team-name merge",
+            flush=True,
+        )
     scores = sort_scores_chronologically(scores)
     player_stats = player_stats.copy()
     player_stats["Teams"] = player_stats["Teams"].map(normalize_team)

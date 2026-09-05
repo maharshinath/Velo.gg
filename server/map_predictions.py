@@ -39,6 +39,7 @@ TEAM_ALIASES = {
     "NRG Esports": "NRG",
     "Talon Esports": "TALON",
     "Envy": "ENVY",
+    "JD Gaming": "JDG Esports",
 }
 
 
@@ -90,6 +91,8 @@ def load_merged_map_scores(min_year: int = 2021) -> pd.DataFrame:
     if not frames:
         raise FileNotFoundError("No map score data found (Kaggle or VLR)")
     merged = pd.concat(frames, ignore_index=True)
+    for col in ("Team A", "Team B"):
+        merged[col] = merged[col].map(normalize_team)
     merged = merged.drop_duplicates(
         subset=["Tournament", "Stage", "Match Type", "Map", "Team A", "Team B", "Team A Score", "Team B Score"],
         keep="last",
