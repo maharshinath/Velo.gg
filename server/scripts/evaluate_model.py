@@ -113,6 +113,95 @@ def _selective_accuracy(
     }
 
 
+def _short_intl_label(name: str) -> str:
+    name = str(name)
+    stage_masters = re.search(
+        r"Valorant Champions Tour Stage (\d+): Masters (.+)$", name
+    )
+    if stage_masters:
+        return f"Masters {stage_masters.group(2)} (S{stage_masters.group(1)})"
+    if name.startswith("Valorant Champions "):
+        return name.replace("Valorant ", "", 1)
+    if name.startswith("Valorant Masters "):
+        return name.replace("Valorant ", "", 1)
+    return name
+
+
+def _intl_category(name: str) -> str:
+    if re.match(r"^Valorant Champions \d{4}$", str(name)):
+        return "Champions"
+    if "Masters" in str(name):
+        return "Masters"
+    if "Esports World Cup" in str(name):
+        return "Esports World Cup"
+    return "Other"
+
+
+def _score_deployed_slice(
+    deployed: Any,
+    slice_df: pd.DataFrame,
+    feature_cols: list[str],
+) -> dict[str, Any] | None:
+    if slice_df.empty:
+        return None
+    cols = [c for c in feature_cols if c in slice_df.columns]
+    if not cols:
+        return None
+    y = slice_df["Team A Win"].astype(int)
+    scores = probability_scores(deployed, slice_df[cols], y)
+    probs = deployed.predict_proba(slice_df[cols])[:, 1]
+    selective = _selective_accuracy(probs, y.to_numpy(), BETTING_CONFIDENCE_GATE)
+    sel_acc = selective.get("accuracy") if selective else None
+    return {
+        "n": int(len(slice_df)),
+        "accuracy": round(float(scores["accuracy"]) * 100, 1),
+        "brier_score": round(float(scores["brier_score"]), 3),
+        "selective_65_accuracy": (
+            round(float(sel_acc) * 100, 1) if sel_acc is not None else None
+        ),
+        "selective_65_n": int(selective["n"]) if selective else 0,
+    }
+
+
+def international_event_breakdown(
+    deployed: Any,
+    df: pd.DataFrame,
+    feature_cols: list[str],
+) -> dict[str, Any]:
+    """Score the shipped pickle on each completed international event."""
+    intl = df[df["Tournament"].astype(str).map(is_international_tournament)]
+    events: list[dict[str, Any]] = []
+    for tournament, group in intl.groupby("Tournament", sort=False):
+        scored = _score_deployed_slice(deployed, group, feature_cols)
+        if not scored:
+            continue
+        events.append(
+            {
+                "event": str(tournament),
+                "label": _short_intl_label(str(tournament)),
+                "category": _intl_category(str(tournament)),
+                **scored,
+            }
+        )
+    events.sort(key=lambda row: (-float(row["accuracy"]), str(row["label"])))
+
+    categories: list[dict[str, Any]] = []
+    for category in ("Champions", "Masters", "Esports World Cup"):
+        mask = intl["Tournament"].astype(str).map(_intl_category) == category
+        scored = _score_deployed_slice(deployed, intl.loc[mask], feature_cols)
+        if scored:
+            categories.append({"label": category, **scored})
+
+    overall = _score_deployed_slice(deployed, intl, feature_cols) or {
+        "n": 0,
+        "accuracy": None,
+        "brier_score": None,
+        "selective_65_accuracy": None,
+        "selective_65_n": 0,
+    }
+    return {"events": events, "categories": categories, "all": overall}
+
+
 def _deployed_selective_on_holdout(
     deployed: Any,
     feature_cols: list[str],
@@ -156,6 +245,7 @@ def main() -> None:
     selective = _deployed_selective_on_holdout(deployed, feature_cols, df)
 
     wf = walk_forward_accuracy(df)
+    intl_breakdown = international_event_breakdown(deployed, df, feature_cols)
 
     metrics = {
         "random_split_accuracy": round(random_scores["accuracy"] * 100, 1) if random_scores else None,
@@ -172,6 +262,14 @@ def main() -> None:
         ),
         "vct_regional_split_accuracy": round(vct_scores["accuracy"] * 100, 1) if vct_scores else None,
         "international_split_accuracy": round(intl_scores["accuracy"] * 100, 1) if intl_scores else None,
+        "international_deployed_accuracy": intl_breakdown["all"].get("accuracy"),
+        "international_deployed_n": intl_breakdown["all"].get("n"),
+        "international_deployed_selective_65_accuracy": intl_breakdown["all"].get(
+            "selective_65_accuracy"
+        ),
+        "international_deployed_selective_65_n": intl_breakdown["all"].get("selective_65_n"),
+        "international_categories": intl_breakdown["categories"],
+        "international_events": intl_breakdown["events"],
         "brier_score": round(all_scores["brier_score"], 4) if all_scores else None,
         "log_loss": round(all_scores["log_loss"], 4) if all_scores else None,
         "walk_forward_accuracy": (
@@ -191,7 +289,8 @@ def main() -> None:
         "note": (
             "current_holdout_accuracy = deployed model on the latest 20% of matches "
             "(refreshed features). deployed_at_training_holdout_accuracy = score when "
-            "the pickle was saved. selective_65_* uses the deployed model on that holdout."
+            "the pickle was saved. selective_65_* uses the deployed model on that holdout. "
+            "international_events is the shipped pickle on every series in that event."
         ),
     }
     METRICS_PATH.parent.mkdir(parents=True, exist_ok=True)

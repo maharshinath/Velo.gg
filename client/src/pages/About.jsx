@@ -20,6 +20,32 @@ const FALLBACK_METRICS = {
   match_count: 1379,
   team_count: 89,
   evaluated_at: '2026-09-06',
+  international_deployed_accuracy: 56.4,
+  international_deployed_n: 445,
+  international_deployed_selective_65_accuracy: 64.3,
+  international_deployed_selective_65_n: 56,
+  international_categories: [
+    { label: 'Champions', n: 161, accuracy: 57.1, selective_65_accuracy: 82.4, selective_65_n: 17 },
+    { label: 'Masters', n: 180, accuracy: 52.8, selective_65_accuracy: 60.0, selective_65_n: 25 },
+    { label: 'Esports World Cup', n: 104, accuracy: 61.5, selective_65_accuracy: 50.0, selective_65_n: 14 },
+  ],
+  international_events: [
+    { label: 'Esports World Cup 2026', n: 27, accuracy: 70.4, selective_65_accuracy: 80.0, selective_65_n: 5 },
+    { label: 'Champions 2022', n: 33, accuracy: 66.7, selective_65_accuracy: 66.7, selective_65_n: 3 },
+    { label: 'Masters Toronto 2025', n: 24, accuracy: 62.5, selective_65_accuracy: 57.1, selective_65_n: 7 },
+    { label: 'Champions 2021', n: 27, accuracy: 59.3, selective_65_accuracy: null, selective_65_n: 0 },
+    { label: 'Masters Berlin (S3)', n: 27, accuracy: 59.3, selective_65_accuracy: null, selective_65_n: 0 },
+    { label: 'Esports World Cup 2025', n: 77, accuracy: 58.4, selective_65_accuracy: 33.3, selective_65_n: 9 },
+    { label: 'Masters Santiago 2026', n: 24, accuracy: 58.3, selective_65_accuracy: 71.4, selective_65_n: 7 },
+    { label: 'Champions 2023', n: 33, accuracy: 57.6, selective_65_accuracy: 100.0, selective_65_n: 3 },
+    { label: 'Champions 2025', n: 34, accuracy: 55.9, selective_65_accuracy: 75.0, selective_65_n: 8 },
+    { label: 'Masters Reykjavík (S2)', n: 18, accuracy: 55.6, selective_65_accuracy: null, selective_65_n: 0 },
+    { label: 'Masters Copenhagen (S2)', n: 24, accuracy: 50.0, selective_65_accuracy: null, selective_65_n: 0 },
+    { label: 'Masters Reykjavík (S1)', n: 24, accuracy: 50.0, selective_65_accuracy: null, selective_65_n: 0 },
+    { label: 'Champions 2024', n: 34, accuracy: 47.1, selective_65_accuracy: 100.0, selective_65_n: 3 },
+    { label: 'Masters London 2026', n: 23, accuracy: 43.5, selective_65_accuracy: 66.7, selective_65_n: 6 },
+    { label: 'Masters Bangkok 2025', n: 16, accuracy: 37.5, selective_65_accuracy: 40.0, selective_65_n: 5 },
+  ],
 }
 
 const FALLBACK_MAP_POOL = [
@@ -43,10 +69,18 @@ function fmtNum(value, digits = 0) {
   return Number(value).toLocaleString()
 }
 
-function AboutTable({ columns, rows }) {
+function intlRowDetail(row) {
+  const series = `${fmtNum(row.n)} series`
+  if (row.selective_65_accuracy == null || !row.selective_65_n) {
+    return series
+  }
+  return `${series} · ≥65% ${fmtPct(row.selective_65_accuracy)} (n=${fmtNum(row.selective_65_n)})`
+}
+
+function AboutTable({ columns, rows, wide }) {
   return (
     <div className="about-table-wrap">
-      <table className="about-table">
+      <table className={wide ? 'about-table about-table--wide' : 'about-table'}>
         <thead>
           <tr>
             {columns.map((col) => (
@@ -89,7 +123,7 @@ function About() {
     getMeta().then(setMeta).catch(() => {})
   }, [])
 
-  const metrics = meta?.model_metrics ?? FALLBACK_METRICS
+  const metrics = { ...FALLBACK_METRICS, ...(meta?.model_metrics ?? {}) }
   const currentHoldout =
     metrics.current_holdout_accuracy ?? metrics.time_ordered_split_accuracy
   const atTraining =
@@ -141,9 +175,9 @@ function About() {
       detail: 'Time-ordered holdout on regional leagues',
     },
     {
-      metric: 'International',
+      metric: 'International holdout',
       value: fmtPct(metrics.international_split_accuracy),
-      detail: 'Time-ordered holdout on international events',
+      detail: 'Time-ordered holdout on international events only',
     },
     {
       metric: `High-confidence (≥${confidenceGate}%)`,
@@ -153,6 +187,31 @@ function About() {
           ? `${Number(metrics.selective_65_coverage).toFixed(1)}% of holdout · n=${fmtNum(metrics.selective_65_n)}`
           : 'Favorites above the confidence gate',
     },
+  ]
+
+  const intlAll = {
+    n: metrics.international_deployed_n,
+    accuracy: metrics.international_deployed_accuracy,
+    selective_65_accuracy: metrics.international_deployed_selective_65_accuracy,
+    selective_65_n: metrics.international_deployed_selective_65_n,
+  }
+  const intlCategoryRows = (metrics.international_categories ?? []).map((row) => ({
+    metric: row.label,
+    value: fmtPct(row.accuracy),
+    detail: intlRowDetail(row),
+  }))
+  const intlEventRows = (metrics.international_events ?? []).map((row) => ({
+    metric: row.label,
+    value: fmtPct(row.accuracy),
+    detail: intlRowDetail(row),
+  }))
+  const intlSummaryRows = [
+    {
+      metric: 'All internationals',
+      value: fmtPct(intlAll.accuracy),
+      detail: intlRowDetail(intlAll),
+    },
+    ...intlCategoryRows,
   ]
 
   const calibrationRows = [
@@ -251,6 +310,32 @@ function About() {
           />
           <p className="about-section__footnote">
             Holdout uses the most recent 20% of matches with point-in-time features.
+          </p>
+        </section>
+
+        <section className="about-section">
+          <h2 className="about-section__title">Internationals</h2>
+          <AboutTable
+            wide
+            columns={[
+              { key: 'metric', label: 'Slice' },
+              { key: 'value', label: 'Accuracy', numeric: true },
+              { key: 'detail', label: 'Notes', note: true },
+            ]}
+            rows={intlSummaryRows}
+          />
+          <AboutTable
+            wide
+            columns={[
+              { key: 'metric', label: 'Event' },
+              { key: 'value', label: 'Accuracy', numeric: true },
+              { key: 'detail', label: 'Notes', note: true },
+            ]}
+            rows={intlEventRows}
+          />
+          <p className="about-section__footnote">
+            Live pickle on every series in that event, including matches used in
+            training. The holdout figure above is the stricter time-ordered split.
           </p>
         </section>
 

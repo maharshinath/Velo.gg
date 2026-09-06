@@ -17,5 +17,187 @@
   "feature_count": 4,
   "match_count": 1379,
   "evaluated_at": "2026-09-06",
-  "note": "current_holdout_accuracy = deployed model on the latest 20% of matches (refreshed features). deployed_at_training_holdout_accuracy = score when the pickle was saved. selective_65_* uses the deployed model on that holdout."
+  "note": "current_holdout_accuracy = deployed model on the latest 20% of matches (refreshed features). deployed_at_training_holdout_accuracy = score when the pickle was saved. selective_65_* uses the deployed model on that holdout. international_events is the shipped pickle on every series in that event.",
+  "international_deployed_accuracy": 56.4,
+  "international_deployed_n": 445,
+  "international_deployed_selective_65_accuracy": 64.3,
+  "international_deployed_selective_65_n": 56,
+  "international_categories": [
+    {
+      "label": "Champions",
+      "n": 161,
+      "accuracy": 57.1,
+      "brier_score": 0.242,
+      "selective_65_accuracy": 82.4,
+      "selective_65_n": 17
+    },
+    {
+      "label": "Masters",
+      "n": 180,
+      "accuracy": 52.8,
+      "brier_score": 0.253,
+      "selective_65_accuracy": 60.0,
+      "selective_65_n": 25
+    },
+    {
+      "label": "Esports World Cup",
+      "n": 104,
+      "accuracy": 61.5,
+      "brier_score": 0.24,
+      "selective_65_accuracy": 50.0,
+      "selective_65_n": 14
+    }
+  ],
+  "international_events": [
+    {
+      "event": "Esports World Cup 2026",
+      "label": "Esports World Cup 2026",
+      "category": "Esports World Cup",
+      "n": 27,
+      "accuracy": 70.4,
+      "brier_score": 0.22,
+      "selective_65_accuracy": 80.0,
+      "selective_65_n": 5
+    },
+    {
+      "event": "Valorant Champions 2022",
+      "label": "Champions 2022",
+      "category": "Champions",
+      "n": 33,
+      "accuracy": 66.7,
+      "brier_score": 0.23,
+      "selective_65_accuracy": 66.7,
+      "selective_65_n": 3
+    },
+    {
+      "event": "Valorant Masters Toronto 2025",
+      "label": "Masters Toronto 2025",
+      "category": "Masters",
+      "n": 24,
+      "accuracy": 62.5,
+      "brier_score": 0.247,
+      "selective_65_accuracy": 57.1,
+      "selective_65_n": 7
+    },
+    {
+      "event": "Valorant Champions 2021",
+      "label": "Champions 2021",
+      "category": "Champions",
+      "n": 27,
+      "accuracy": 59.3,
+      "brier_score": 0.246,
+      "selective_65_accuracy": null,
+      "selective_65_n": 0
+    },
+    {
+      "event": "Valorant Champions Tour Stage 3: Masters Berlin",
+      "label": "Masters Berlin (S3)",
+      "category": "Masters",
+      "n": 27,
+      "accuracy": 59.3,
+      "brier_score": 0.25,
+      "selective_65_accuracy": null,
+      "selective_65_n": 0
+    },
+    {
+      "event": "Esports World Cup 2025",
+      "label": "Esports World Cup 2025",
+      "category": "Esports World Cup",
+      "n": 77,
+      "accuracy": 58.4,
+      "brier_score": 0.247,
+      "selective_65_accuracy": 33.3,
+      "selective_65_n": 9
+    },
+    {
+      "event": "Valorant Masters Santiago 2026",
+      "label": "Masters Santiago 2026",
+      "category": "Masters",
+      "n": 24,
+      "accuracy": 58.3,
+      "brier_score": 0.227,
+      "selective_65_accuracy": 71.4,
+      "selective_65_n": 7
+    },
+    {
+      "event": "Valorant Champions 2023",
+      "label": "Champions 2023",
+      "category": "Champions",
+      "n": 33,
+      "accuracy": 57.6,
+      "brier_score": 0.241,
+      "selective_65_accuracy": 100.0,
+      "selective_65_n": 3
+    },
+    {
+      "event": "Valorant Champions 2025",
+      "label": "Champions 2025",
+      "category": "Champions",
+      "n": 34,
+      "accuracy": 55.9,
+      "brier_score": 0.237,
+      "selective_65_accuracy": 75.0,
+      "selective_65_n": 8
+    },
+    {
+      "event": "Valorant Champions Tour Stage 2: Masters Reykjav\u00edk",
+      "label": "Masters Reykjav\u00edk (S2)",
+      "category": "Masters",
+      "n": 18,
+      "accuracy": 55.6,
+      "brier_score": 0.243,
+      "selective_65_accuracy": null,
+      "selective_65_n": 0
+    },
+    {
+      "event": "Valorant Champions Tour Stage 2: Masters Copenhagen",
+      "label": "Masters Copenhagen (S2)",
+      "category": "Masters",
+      "n": 24,
+      "accuracy": 50.0,
+      "brier_score": 0.259,
+      "selective_65_accuracy": null,
+      "selective_65_n": 0
+    },
+    {
+      "event": "Valorant Champions Tour Stage 1: Masters Reykjav\u00edk",
+      "label": "Masters Reykjav\u00edk (S1)",
+      "category": "Masters",
+      "n": 24,
+      "accuracy": 50.0,
+      "brier_score": 0.263,
+      "selective_65_accuracy": null,
+      "selective_65_n": 0
+    },
+    {
+      "event": "Valorant Champions 2024",
+      "label": "Champions 2024",
+      "category": "Champions",
+      "n": 34,
+      "accuracy": 47.1,
+      "brier_score": 0.257,
+      "selective_65_accuracy": 100.0,
+      "selective_65_n": 3
+    },
+    {
+      "event": "Valorant Masters London 2026",
+      "label": "Masters London 2026",
+      "category": "Masters",
+      "n": 23,
+      "accuracy": 43.5,
+      "brier_score": 0.253,
+      "selective_65_accuracy": 66.7,
+      "selective_65_n": 6
+    },
+    {
+      "event": "Valorant Masters Bangkok 2025",
+      "label": "Masters Bangkok 2025",
+      "category": "Masters",
+      "n": 16,
+      "accuracy": 37.5,
+      "brier_score": 0.293,
+      "selective_65_accuracy": 40.0,
+      "selective_65_n": 5
+    }
+  ]
 }
