@@ -105,7 +105,7 @@ Karmine Corp,Team Heretics,Abyss,1,1,100.0
 Kiwoom DRX,T1,Abyss,0,1,0.0
 LEVIATÁN,Team Heretics,Abyss,1,1,100.0
 LEVIATÁN,MIBR,Abyss,1,1,100.0
-LOUD,NRG,Abyss,1,1,100.0
+LOUD,NRG,Abyss,2,2,100.0
 MIBR,Rex Regum Qeon,Abyss,1,1,100.0
 MIBR,NRG,Abyss,0,3,0.0
 MIBR,Sentinels,Abyss,0,1,0.0
@@ -1349,7 +1349,7 @@ LEVIATÁN,NRG,Haven,1,2,50.0
 LEVIATÁN,MIBR,Haven,1,2,50.0
 LOUD,OpTic Gaming,Haven,1,1,100.0
 LOUD,Team Liquid,Haven,1,2,50.0
-LOUD,NRG,Haven,0,1,0.0
+LOUD,NRG,Haven,0,2,0.0
 LOUD,Sentinels,Haven,0,1,0.0
 LOUD,MIBR,Haven,0,1,0.0
 Lavie,Penguins and Frogs,Haven,1,1,100.0
@@ -1854,7 +1854,7 @@ LEVIATÁN,MIBR,Lotus,2,2,100.0
 LEVIATÁN,NRG,Lotus,0,1,0.0
 LOUD,Paper Rex,Lotus,0,1,0.0
 LOUD,Sentinels,Lotus,2,3,66.67
-LOUD,NRG,Lotus,0,1,0.0
+LOUD,NRG,Lotus,1,2,50.0
 LOUD,MIBR,Lotus,1,1,100.0
 MIBR,NRG,Lotus,0,1,0.0
 MIBR,Sentinels,Lotus,0,2,0.0
@@ -2408,6 +2408,7 @@ KeepBest Gaming,Titan Esports Club,Summit,0,1,0.0
 Kiwoom DRX,Paper Rex,Summit,0,1,0.0
 Kiwoom DRX,VARREL,Summit,1,1,100.0
 LEVIATÁN,NRG,Summit,0,1,0.0
+LOUD,NRG,Summit,0,1,0.0
 Natus Vincere,PCIFIC Esports,Summit,1,1,100.0
 Natus Vincere,Team Heretics,Summit,0,1,0.0
 Nongshim RedForce,Team Secret,Summit,1,1,100.0
@@ -2555,6 +2556,7 @@ LEVIATÁN,Team Heretics,Sunset,0,1,0.0
 LEVIATÁN,MIBR,Sunset,2,2,100.0
 LEVIATÁN,NRG,Sunset,1,1,100.0
 LOUD,MIBR,Sunset,1,2,50.0
+LOUD,NRG,Sunset,1,1,100.0
 MIBR,Team Heretics,Sunset,1,1,100.0
 MIBR,Team Liquid,Sunset,0,1,0.0
 MIBR,NRG,Sunset,1,1,100.0

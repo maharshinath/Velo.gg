@@ -7,19 +7,19 @@ const FALLBACK_METRICS = {
   current_holdout_accuracy: 61.1,
   deployed_at_training_holdout_accuracy: 61.4,
   time_ordered_split_accuracy: 61.1,
-  walk_forward_accuracy: 59.2,
+  walk_forward_accuracy: 59.3,
   vct_regional_split_accuracy: 61.3,
-  international_split_accuracy: 57.3,
-  selective_65_accuracy: 64.3,
-  selective_65_coverage: 31.1,
-  selective_65_n: 84,
+  international_split_accuracy: 58.4,
+  selective_65_accuracy: 63.5,
+  selective_65_coverage: 31.5,
+  selective_65_n: 85,
   betting_confidence_gate: 65,
-  brier_score: 0.2357,
-  log_loss: 0.6637,
+  brier_score: 0.2362,
+  log_loss: 0.6647,
   feature_count: 4,
-  match_count: 1378,
+  match_count: 1379,
   team_count: 89,
-  evaluated_at: '2026-09-05',
+  evaluated_at: '2026-09-06',
 }
 
 const FALLBACK_MAP_POOL = [
@@ -95,7 +95,7 @@ function About() {
   const atTraining =
     metrics.deployed_at_training_holdout_accuracy ??
     metrics.deployed_model_holdout_accuracy
-  const matchCount = meta?.match_count ?? metrics.match_count ?? 1378
+  const matchCount = meta?.match_count ?? metrics.match_count ?? 1379
   const teamCount = meta?.team_count ?? metrics.team_count ?? 89
   const confidenceGate = metrics.betting_confidence_gate ?? 65
   const mapPool = meta?.comp_pool_maps?.length
