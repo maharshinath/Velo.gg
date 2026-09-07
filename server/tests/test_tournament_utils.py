@@ -24,6 +24,20 @@ def test_normalize_ewc_tournament():
     assert is_international_tournament("Esports World Cup 2025")
 
 
+def test_normalize_champions_2026_variants():
+    expected = "Valorant Champions 2026"
+    assert normalize_tournament_name("Valorant Champions 2026") == expected
+    assert normalize_tournament_name("Champions 2026") == expected
+    assert normalize_tournament_name("Champions Shanghai 2026") == expected
+    assert normalize_tournament_name("VALORANT Champions Shanghai 2026") == expected
+    assert normalize_tournament_name("Valorant Champions 2026: Shanghai") == expected
+    assert normalize_tournament_name("Champions Shanghai") == expected
+    assert normalize_tournament_name("Valorant Champions Tour 2026") == "Valorant Champions Tour 2026"
+    assert is_pro_event_name(expected)
+    assert is_international_tournament(expected)
+    assert is_pro_event_name("Champions Shanghai 2026")
+
+
 def test_shrink_sparse_h2h():
     assert shrink_rate(100.0, 1) == 66.66666666666666
     assert shrink_rate(100.0, 3) == 100.0
@@ -112,3 +126,20 @@ def test_sort_scores_chronologically_adds_match_date_column():
     assert sorted_df.iloc[0]["Team A"] == "A"
     assert sorted_df.iloc[1]["Team A"] == "C"
     assert "Match Date" in sorted_df.columns
+
+
+def test_homepage_includes_champions_2026_cards():
+    from today_matches import _is_vct_2026
+
+    assert _is_vct_2026("Valorant Champions 2026")
+    assert _is_vct_2026("Champions Shanghai")
+    assert _is_vct_2026("Champions Shanghai 2026")
+    assert not _is_vct_2026("VCT 2025: Americas Stage 2")
+
+
+def test_group_stage_en_dash_match_type():
+    from vlr_ingest import _stage_match_type_from_event_card
+
+    stage, match_type = _stage_match_type_from_event_card("Group Stage–Opening (A)")
+    assert stage == "Group Stage"
+    assert match_type == "Opening (A)"

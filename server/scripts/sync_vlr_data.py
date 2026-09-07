@@ -135,7 +135,7 @@ if __name__ == "__main__":
         "--event-ids",
         nargs="+",
         metavar="ID",
-        help="Ingest specific VLR event ids (includes ongoing events, e.g. 2765 for Masters London)",
+        help="Ingest specific VLR event ids (Champions 2026 / 2766 is always scanned)",
     )
     args = parser.parse_args()
     os.chdir(SERVER_DIR)

@@ -18,6 +18,9 @@ SERVER_DIR = Path(__file__).resolve().parent
 VLR_API = "https://vlr.orlandomm.net/api/v1"
 VLR_MATCH_URL = "https://www.vlr.gg/{match_id}/{slug}"
 INGESTED_IDS_PATH = SERVER_DIR / "data" / "vlr_ingested_match_ids.json"
+# Scan even while VLR still lists the event as upcoming.
+CHAMPIONS_2026_EVENT_ID = "2766"
+KNOWN_LIVE_EVENT_IDS = (CHAMPIONS_2026_EVENT_ID,)
 REQUEST_DELAY = 0.4
 API_TIMEOUT = 90
 API_RETRIES = 5
@@ -403,7 +406,8 @@ def _stage_match_type_from_event_card(text: str) -> tuple[str, str]:
         match_type = f"Play-Ins: {round_name}" if round_name else "Play-Ins"
         return "Main Event", match_type
     if "Group Stage" in text:
-        rest = text.replace("Group Stage", "").replace(":", "").strip()
+        rest = re.sub(r"(?i)group stage", "", text)
+        rest = rest.replace(":", "").strip(" –—-")
         return "Group Stage", rest or "Match"
     return "Main Event", text or "Match"
 
@@ -574,10 +578,21 @@ def _parse_stage_match_type(soup: BeautifulSoup, tournament: str) -> tuple[str, 
     text = " ".join(header.get_text(" ", strip=True).split())
     if tournament and tournament in text:
         text = text.replace(tournament, "", 1).strip()
-    for sep in ("Playoffs:", "Group Stage:", "Main Event:", "Swiss Stage:"):
+    for sep in (
+        "Playoffs:",
+        "Group Stage:",
+        "Main Event:",
+        "Swiss Stage:",
+        "Playoffs–",
+        "Playoffs—",
+        "Group Stage–",
+        "Group Stage—",
+        "Swiss Stage–",
+        "Swiss Stage—",
+    ):
         if sep in text:
-            stage = sep.replace(":", "").strip()
-            rest = text.split(sep, 1)[1].strip()
+            stage = re.split(r"[:–—]", sep, maxsplit=1)[0].strip()
+            rest = text.split(sep, 1)[1].strip(" –—-")
             if rest:
                 match_type = rest
             return stage, match_type
@@ -1165,11 +1180,14 @@ def fetch_new_vlr_data(
     ingested = load_ingested_ids()
     existing_keys = existing_score_keys(scores)
 
-    if event_ids:
+    requested_ids = [str(eid) for eid in event_ids] if event_ids else []
+    extra_ids = [eid for eid in KNOWN_LIVE_EVENT_IDS if eid not in requested_ids]
+
+    if requested_ids:
         events = fetch_pro_events(
             session,
             statuses=("completed", "ongoing"),
-            event_ids=[str(eid) for eid in event_ids],
+            event_ids=requested_ids,
         )
     else:
         completed = fetch_completed_pro_events(session)
@@ -1178,6 +1196,17 @@ def fetch_new_vlr_data(
         for event in ongoing:
             by_id[event["id"]] = event
         events = list(by_id.values())
+
+    if extra_ids:
+        extras = fetch_pro_events(
+            session,
+            statuses=("completed", "ongoing", "upcoming"),
+            event_ids=extra_ids,
+        )
+        have = {e["id"] for e in events}
+        for event in extras:
+            if event["id"] not in have:
+                events.append(event)
 
     if verbose:
         print(f"VLR: {len(events)} pro event(s) to scan for new matches", flush=True)

@@ -10,6 +10,7 @@ from typing import Any
 import requests
 from bs4 import BeautifulSoup
 
+from tournament_utils import is_pro_event_name, normalize_tournament_name
 from vlr_ingest import VLR_API, _get_with_retry, clean_team_display_name
 
 _CACHE: dict[str, tuple[float, dict]] = {}
@@ -33,10 +34,17 @@ def _session() -> requests.Session:
 
 
 def _is_vct_2026(tournament: str | None) -> bool:
-    t = (tournament or "").upper()
+    raw = tournament or ""
+    normalized = normalize_tournament_name(raw)
+    year_m = re.search(r"(20\d{2})", normalized)
+    if is_pro_event_name(normalized) and year_m and int(year_m.group(1)) == _TARGET_YEAR:
+        return True
+    t = raw.upper()
+    if re.search(r"CHAMPIONS\s+SHANGHAI", t) and "TOUR" not in t:
+        return True
     if "VCT" not in t and "CHAMPIONS" not in t and "MASTERS" not in t:
         return False
-    return str(_TARGET_YEAR) in t or "2026" in t
+    return str(_TARGET_YEAR) in t
 
 
 def _parse_utc(match: dict) -> datetime | None:

@@ -146,9 +146,25 @@ def normalize_tournament_name(name: str) -> str:
     if masters:
         return f"Valorant Masters {masters.group(1)}"
 
-    champions = re.search(r"^(?:Valorant\s+)?Champions\s+(\d{4})$", name, re.I)
-    if champions:
-        return f"Valorant Champions {champions.group(1)}"
+    # World Championship only — not "Valorant Champions Tour ...".
+    if not re.search(r"Champions\s+Tour", name, re.I):
+        year_first = re.search(
+            r"^(?:Valorant\s+)?Champions\s+(\d{4})(?:\s*[:\-]?\s*[A-Za-z]+)?$",
+            name,
+            re.I,
+        )
+        if year_first:
+            return f"Valorant Champions {year_first.group(1)}"
+        city_year = re.search(
+            r"^(?:Valorant\s+)?Champions\s+([A-Za-z]+)\s+(\d{4})$",
+            name,
+            re.I,
+        )
+        if city_year and city_year.group(1).lower() not in {"tour", "stage", "kickoff"}:
+            return f"Valorant Champions {city_year.group(2)}"
+        # VLR cards sometimes omit the year ("Champions Shanghai").
+        if re.search(r"^(?:Valorant\s+)?Champions\s+Shanghai$", name, re.I):
+            return "Valorant Champions 2026"
 
     return name
 

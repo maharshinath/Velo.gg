@@ -19,3 +19,5 @@ def test_short_intl_labels():
     assert _intl_category("Valorant Masters London 2026") == "Masters"
     assert _intl_category("Esports World Cup 2026") == "Esports World Cup"
     assert _intl_category("Valorant Champions Tour Stage 2: Masters Copenhagen") == "Masters"
+    assert _short_intl_label("Valorant Champions 2026") == "Champions 2026"
+    assert _intl_category("Valorant Champions 2026") == "Champions"
