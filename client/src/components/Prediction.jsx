@@ -68,6 +68,7 @@ function BettingInsightsPanel({ team1, team2, betting, oddsLoading }) {
 
   const rec = betting.recommendation || 'pass'
   const hasOdds = Boolean(betting.odds_available)
+  const hasAnyPrice = betting.team1_odds != null || betting.team2_odds != null
   const bookies = Array.isArray(betting.bookies) ? betting.bookies : []
   const tipTeam = betting.tip_team || betting.favored_team
   const team1Pct = ((betting.model_prob_team1 ?? 0) * 100).toFixed(0)
@@ -131,8 +132,29 @@ function BettingInsightsPanel({ team1, team2, betting, oddsLoading }) {
                 {betting.bookie_count > 1 ? ` · avg of ${betting.bookie_count} sites` : ''}
               </p>
             </>
+          ) : hasAnyPrice ? (
+            <>
+              {betting.team1_odds != null && (
+                <p>
+                  {team1.Team}{' '}
+                  <span className="betting-sub">price {Number(betting.team1_odds).toFixed(2)}</span>
+                </p>
+              )}
+              {betting.team2_odds != null && (
+                <p>
+                  {team2.Team}{' '}
+                  <span className="betting-sub">price {Number(betting.team2_odds).toFixed(2)}</span>
+                </p>
+              )}
+              <p className="betting-sub">
+                VLR only still lists one side (typical after the match is over).
+              </p>
+            </>
           ) : (
-            <p className="betting-sub">No prices found on VLR for this match right now.</p>
+            <p className="betting-sub">
+              VLR has no book prices for this pair right now. Two-way lines usually
+              appear on upcoming match pages.
+            </p>
           )}
         </div>
 
@@ -178,20 +200,24 @@ function BettingInsightsPanel({ team1, team2, betting, oddsLoading }) {
         </div>
       </div>
 
-      {bookies.length > 0 && (
+      {(bookies.length > 0 || betting.source_url) && (
         <div className="betting-books">
-          <h4>Prices by site</h4>
-          <ul className="betting-books-list">
-            {bookies.map((b) => (
-              <li key={`${b.bookie}-${b.team1_odds}-${b.team2_odds}`}>
-                <span className="betting-book-name">{b.bookie}</span>
-                <span>
-                  {team1.Team} {Number(b.team1_odds).toFixed(2)} · {team2.Team}{' '}
-                  {Number(b.team2_odds).toFixed(2)}
-                </span>
-              </li>
-            ))}
-          </ul>
+          {bookies.length > 0 && (
+            <>
+              <h4>Prices by site</h4>
+              <ul className="betting-books-list">
+                {bookies.map((b) => (
+                  <li key={`${b.bookie}-${b.team1_odds}-${b.team2_odds}`}>
+                    <span className="betting-book-name">{b.bookie}</span>
+                    <span>
+                      {team1.Team} {Number(b.team1_odds).toFixed(2)} · {team2.Team}{' '}
+                      {Number(b.team2_odds).toFixed(2)}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
           {betting.source_url && (
             <a
               className="betting-source"

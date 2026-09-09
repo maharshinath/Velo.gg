@@ -86,7 +86,22 @@ def build_betting_insight(
         o2_f = float(o2) if o2 is not None else None
     except (TypeError, ValueError):
         return out
-    if not o1_f or not o2_f or o1_f <= 1.0 or o2_f <= 1.0:
+
+    have_both = o1_f is not None and o2_f is not None and o1_f > 1.0 and o2_f > 1.0
+    if not have_both:
+        if o1_f is not None and o1_f > 1.0:
+            out["team1_odds"] = round(o1_f, 3)
+            out["implied_prob_team1"] = round(implied_prob_from_decimal(o1_f) * 100, 1)
+        if o2_f is not None and o2_f > 1.0:
+            out["team2_odds"] = round(o2_f, 3)
+            out["implied_prob_team2"] = round(implied_prob_from_decimal(o2_f) * 100, 1)
+        if out.get("team1_odds") or out.get("team2_odds"):
+            out["odds_method"] = odds.get("method")
+            out["source_url"] = odds.get("source_url")
+            out["match_id"] = odds.get("match_id")
+            out["recommendation_label"] = (
+                "Only one pre-match price is still listed on VLR (usual after the match)."
+            )
         return out
 
     i1 = implied_prob_from_decimal(o1_f)

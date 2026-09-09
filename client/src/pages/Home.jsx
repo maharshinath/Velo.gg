@@ -16,6 +16,7 @@ function Home() {
     const [matchResult, setResult] = useState(null)
     const [predictionLoading, setPredictionLoading] = useState(false)
     const [matchupData, setMatchupData] = useState(null)
+    const [oddsLoading, setOddsLoading] = useState(false)
 
     useEffect(() => {
         const loadTeams = async() => {
@@ -63,6 +64,7 @@ function Home() {
                 setResult(result)
                 setMatchupData(matchup)
                 setPredict(true)
+                setOddsLoading(true)
                 getMatchOdds(match[0], match[1])
                     .then((oddsPayload) => {
                         if (!oddsPayload?.betting) return
@@ -71,6 +73,7 @@ function Home() {
                         )
                     })
                     .catch((err) => console.error(err))
+                    .finally(() => setOddsLoading(false))
             } catch (err) {
                 console.error('Prediction failed:', err)
                 setError('Failed to get prediction')
@@ -83,6 +86,7 @@ function Home() {
         setPredict(false)
         setMatch([null,null])
         setResult(null)
+        setOddsLoading(false)
     }
 
     const clearMatch = () => {
@@ -95,7 +99,7 @@ function Home() {
 
     return predict ? (
             <>
-                <Prediction team1={match[0]} team2={match[1]} result={matchResult} onReset={handleReset} />
+                <Prediction team1={match[0]} team2={match[1]} result={matchResult} oddsLoading={oddsLoading} onReset={handleReset} />
                 <TeamStatsDashboard team1={match[0]} team2={match[1]} matchupData={matchupData}/>
             </>
             

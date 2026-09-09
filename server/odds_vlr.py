@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
+import json
 import re
 import time
 import unicodedata
+from pathlib import Path
 from typing import Any
 
 import requests
@@ -23,8 +25,11 @@ from vlr_ingest import (
 _ODDS_CACHE: dict[str, tuple[float, dict | None]] = {}
 _CACHE_TTL_SEC = 180.0
 # Keep odds fetch snappy so /api/predict stays usable when VLR is slow.
-_ODDS_TIMEOUT = 20
-_ODDS_RETRIES = 2
+_ODDS_TIMEOUT = 12
+_ODDS_RETRIES = 1
+_ODDS_API_TIMEOUT = 4
+_VLR_TEAM_IDS_PATH = Path(__file__).resolve().parent / "data" / "vlr_team_ids.json"
+_VLR_TEAM_IDS: dict[str, int] | None = None
 _MISS = object()
 
 _BOOKIE_LABELS = {
@@ -82,6 +87,19 @@ def _fold(text: str) -> str:
 
 def _team_key(name: str) -> str:
     return _fold(clean_team_display_name(normalize_team(str(name))))
+
+
+def _vlr_team_id(name: str) -> int | None:
+    global _VLR_TEAM_IDS
+    if _VLR_TEAM_IDS is None:
+        try:
+            raw = json.loads(_VLR_TEAM_IDS_PATH.read_text(encoding="utf-8"))
+            _VLR_TEAM_IDS = {str(k): int(v) for k, v in raw.items()}
+        except (json.JSONDecodeError, OSError, TypeError, ValueError):
+            _VLR_TEAM_IDS = {}
+    canonical = TEAM_ALIASES.get(str(name).strip(), str(name).strip())
+    tid = _VLR_TEAM_IDS.get(str(name).strip()) or _VLR_TEAM_IDS.get(canonical)
+    return int(tid) if tid else None
 
 
 def _names_match(a: str, b: str) -> bool:
@@ -177,11 +195,31 @@ def parse_betting_books(html: str) -> list[dict[str, Any]]:
     return books
 
 
+def parse_post_match_odds(html: str) -> list[tuple[str, float]]:
+    """Completed matches only list the winning side's pre-match price."""
+    soup = BeautifulSoup(html, "html.parser")
+    found: list[tuple[str, float]] = []
+    for item in soup.select("a.match-bet-item.mod-post-odds, .match-bet-item.mod-post-odds"):
+        names = [
+            n.get_text(" ", strip=True)
+            for n in item.select(".match-bet-item-teamzzz, .match-bet-item-team-name")
+        ]
+        full = next((n for n in names if n and len(n) > 3), names[0] if names else "")
+        text = item.get_text(" ", strip=True)
+        m = re.search(r"(\d+\.\d{2})\s+\S+\s+odds\s+pre-match", text, re.I)
+        if full and m:
+            found.append((full, float(m.group(1))))
+    return _dedupe_odds(found)
+
+
 def parse_odds_from_html(html: str) -> list[tuple[str, float]]:
     """Backward-compatible: return averaged (team, odds) pairs from Betting module."""
     books = parse_betting_books(html)
     if books:
         return _average_team_odds(books)
+    post = parse_post_match_odds(html)
+    if post:
+        return post
 
     soup = BeautifulSoup(html, "html.parser")
     found: list[tuple[str, float]] = []
@@ -239,9 +277,14 @@ def _map_odds_to_teams(
             o1 = odds
         elif _names_match(name, team2):
             o2 = odds
-    if o1 is None or o2 is None:
+    if o1 is None and o2 is None:
         return None
-    return {"team1_odds": float(o1), "team2_odds": float(o2)}
+    out: dict[str, float] = {}
+    if o1 is not None:
+        out["team1_odds"] = float(o1)
+    if o2 is not None:
+        out["team2_odds"] = float(o2)
+    return out
 
 
 def _remap_books_to_caller(
@@ -303,16 +346,68 @@ def _match_pairs(match: dict) -> tuple[str, str] | None:
     return str(t0), str(t1)
 
 
+def _pair_is_matchup(a: str, b: str, team1: str, team2: str) -> bool:
+    return (_names_match(a, team1) and _names_match(b, team2)) or (
+        _names_match(a, team2) and _names_match(b, team1)
+    )
+
+
+def _candidate_from_href(
+    href: str,
+    team_a: str,
+    team_b: str,
+    status: str | None = None,
+) -> dict | None:
+    if not href:
+        return None
+    path = href.split("?", 1)[0]
+    m = re.match(r"^/(\d+)/", path)
+    if not m:
+        return None
+    mid = m.group(1)
+    match_url = href if href.startswith("http") else f"https://www.vlr.gg{path}"
+    return {
+        "match_id": mid,
+        "url": match_url,
+        "vlr_team_a": team_a,
+        "vlr_team_b": team_b,
+        "status": status,
+    }
+
+
+def _candidate_from_listing_anchor(
+    anchor,
+    team1: str,
+    team2: str,
+) -> dict | None:
+    team_blocks = anchor.select(".match-item-vs-team .text-of")
+    names = [clean_team_display_name(el.get_text(" ", strip=True)) for el in team_blocks]
+    if len(names) < 2:
+        names = [
+            clean_team_display_name(el.get_text(" ", strip=True))
+            for el in anchor.select(".m-item-team-name")
+        ]
+    if len(names) < 2:
+        return None
+    a, b = names[0], names[1]
+    if not _pair_is_matchup(a, b, team1, team2):
+        return None
+    status_el = anchor.select_one(".ml-status")
+    status = status_el.get_text(strip=True) if status_el else None
+    return _candidate_from_href(anchor.get("href") or "", a, b, status)
+
+
 def _find_match_candidate_from_vlrgg(
     session: requests.Session,
     team1: str,
     team2: str,
 ) -> dict | None:
-    """Find a match URL by scraping vlr.gg match lists (API-independent)."""
+    """Find a match URL by scraping vlr.gg lists, then team match history."""
     for url in (
         "https://www.vlr.gg/matches",
         "https://www.vlr.gg/matches/?group=upcoming",
         "https://www.vlr.gg/matches/results",
+        "https://www.vlr.gg/matches/results/?page=2",
     ):
         try:
             resp = _get_with_retry(
@@ -325,34 +420,48 @@ def _find_match_candidate_from_vlrgg(
                 continue
             soup = BeautifulSoup(resp.text, "html.parser")
             for anchor in soup.select("a.match-item"):
-                team_blocks = anchor.select(".match-item-vs-team .text-of")
-                if len(team_blocks) < 2:
-                    continue
-                a = clean_team_display_name(team_blocks[0].get_text(" ", strip=True))
-                b = clean_team_display_name(team_blocks[1].get_text(" ", strip=True))
-                if not (
-                    (_names_match(a, team1) and _names_match(b, team2))
-                    or (_names_match(a, team2) and _names_match(b, team1))
-                ):
-                    continue
-                href = anchor.get("href") or ""
-                m = re.match(r"^/(\d+)/", href)
-                if not m:
-                    continue
-                mid = m.group(1)
-                status_el = anchor.select_one(".ml-status")
-                status = status_el.get_text(strip=True) if status_el else None
-                match_url = href if href.startswith("http") else f"https://www.vlr.gg{href}"
-                return {
-                    "match_id": mid,
-                    "url": match_url,
-                    "vlr_team_a": a,
-                    "vlr_team_b": b,
-                    "status": status,
-                }
+                found = _candidate_from_listing_anchor(anchor, team1, team2)
+                if found:
+                    return found
         except Exception:
             continue
         time.sleep(REQUEST_DELAY)
+
+    for seed in (team1, team2):
+        found = _find_match_on_team_history(session, seed, team1, team2)
+        if found:
+            return found
+    return None
+
+
+def _find_match_on_team_history(
+    session: requests.Session,
+    seed_team: str,
+    team1: str,
+    team2: str,
+) -> dict | None:
+    """Team results pages keep H2H after it falls off /matches/results page 1."""
+    tid = _vlr_team_id(seed_team)
+    if not tid:
+        return None
+    url = f"https://www.vlr.gg/team/matches/{tid}/"
+    try:
+        resp = _get_with_retry(
+            session,
+            url,
+            timeout=_ODDS_TIMEOUT,
+            retries=_ODDS_RETRIES,
+        )
+        if resp is None or resp.status_code != 200:
+            return None
+        soup = BeautifulSoup(resp.text, "html.parser")
+        for anchor in soup.select("a.m-item"):
+            found = _candidate_from_listing_anchor(anchor, team1, team2)
+            if found:
+                found["status"] = found.get("status") or "completed"
+                return found
+    except Exception:
+        return None
     return None
 
 
@@ -361,20 +470,22 @@ def _find_match_candidate(
     team1: str,
     team2: str,
 ) -> dict | None:
-    """Search live/upcoming then completed matches for this pair."""
+    """Prefer vlr.gg scrape; the JSON mirror is often down and too slow for odds."""
+    scraped = _find_match_candidate_from_vlrgg(session, team1, team2)
+    if scraped:
+        return scraped
+
     for path, params in (
-        ("matches", {"page": 1}),
-        ("matches", {"page": 1, "status": "live"}),
         ("matches", {"page": 1, "status": "upcoming"}),
-        ("results", {"page": 1}),
+        ("matches", {"page": 1, "status": "live"}),
     ):
         try:
             resp = _get_with_retry(
                 session,
                 f"{VLR_API}/{path}",
                 params=params,
-                timeout=_ODDS_TIMEOUT,
-                retries=_ODDS_RETRIES,
+                timeout=_ODDS_API_TIMEOUT,
+                retries=1,
             )
             if resp is None or resp.status_code != 200:
                 continue
@@ -389,27 +500,24 @@ def _find_match_candidate(
             if not pair:
                 continue
             a, b = pair
-            if (_names_match(a, team1) and _names_match(b, team2)) or (
-                _names_match(a, team2) and _names_match(b, team1)
-            ):
-                mid = str(match.get("id") or match.get("match_id") or "")
-                slug = str(match.get("slug") or "match")
-                url = match.get("url") or (
-                    VLR_MATCH_URL.format(match_id=mid, slug=slug) if mid else None
-                )
-                if not url and mid:
-                    url = f"https://www.vlr.gg/{mid}"
-                if url:
-                    return {
-                        "match_id": mid,
-                        "url": url,
-                        "vlr_team_a": a,
-                        "vlr_team_b": b,
-                        "status": match.get("status"),
-                    }
-        time.sleep(REQUEST_DELAY)
-
-    return _find_match_candidate_from_vlrgg(session, team1, team2)
+            if not _pair_is_matchup(a, b, team1, team2):
+                continue
+            mid = str(match.get("id") or match.get("match_id") or "")
+            slug = str(match.get("slug") or "match")
+            url = match.get("url") or (
+                VLR_MATCH_URL.format(match_id=mid, slug=slug) if mid else None
+            )
+            if not url and mid:
+                url = f"https://www.vlr.gg/{mid}"
+            if url:
+                return {
+                    "match_id": mid,
+                    "url": url,
+                    "vlr_team_a": a,
+                    "vlr_team_b": b,
+                    "status": match.get("status"),
+                }
+    return None
 
 def fetch_match_odds(team1: str, team2: str) -> dict[str, Any] | None:
     """Return averaged decimal odds + per-bookie lines from VLR Betting module."""
@@ -479,16 +587,18 @@ def fetch_match_odds(team1: str, team2: str) -> dict[str, Any] | None:
                 rows, candidate["vlr_team_a"], candidate["vlr_team_b"]
             )
             if mapped and not _names_match(candidate["vlr_team_a"], team1):
-                mapped = {
-                    "team1_odds": mapped["team2_odds"],
-                    "team2_odds": mapped["team1_odds"],
+                swapped = {
+                    "team1_odds": mapped.get("team2_odds"),
+                    "team2_odds": mapped.get("team1_odds"),
                 }
+                mapped = {k: v for k, v in swapped.items() if v is not None} or None
         if not mapped:
             _cache_set(cache_key, None)
             return None
+        both = mapped.get("team1_odds") is not None and mapped.get("team2_odds") is not None
         out = {
             **mapped,
-            "method": "vlr_blurb",
+            "method": "vlr_blurb" if both else "vlr_post_odds",
             "bookies": [],
             "bookie_count": 0,
             "source_url": candidate["url"],

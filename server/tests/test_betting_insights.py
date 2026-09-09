@@ -10,7 +10,7 @@ import pytest
 SERVER_DIR = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(SERVER_DIR))
 
-from odds_vlr import parse_betting_books, parse_odds_from_html
+from odds_vlr import parse_betting_books, parse_odds_from_html, parse_post_match_odds
 from prediction_extras import build_betting_insight, decimal_ev, implied_prob_from_decimal
 
 
@@ -115,3 +115,41 @@ def test_betting_can_tip_underdog():
     # implied B ≈ 32.3%; model 40% → value on B
     assert insight["tip_team"] == "B"
     assert insight["recommendation"] == "bet"
+
+
+SAMPLE_POST_ODDS_HTML = """
+<html><body>
+  <div class="wf-label">Betting</div>
+  <a href="/rr/bet/1" class="wf-card mod-dark match-bet-item mod-post-odds">
+    <div class="match-bet-item-return">
+      <div class="match-bet-item-return-msg">
+        <span class="match-bet-item-odds">$100</span> on
+        <span class="match-bet-item-teamzzz">100 Thieves</span>
+        returned <span class="match-bet-item-odds">$139</span>
+        at pre-match odds
+      </div>
+      <div class="match-bet-item-return-short">
+        <span class="match-bet-item-odds">1.39</span>
+        <span class="match-bet-item-teamzzz">100T</span>
+        odds pre-match
+      </div>
+    </div>
+  </a>
+</body></html>
+"""
+
+
+def test_parse_post_match_winner_price():
+    rows = parse_post_match_odds(SAMPLE_POST_ODDS_HTML)
+    assert rows
+    name, price = rows[0]
+    assert "100" in name
+    assert price == pytest.approx(1.39)
+
+
+def test_betting_keeps_one_sided_post_match_price():
+    odds = {"team1_odds": 1.39, "method": "vlr_post_odds", "source_url": "https://www.vlr.gg/1"}
+    insight = build_betting_insight("100 Thieves", "LOUD", 0.65, odds=odds)
+    assert insight["odds_available"] is False
+    assert insight["team1_odds"] == 1.39
+    assert "one pre-match price" in insight["recommendation_label"].lower()

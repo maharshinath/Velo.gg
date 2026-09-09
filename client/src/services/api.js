@@ -18,11 +18,18 @@ export const getPrediction = async (team1, team2) => {
 
 
 export const getMatchOdds = async (team1, team2) => {
-    const result = await fetch(
-        `${BASE_URL}/odds/${encodeURIComponent(teamParam(team1))}/${encodeURIComponent(teamParam(team2))}`
-    )
-    if (!result.ok) throw new Error('Failed to load odds')
-    return await result.json()
+    const controller = new AbortController()
+    const timer = setTimeout(() => controller.abort(), 45000)
+    try {
+        const result = await fetch(
+            `${BASE_URL}/odds/${encodeURIComponent(teamParam(team1))}/${encodeURIComponent(teamParam(team2))}`,
+            { signal: controller.signal }
+        )
+        if (!result.ok) throw new Error('Failed to load odds')
+        return await result.json()
+    } finally {
+        clearTimeout(timer)
+    }
 }
 
 
