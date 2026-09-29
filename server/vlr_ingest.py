@@ -380,9 +380,8 @@ def _event_team_ids(session: requests.Session, event_id: str) -> list[str]:
             f"{VLR_API}/teams",
             params={"event": event_id, "page": page, "limit": 50},
         )
-        if resp is None:
+        if resp is None or resp.status_code >= 400:
             break
-        resp.raise_for_status()
         payload = resp.json()
         batch = payload.get("data") or []
         if not batch:
@@ -489,8 +488,13 @@ def _collect_event_match_stubs(
         return stubs
 
     # Fallback: team result feeds (slower, used when event page is unavailable).
+    # Mirror 503s are normal; an upcoming event with 0 completed series must
+    # return empty rather than abort the whole Champions scan.
     target = normalize_tournament(event_name)
-    team_ids = _event_team_ids(session, event_id)
+    try:
+        team_ids = _event_team_ids(session, event_id)
+    except Exception:
+        return stubs
     for team_id in team_ids:
         resp = _get_with_retry(
             session,

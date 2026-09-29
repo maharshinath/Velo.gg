@@ -4,45 +4,46 @@ import '../css/Home.css'
 
 /** Fallback when the API is asleep — keep in sync with server/data/model_metrics.json */
 const FALLBACK_METRICS = {
-  current_holdout_accuracy: 61.1,
-  deployed_at_training_holdout_accuracy: 61.4,
-  time_ordered_split_accuracy: 61.1,
-  walk_forward_accuracy: 59.3,
+  current_holdout_accuracy: 61.0,
+  deployed_at_training_holdout_accuracy: 60.4,
+  time_ordered_split_accuracy: 61.0,
+  walk_forward_accuracy: 59.4,
   vct_regional_split_accuracy: 61.3,
-  international_split_accuracy: 58.4,
-  selective_65_accuracy: 63.5,
-  selective_65_coverage: 31.5,
-  selective_65_n: 85,
+  international_split_accuracy: 62.6,
+  selective_65_accuracy: 68.7,
+  selective_65_coverage: 24.6,
+  selective_65_n: 67,
   betting_confidence_gate: 65,
-  brier_score: 0.2362,
-  log_loss: 0.6647,
-  feature_count: 4,
-  match_count: 1379,
+  brier_score: 0.2336,
+  log_loss: 0.6591,
+  feature_count: 7,
+  match_count: 1391,
   team_count: 89,
-  evaluated_at: '2026-09-06',
-  international_deployed_accuracy: 56.4,
-  international_deployed_n: 445,
-  international_deployed_selective_65_accuracy: 64.3,
-  international_deployed_selective_65_n: 56,
+  evaluated_at: '2026-09-29',
+  international_deployed_accuracy: 56.0,
+  international_deployed_n: 455,
+  international_deployed_selective_65_accuracy: 67.4,
+  international_deployed_selective_65_n: 46,
   international_categories: [
-    { label: 'Champions', n: 161, accuracy: 57.1, selective_65_accuracy: 82.4, selective_65_n: 17 },
-    { label: 'Masters', n: 180, accuracy: 52.8, selective_65_accuracy: 60.0, selective_65_n: 25 },
-    { label: 'Esports World Cup', n: 104, accuracy: 61.5, selective_65_accuracy: 50.0, selective_65_n: 14 },
+    { label: 'Champions', n: 171, accuracy: 59.1, selective_65_accuracy: 84.6, selective_65_n: 13 },
+    { label: 'Masters', n: 180, accuracy: 51.1, selective_65_accuracy: 62.5, selective_65_n: 24 },
+    { label: 'Esports World Cup', n: 104, accuracy: 59.6, selective_65_accuracy: 55.6, selective_65_n: 9 },
   ],
   international_events: [
-    { label: 'Esports World Cup 2026', n: 27, accuracy: 70.4, selective_65_accuracy: 80.0, selective_65_n: 5 },
-    { label: 'Champions 2022', n: 33, accuracy: 66.7, selective_65_accuracy: 66.7, selective_65_n: 3 },
+    { label: 'Champions 2026', n: 10, accuracy: 80.0, selective_65_accuracy: 100.0, selective_65_n: 2 },
+    { label: 'Esports World Cup 2026', n: 27, accuracy: 70.4, selective_65_accuracy: 75.0, selective_65_n: 4 },
+    { label: 'Champions 2022', n: 33, accuracy: 63.6, selective_65_accuracy: 100.0, selective_65_n: 1 },
+    { label: 'Champions 2021', n: 27, accuracy: 63.0, selective_65_accuracy: null, selective_65_n: 0 },
     { label: 'Masters Toronto 2025', n: 24, accuracy: 62.5, selective_65_accuracy: 57.1, selective_65_n: 7 },
-    { label: 'Champions 2021', n: 27, accuracy: 59.3, selective_65_accuracy: null, selective_65_n: 0 },
-    { label: 'Masters Berlin (S3)', n: 27, accuracy: 59.3, selective_65_accuracy: null, selective_65_n: 0 },
-    { label: 'Esports World Cup 2025', n: 77, accuracy: 58.4, selective_65_accuracy: 33.3, selective_65_n: 9 },
-    { label: 'Masters Santiago 2026', n: 24, accuracy: 58.3, selective_65_accuracy: 71.4, selective_65_n: 7 },
-    { label: 'Champions 2023', n: 33, accuracy: 57.6, selective_65_accuracy: 100.0, selective_65_n: 3 },
-    { label: 'Champions 2025', n: 34, accuracy: 55.9, selective_65_accuracy: 75.0, selective_65_n: 8 },
+    { label: 'Champions 2023', n: 33, accuracy: 60.6, selective_65_accuracy: 100.0, selective_65_n: 1 },
+    { label: 'Masters Santiago 2026', n: 24, accuracy: 58.3, selective_65_accuracy: 83.3, selective_65_n: 6 },
+    { label: 'Champions 2025', n: 34, accuracy: 55.9, selective_65_accuracy: 71.4, selective_65_n: 7 },
+    { label: 'Esports World Cup 2025', n: 77, accuracy: 55.8, selective_65_accuracy: 40.0, selective_65_n: 5 },
     { label: 'Masters Reykjavík (S2)', n: 18, accuracy: 55.6, selective_65_accuracy: null, selective_65_n: 0 },
-    { label: 'Masters Copenhagen (S2)', n: 24, accuracy: 50.0, selective_65_accuracy: null, selective_65_n: 0 },
+    { label: 'Masters Berlin (S3)', n: 27, accuracy: 51.9, selective_65_accuracy: null, selective_65_n: 0 },
     { label: 'Masters Reykjavík (S1)', n: 24, accuracy: 50.0, selective_65_accuracy: null, selective_65_n: 0 },
-    { label: 'Champions 2024', n: 34, accuracy: 47.1, selective_65_accuracy: 100.0, selective_65_n: 3 },
+    { label: 'Champions 2024', n: 34, accuracy: 47.1, selective_65_accuracy: 100.0, selective_65_n: 2 },
+    { label: 'Masters Copenhagen (S2)', n: 24, accuracy: 45.8, selective_65_accuracy: null, selective_65_n: 0 },
     { label: 'Masters London 2026', n: 23, accuracy: 43.5, selective_65_accuracy: 66.7, selective_65_n: 6 },
     { label: 'Masters Bangkok 2025', n: 16, accuracy: 37.5, selective_65_accuracy: 40.0, selective_65_n: 5 },
   ],
@@ -129,7 +130,7 @@ function About() {
   const atTraining =
     metrics.deployed_at_training_holdout_accuracy ??
     metrics.deployed_model_holdout_accuracy
-  const matchCount = meta?.match_count ?? metrics.match_count ?? 1379
+  const matchCount = meta?.match_count ?? metrics.match_count ?? 1391
   const teamCount = meta?.team_count ?? metrics.team_count ?? 89
   const confidenceGate = metrics.betting_confidence_gate ?? 65
   const mapPool = meta?.comp_pool_maps?.length
@@ -294,7 +295,7 @@ function About() {
             >
               Kaggle
             </a>
-            ; 2026 Stage 2 playoffs and EWC results synced from VLR.
+            ; Champions Shanghai 2026, Stage 2 playoffs, and EWC results synced from VLR.
           </p>
         </section>
 
