@@ -8,7 +8,7 @@ from flask_cors import CORS
 import pandas as pd
 
 from roster import get_team_roster
-from vct_config import ALL_STANDARD_MAPS, COMP_POOL_MAPS
+from vct_config import ALL_STANDARD_MAPS, COMP_POOL_MAPS, ELO_K_FACTOR, ELO_MARGIN_CLOSE, ELO_MARGIN_SWEEP
 
 SERVER_DIR = Path(__file__).resolve().parent
 CLIENT_DIST = SERVER_DIR.parent / "client" / "dist"
@@ -166,6 +166,11 @@ class MetaData(Resource):
             "model_metrics": metrics,
             "match_count": match_count,
             "team_count": team_count,
+            "elo": {
+                "k": ELO_K_FACTOR,
+                "margin_sweep": ELO_MARGIN_SWEEP,
+                "margin_close": ELO_MARGIN_CLOSE,
+            },
         }, 200
 
 

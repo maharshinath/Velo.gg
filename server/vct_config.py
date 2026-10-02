@@ -38,7 +38,7 @@ RECENT_PLAYER_STAT_MATCHES = 15
 RECENT_LAN_MATCHES = 5
 
 ELO_INITIAL = 1500.0
-ELO_K_FACTOR = 32.0
+ELO_K_FACTOR = 40.0
 # Scale Elo / form updates by series margin (2-0 stronger than 2-1).
 ELO_MARGIN_SWEEP = 1.25  # margin >= 2 maps
 ELO_MARGIN_CLOSE = 0.85  # margin == 1

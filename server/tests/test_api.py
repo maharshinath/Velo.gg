@@ -58,4 +58,6 @@ def test_meta(client):
     assert r.status_code == 200
     data = r.get_json()
     assert len(data["comp_pool_maps"]) == 7
+    assert "k" in data["elo"]
+    assert data["elo"]["k"] > 0
 
