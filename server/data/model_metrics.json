@@ -1,24 +1,24 @@
 {
-  "random_split_accuracy": 58.8,
-  "time_ordered_split_accuracy": 61.7,
-  "current_holdout_accuracy": 61.7,
+  "random_split_accuracy": 59.3,
+  "time_ordered_split_accuracy": 60.7,
+  "current_holdout_accuracy": 60.7,
   "deployed_at_training_holdout_accuracy": 60.9,
   "deployed_model_holdout_accuracy": 60.9,
-  "fresh_retrain_holdout_accuracy": 61.7,
+  "fresh_retrain_holdout_accuracy": 60.7,
   "vct_regional_split_accuracy": 60.2,
-  "international_split_accuracy": 64.5,
-  "international_deployed_accuracy": 57.6,
-  "international_deployed_n": 465,
-  "international_deployed_selective_65_accuracy": 65.7,
-  "international_deployed_selective_65_n": 70,
+  "international_split_accuracy": 62.8,
+  "international_deployed_accuracy": 57.4,
+  "international_deployed_n": 469,
+  "international_deployed_selective_65_accuracy": 64.8,
+  "international_deployed_selective_65_n": 71,
   "international_categories": [
     {
       "label": "Champions",
-      "n": 181,
-      "accuracy": 59.7,
-      "brier_score": 0.232,
-      "selective_65_accuracy": 78.6,
-      "selective_65_n": 28
+      "n": 185,
+      "accuracy": 58.9,
+      "brier_score": 0.234,
+      "selective_65_accuracy": 75.9,
+      "selective_65_n": 29
     },
     {
       "label": "Masters",
@@ -42,11 +42,11 @@
       "event": "Valorant Champions 2026",
       "label": "Champions 2026",
       "category": "Champions",
-      "n": 20,
-      "accuracy": 85.0,
-      "brier_score": 0.167,
-      "selective_65_accuracy": 100.0,
-      "selective_65_n": 7
+      "n": 24,
+      "accuracy": 75.0,
+      "brier_score": 0.193,
+      "selective_65_accuracy": 87.5,
+      "selective_65_n": 8
     },
     {
       "event": "Esports World Cup 2026",
@@ -199,15 +199,15 @@
       "selective_65_n": 6
     }
   ],
-  "brier_score": 0.2304,
-  "log_loss": 0.6524,
-  "walk_forward_accuracy": 60.0,
-  "selective_65_accuracy": 67.7,
-  "selective_65_coverage": 33.9,
-  "selective_65_n": 93,
+  "brier_score": 0.2331,
+  "log_loss": 0.6579,
+  "walk_forward_accuracy": 59.6,
+  "selective_65_accuracy": 66.3,
+  "selective_65_coverage": 33.5,
+  "selective_65_n": 92,
   "betting_confidence_gate": 65.0,
   "feature_count": 4,
-  "match_count": 1401,
-  "evaluated_at": "2026-10-05",
+  "match_count": 1405,
+  "evaluated_at": "2026-10-08",
   "note": "current_holdout_accuracy = deployed model on the latest 20% of matches (refreshed features). deployed_at_training_holdout_accuracy = score when the pickle was saved. selective_65_* uses the deployed model on that holdout. international_events is the shipped pickle on every series in that event."
 }

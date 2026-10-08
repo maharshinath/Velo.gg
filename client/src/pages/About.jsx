@@ -4,33 +4,33 @@ import '../css/Home.css'
 
 /** Fallback when the API is asleep — keep in sync with server/data/model_metrics.json */
 const FALLBACK_METRICS = {
-  current_holdout_accuracy: 61.7,
+  current_holdout_accuracy: 60.7,
   deployed_at_training_holdout_accuracy: 60.9,
-  time_ordered_split_accuracy: 61.7,
-  walk_forward_accuracy: 60.0,
+  time_ordered_split_accuracy: 60.7,
+  walk_forward_accuracy: 59.6,
   vct_regional_split_accuracy: 60.2,
-  international_split_accuracy: 64.5,
-  selective_65_accuracy: 67.7,
-  selective_65_coverage: 33.9,
-  selective_65_n: 93,
+  international_split_accuracy: 62.8,
+  selective_65_accuracy: 66.3,
+  selective_65_coverage: 33.5,
+  selective_65_n: 92,
   betting_confidence_gate: 65,
-  brier_score: 0.2304,
-  log_loss: 0.6524,
+  brier_score: 0.2331,
+  log_loss: 0.6579,
   feature_count: 4,
-  match_count: 1401,
+  match_count: 1405,
   team_count: 89,
-  evaluated_at: '2026-10-05',
-  international_deployed_accuracy: 57.6,
-  international_deployed_n: 465,
-  international_deployed_selective_65_accuracy: 65.7,
-  international_deployed_selective_65_n: 70,
+  evaluated_at: '2026-10-08',
+  international_deployed_accuracy: 57.4,
+  international_deployed_n: 469,
+  international_deployed_selective_65_accuracy: 64.8,
+  international_deployed_selective_65_n: 71,
   international_categories: [
-    { label: 'Champions', n: 181, accuracy: 59.7, selective_65_accuracy: 78.6, selective_65_n: 28 },
+    { label: 'Champions', n: 185, accuracy: 58.9, selective_65_accuracy: 75.9, selective_65_n: 29 },
     { label: 'Masters', n: 180, accuracy: 53.9, selective_65_accuracy: 57.1, selective_65_n: 28 },
     { label: 'Esports World Cup', n: 104, accuracy: 60.6, selective_65_accuracy: 57.1, selective_65_n: 14 },
   ],
   international_events: [
-    { label: 'Champions 2026', n: 20, accuracy: 85.0, selective_65_accuracy: 100.0, selective_65_n: 7 },
+    { label: 'Champions 2026', n: 24, accuracy: 75.0, selective_65_accuracy: 87.5, selective_65_n: 8 },
     { label: 'Esports World Cup 2026', n: 27, accuracy: 70.4, selective_65_accuracy: 83.3, selective_65_n: 6 },
     { label: 'Masters Toronto 2025', n: 24, accuracy: 66.7, selective_65_accuracy: 62.5, selective_65_n: 8 },
     { label: 'Champions 2022', n: 33, accuracy: 60.6, selective_65_accuracy: 66.7, selective_65_n: 3 },
@@ -135,7 +135,7 @@ function About() {
   const atTraining =
     metrics.deployed_at_training_holdout_accuracy ??
     metrics.deployed_model_holdout_accuracy
-  const matchCount = meta?.match_count ?? metrics.match_count ?? 1401
+  const matchCount = meta?.match_count ?? metrics.match_count ?? 1405
   const teamCount = meta?.team_count ?? metrics.team_count ?? 89
   const confidenceGate = metrics.betting_confidence_gate ?? 65
   const mapPool = meta?.comp_pool_maps?.length
@@ -300,7 +300,7 @@ function About() {
             >
               Kaggle
             </a>
-            ; Champions Shanghai 2026 group stage (20 series), Stage 2 playoffs, and EWC results synced from VLR.
+            ; Champions Shanghai 2026 (24 series through upper QFs), Stage 2 playoffs, and EWC results synced from VLR.
           </p>
         </section>
 
